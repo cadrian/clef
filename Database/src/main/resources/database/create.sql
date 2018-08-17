@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS piece (
 	id BIGINT AUTO_INCREMENT NOT NULL,
 	work_id BIGINT NOT NULL,
 	name VARCHAR(4096),
+	previous_id BIGINT,
+	duration BIGINT,
 	notes CLOB,
 	PRIMARY KEY(id)
 );
@@ -66,6 +68,14 @@ CREATE TABLE IF NOT EXISTS author (
 	name VARCHAR(4096),
 	PRIMARY KEY(id)
 );
+
+CREATE TABLE IF NOT EXISTS author_property (
+	property_id BIGINT NOT NULL,
+	author_id BIGINT NOT NULL,
+	PRIMARY KEY(property_id, author_id)
+);
+
+CREATE INDEX IF NOT EXISTS author_property_idx ON author_property (author_id); 
 
 CREATE TABLE IF NOT EXISTS pricing (
 	id BIGINT AUTO_INCREMENT NOT NULL,
