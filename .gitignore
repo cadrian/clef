@@ -1,0 +1,11 @@
+.metadata
+.recommenders
+.classpath
+.project
+.settings
+log.txt
+debian
+*.deb
+*.build
+*.buildinfo
+*.changes
