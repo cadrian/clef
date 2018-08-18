@@ -8,10 +8,17 @@
 	<packaging>pom</packaging>
 	<name>ClefRoot</name>
 
+	<modules>
+		<module>../Model</module>
+		<module>../Database</module>
+		<module>../UserInterface</module>
+		<module>../Application</module>
+	</modules>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>10</maven.compiler.source>
-		<maven.compiler.target>10</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
 	<dependencies>
@@ -32,11 +39,13 @@
 			<version>4.x</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>debian</version>
 			<scope>test</scope>
 		</dependency>
+		-->
 	</dependencies>
 </project>

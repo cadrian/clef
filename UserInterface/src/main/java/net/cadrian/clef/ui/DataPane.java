@@ -131,7 +131,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 	}
 
 	void addData() {
-		final SwingWorker<Void, T> worker = new SwingWorker<>() {
+		final SwingWorker<Void, T> worker = new SwingWorker<Void, T>() {
 
 			@Override
 			protected Void doInBackground() throws Exception {
@@ -183,7 +183,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 	}
 
 	void refreshList() {
-		final SwingWorker<Void, T> worker = new SwingWorker<>() {
+		final SwingWorker<Void, T> worker = new SwingWorker<Void, T>() {
 
 			@Override
 			protected Void doInBackground() throws Exception {
