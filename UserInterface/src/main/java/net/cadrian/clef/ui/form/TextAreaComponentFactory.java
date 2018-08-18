@@ -29,7 +29,7 @@ public class TextAreaComponentFactory implements FieldComponentFactory<String, J
 
 		@Override
 		public double getWeight() {
-			return 1;
+			return 2;
 		}
 
 	}

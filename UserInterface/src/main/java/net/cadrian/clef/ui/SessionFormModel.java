@@ -8,6 +8,7 @@ import javax.swing.JComponent;
 import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.ui.form.DateComponentFactory;
 import net.cadrian.clef.ui.form.FieldComponentFactory;
+import net.cadrian.clef.ui.form.PropertiesComponentFactory;
 import net.cadrian.clef.ui.form.TextAreaComponentFactory;
 
 class SessionFormModel extends BeanFormModel<Session> {
@@ -16,8 +17,10 @@ class SessionFormModel extends BeanFormModel<Session> {
 	static {
 		final DateComponentFactory stopFactory = new DateComponentFactory();
 		final TextAreaComponentFactory notesFactory = new TextAreaComponentFactory();
+		final PropertiesComponentFactory propertiesFactory = new PropertiesComponentFactory();
 		COMPONENT_FACTORIES.put("Stop", stopFactory);
 		COMPONENT_FACTORIES.put("Notes", notesFactory);
+		COMPONENT_FACTORIES.put("Properties", propertiesFactory);
 	}
 
 	SessionFormModel(final Class<Session> beanType) {
