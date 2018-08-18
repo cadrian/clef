@@ -75,6 +75,15 @@ public class WorkBean extends AbstractPropertyBean implements net.cadrian.clef.m
 	}
 
 	@Override
+	public void delete() {
+		try {
+			db.getWorks().delete(bean);
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+	}
+
+	@Override
 	public String toString() {
 		final String name = getName();
 		if (name == null || name.isEmpty()) {

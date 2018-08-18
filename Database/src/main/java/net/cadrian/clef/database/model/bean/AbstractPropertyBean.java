@@ -12,11 +12,10 @@ import net.cadrian.clef.model.bean.Property;
 abstract class AbstractPropertyBean extends AbstractBean implements net.cadrian.clef.model.bean.PropertyBean {
 
 	private final DatabasePropertyBean bean;
-	protected final DatabaseBeansHolder db;
 
 	AbstractPropertyBean(final DatabasePropertyBean bean, final DatabaseBeansHolder db) {
+		super(db);
 		this.bean = bean;
-		this.db = db;
 	}
 
 	@Override

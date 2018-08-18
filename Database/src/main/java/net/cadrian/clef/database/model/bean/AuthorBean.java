@@ -34,6 +34,15 @@ public class AuthorBean extends AbstractPropertyBean implements net.cadrian.clef
 	}
 
 	@Override
+	public void delete() {
+		try {
+			db.getAuthors().delete(bean);
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+	}
+
+	@Override
 	public String toString() {
 		final String name = getName();
 		if (name == null || name.isEmpty()) {

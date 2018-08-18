@@ -18,7 +18,7 @@ public class BeanForm<T extends Bean> extends JPanel {
 
 	private static final long serialVersionUID = -2371381405618937355L;
 
-	private static class FieldModel {
+	private static class FieldModel<T extends Bean> {
 		final String name;
 		final Class<?> type;
 		final Method getter;
@@ -34,10 +34,14 @@ public class BeanForm<T extends Bean> extends JPanel {
 
 			view = new JTextField(); // TODO depends on actual type
 		}
+
+		void save(final T bean) {
+			// TODO
+		}
 	}
 
 	private final T bean;
-	private Map<String, FieldModel> fields = new LinkedHashMap<>();
+	private Map<String, FieldModel<T>> fields = new LinkedHashMap<>();
 
 	public BeanForm(final T bean) {
 		super(new GridBagLayout());
@@ -47,7 +51,7 @@ public class BeanForm<T extends Bean> extends JPanel {
 		filterSettableFields(bean);
 
 		int gridy = 0;
-		for (FieldModel field : fields.values()) {
+		for (FieldModel<T> field : fields.values()) {
 			GridBagConstraints labelConstraints = new GridBagConstraints();
 			labelConstraints.gridy = gridy;
 			labelConstraints.anchor = GridBagConstraints.WEST;
@@ -73,7 +77,7 @@ public class BeanForm<T extends Bean> extends JPanel {
 			if (methodName.startsWith("get") && !methodName.equals("getId") && method.getParameterTypes().length == 0) {
 				// this is a getter
 				final String fieldName = methodName.substring(3);
-				final FieldModel tmp = new FieldModel(fieldName, method, null);
+				final FieldModel<T> tmp = new FieldModel<>(fieldName, method, null);
 				fields.put(fieldName, tmp);
 			}
 		}
@@ -85,11 +89,11 @@ public class BeanForm<T extends Bean> extends JPanel {
 			if (methodName.startsWith("set") && method.getParameterTypes().length == 1) {
 				// this is a setter
 				final String fieldName = methodName.substring(3);
-				final FieldModel tmp = fields.get(fieldName);
+				final FieldModel<T> tmp = fields.get(fieldName);
 				if (tmp != null && tmp.getter.getReturnType().equals(method.getParameterTypes()[0])) {
 					// the getter exists,
 					// and the setter argument type matches the getter return type
-					final FieldModel fd = new FieldModel(fieldName, tmp.getter, method);
+					final FieldModel<T> fd = new FieldModel<>(fieldName, tmp.getter, method);
 					fields.put(fieldName, fd);
 				}
 			}
@@ -97,12 +101,9 @@ public class BeanForm<T extends Bean> extends JPanel {
 	}
 
 	void save() {
-		// TODO Auto-generated method stub
-
+		for (FieldModel<T> field : fields.values()) {
+			field.save(bean);
+		}
 	}
 
-	void delete() {
-		// TODO Auto-generated method stub
-
-	}
 }

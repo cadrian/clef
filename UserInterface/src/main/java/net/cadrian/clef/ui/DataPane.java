@@ -21,10 +21,15 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 
 class DataPane<T extends Bean> extends JSplitPane {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DataPane.class);
 
 	private static final long serialVersionUID = -6198568152980667836L;
 
@@ -65,18 +70,25 @@ class DataPane<T extends Bean> extends JSplitPane {
 		list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(final ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
+				if (e.getValueIsAdjusting()) {
+					current.setEnabled(false);
+				} else {
 					final T selected = list.getSelectedValue();
 					current.removeAll();
 					if (selected != null) {
+						LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
 						currentForm = new BeanForm<>(selected);
 						current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
 						delAction.setEnabled(true);
+						saveAction.setEnabled(true);
 					} else {
+						LOGGER.debug("Selected nothing");
 						currentForm = null;
+						current.add(new JPanel());
 						delAction.setEnabled(false);
 						saveAction.setEnabled(false);
 					}
+					current.setEnabled(true);
 				}
 			}
 		});
@@ -147,6 +159,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 			@Override
 			protected void process(final java.util.List<T> chunks) {
 				for (final T bean : chunks) {
+					LOGGER.debug("Adding element: {}", bean);
 					model.addElement(bean);
 				}
 				list.setSelectedIndex(model.getSize() - 1);
@@ -160,7 +173,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 		if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this, messages.getString("ConfirmDeleteMessage"),
 				messages.getString("ConfirmDeleteTitle"), JOptionPane.YES_NO_OPTION)) {
 			try {
-				currentForm.delete();
+				list.getSelectedValue().delete();
 			} catch (final ModelException e) {
 				JOptionPane.showMessageDialog(DataPane.this, messages.getString("DeleteFailedMessage"),
 						messages.getString("DeleteFailedTitle"), JOptionPane.WARNING_MESSAGE);
@@ -201,11 +214,13 @@ class DataPane<T extends Bean> extends JSplitPane {
 			@Override
 			protected void process(final java.util.List<T> chunks) {
 				for (final T bean : chunks) {
+					LOGGER.debug("Adding element: {}", bean);
 					model.addElement(bean);
 				}
 			};
 		};
 
+		LOGGER.debug("Removing all elements");
 		model.removeAllElements();
 		worker.execute();
 	}

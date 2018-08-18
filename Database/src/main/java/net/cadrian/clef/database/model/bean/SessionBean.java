@@ -75,6 +75,15 @@ public class SessionBean extends AbstractPropertyBean implements net.cadrian.cle
 	}
 
 	@Override
+	public void delete() {
+		try {
+			db.getSessions().delete(bean);
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+	}
+
+	@Override
 	public String toString() {
 		final StringBuilder result = new StringBuilder();
 		if (getStart() != null) {

@@ -7,11 +7,10 @@ import net.cadrian.clef.model.ModelException;
 public class PropertyBean extends AbstractBean implements net.cadrian.clef.model.bean.Property {
 
 	private final Property bean;
-	private final DatabaseBeansHolder db;
 
 	public PropertyBean(final Property bean, final DatabaseBeansHolder db) {
+		super(db);
 		this.bean = bean;
-		this.db = db;
 	}
 
 	@Override
@@ -38,6 +37,15 @@ public class PropertyBean extends AbstractBean implements net.cadrian.clef.model
 	private void update() {
 		try {
 			db.getProperties().update(bean);
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+	}
+
+	@Override
+	public void delete() {
+		try {
+			db.getProperties().delete(bean);
 		} catch (final DatabaseException e) {
 			throw new ModelException(e);
 		}
