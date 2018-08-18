@@ -78,7 +78,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 					current.removeAll();
 					if (selected != null) {
 						LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
-						currentForm = new BeanForm<>(selected, beanFormModel);
+						currentForm = new BeanForm<>(selected, beanFormModel, messages);
 						current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
 						currentForm.load();
 						delAction.setEnabled(true);
