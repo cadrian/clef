@@ -2,7 +2,9 @@ package net.cadrian.clef;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import javax.swing.SwingUtilities;
 
@@ -17,6 +19,9 @@ import net.cadrian.clef.ui.Application;
 
 public class Clef {
 
+	private static final String PROPERTY_DB_PASSWORD = "db.password";
+	private static final String PROPEERTY_DB_USERNAME = "db.username";
+	private static final String PROPERTY_DB_PATH = "db.path";
 	private static final Logger LOGGER = LoggerFactory.getLogger(Clef.class);
 
 	public static void main(String[] args) throws DatabaseException {
@@ -48,10 +53,20 @@ public class Clef {
 	}
 
 	private static BasicDataSource createDataSource() {
+		LOGGER.debug("Loading properties");
+		final Properties properties = new Properties();
+		try {
+			properties.load(Clef.class.getResourceAsStream("/clef.properties"));
+		} catch (final IOException e) {
+			LOGGER.warn("Failed to load properties", e);
+		}
+
 		final BasicDataSource result = new BasicDataSource();
-		result.setUrl("jdbc:h2:file:./target/db"); // TODO conf
-		result.setUsername("sa");
-		result.setPassword("");
+		final String dbPath = properties.getProperty(PROPERTY_DB_PATH, "./target/db");
+		LOGGER.info("Database path: {}", dbPath);
+		result.setUrl("jdbc:h2:file:" + dbPath);
+		result.setUsername(properties.getProperty(PROPEERTY_DB_USERNAME, "sa"));
+		result.setPassword(properties.getProperty(PROPERTY_DB_PASSWORD, ""));
 		return result;
 	}
 
