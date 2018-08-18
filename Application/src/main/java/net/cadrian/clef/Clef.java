@@ -47,6 +47,7 @@ public class Clef {
 					}
 				});
 
+				app.setSize(800, 600);
 				app.setVisible(true);
 			}
 		});
