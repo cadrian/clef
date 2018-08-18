@@ -36,6 +36,8 @@ public class Clef {
 							ds.close();
 						} catch (SQLException e) {
 							LOGGER.error("Error while closing datasource", e);
+						} finally {
+							LOGGER.info("Bye!");
 						}
 					}
 				});
