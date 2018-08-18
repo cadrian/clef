@@ -24,7 +24,7 @@ public class Clef {
 	private static final String PROPERTY_DB_PATH = "db.path";
 	private static final Logger LOGGER = LoggerFactory.getLogger(Clef.class);
 
-	public static void main(String[] args) throws DatabaseException {
+	public static void main(final String[] args) throws DatabaseException {
 		final BasicDataSource ds = createDataSource();
 		final DatabaseManager manager = new DatabaseManager(ds);
 
@@ -36,10 +36,10 @@ public class Clef {
 
 				app.addWindowListener(new WindowAdapter() {
 					@Override
-					public void windowClosing(WindowEvent ev) {
+					public void windowClosing(final WindowEvent ev) {
 						try {
 							ds.close();
-						} catch (SQLException e) {
+						} catch (final SQLException e) {
 							LOGGER.error("Error while closing datasource", e);
 						} finally {
 							LOGGER.info("Bye!");

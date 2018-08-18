@@ -37,7 +37,7 @@ public class PropertiesComponentFactory implements FieldComponentFactory<Collect
 			component.setRightComponent(new JPanel());
 			list.addListSelectionListener(new ListSelectionListener() {
 				@Override
-				public void valueChanged(ListSelectionEvent e) {
+				public void valueChanged(final ListSelectionEvent e) {
 					if (!e.getValueIsAdjusting()) {
 						saveProperty();
 						loadProperty(list.getSelectedValue());
@@ -46,7 +46,7 @@ public class PropertiesComponentFactory implements FieldComponentFactory<Collect
 			});
 			component.addFocusListener(new FocusAdapter() {
 				@Override
-				public void focusLost(FocusEvent e) {
+				public void focusLost(final FocusEvent e) {
 					saveProperty();
 				}
 			});
@@ -71,7 +71,7 @@ public class PropertiesComponentFactory implements FieldComponentFactory<Collect
 
 		@Override
 		public Collection<? extends Property> getData() {
-			List<Property> result = new ArrayList<>();
+			final List<Property> result = new ArrayList<>();
 			final Enumeration<Property> elements = model.elements();
 			while (elements.hasMoreElements()) {
 				result.add(elements.nextElement());

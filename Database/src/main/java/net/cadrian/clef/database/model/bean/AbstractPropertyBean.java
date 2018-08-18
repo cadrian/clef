@@ -36,7 +36,7 @@ abstract class AbstractPropertyBean extends AbstractBean implements net.cadrian.
 	}
 
 	@Override
-	public void setProperties(Collection<? extends Property> properties) {
+	public void setProperties(final Collection<? extends Property> properties) {
 		final Set<Long> newIds = new TreeSet<>();
 		for (final Property property : properties) {
 			final Long newId = ((PropertyBean) property).getId();
