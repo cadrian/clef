@@ -43,4 +43,13 @@ public class PropertyBean extends AbstractBean implements net.cadrian.clef.model
 		}
 	}
 
+	@Override
+	public String toString() {
+		final String name = getName();
+		if (name == null || name.isEmpty()) {
+			return "(no name)";
+		}
+		return name;
+	}
+
 }

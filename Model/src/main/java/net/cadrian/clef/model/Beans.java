@@ -27,4 +27,14 @@ public interface Beans {
 
 	Collection<? extends Work> getWorksPriced(Pricing pricing);
 
+	Collection<? extends Work> getWorks();
+
+	Collection<? extends Piece> getPieces();
+
+	Collection<? extends Author> getAuthors();
+
+	Collection<? extends Pricing> getPricings();
+
+	Collection<? extends Session> getSessions();
+
 }

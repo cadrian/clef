@@ -285,6 +285,73 @@ public class ModelBeans implements Beans {
 		return result;
 	}
 
+	@Override
+	public Collection<? extends Work> getWorks() {
+		final Collection<? extends Work> result;
+		try {
+			final net.cadrian.clef.database.bean.Work template = new net.cadrian.clef.database.bean.Work();
+			final Map<Long, net.cadrian.clef.database.bean.Work> works = db.getWorks().readMany(template, true);
+			result = db.getWorks(works.keySet());
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+		return result;
+	}
+
+	@Override
+	public Collection<? extends Piece> getPieces() {
+		final Collection<? extends Piece> result;
+		try {
+			final net.cadrian.clef.database.bean.Piece template = new net.cadrian.clef.database.bean.Piece();
+			final Map<Long, net.cadrian.clef.database.bean.Piece> pieces = db.getPieces().readMany(template, true);
+			result = db.getPieces(pieces.keySet());
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+		return result;
+	}
+
+	@Override
+	public Collection<? extends Author> getAuthors() {
+		final Collection<? extends Author> result;
+		try {
+			final net.cadrian.clef.database.bean.Author template = new net.cadrian.clef.database.bean.Author();
+			final Map<Long, net.cadrian.clef.database.bean.Author> authors = db.getAuthors().readMany(template, true);
+			result = db.getAuthors(authors.keySet());
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+		return result;
+	}
+
+	@Override
+	public Collection<? extends Pricing> getPricings() {
+		final Collection<? extends Pricing> result;
+		try {
+			final net.cadrian.clef.database.bean.Pricing template = new net.cadrian.clef.database.bean.Pricing();
+			final Map<Long, net.cadrian.clef.database.bean.Pricing> pricings = db.getPricings().readMany(template,
+					true);
+			result = db.getPricings(pricings.keySet());
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+		return result;
+	}
+
+	@Override
+	public Collection<? extends Session> getSessions() {
+		final Collection<? extends Session> result;
+		try {
+			final net.cadrian.clef.database.bean.Session template = new net.cadrian.clef.database.bean.Session();
+			final Map<Long, net.cadrian.clef.database.bean.Session> sessions = db.getSessions().readMany(template,
+					true);
+			result = db.getSessions(sessions.keySet());
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+		return result;
+	}
+
 	List<AuthorBean> getAuthors(final Collection<Long> ids) {
 		final List<AuthorBean> result = new ArrayList<>();
 		for (final Long id : ids) {

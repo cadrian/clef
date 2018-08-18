@@ -1,6 +1,8 @@
 package net.cadrian.clef.database.model.bean;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import net.cadrian.clef.database.DatabaseException;
@@ -70,6 +72,17 @@ public class SessionBean extends AbstractPropertyBean implements net.cadrian.cle
 		} catch (final DatabaseException e) {
 			throw new ModelException(e);
 		}
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder result = new StringBuilder();
+		if (getStart() != null) {
+			final DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			result.append(df.format(getStart())).append(" - ");
+		}
+		result.append(getPiece().getName());
+		return result.toString();
 	}
 
 }
