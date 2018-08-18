@@ -79,6 +79,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 						LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
 						currentForm = new BeanForm<>(selected);
 						current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
+						currentForm.load();
 						delAction.setEnabled(true);
 						saveAction.setEnabled(true);
 					} else {
@@ -135,7 +136,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 		setLeftComponent(left);
 		setRightComponent(current);
 
-		refreshList();
+		refreshList(null);
 	}
 
 	private ImageIcon getIcon(final String name) {
@@ -178,7 +179,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 				JOptionPane.showMessageDialog(DataPane.this, messages.getString("DeleteFailedMessage"),
 						messages.getString("DeleteFailedTitle"), JOptionPane.WARNING_MESSAGE);
 			} finally {
-				refreshList();
+				refreshList(null);
 			}
 		}
 	}
@@ -190,12 +191,11 @@ class DataPane<T extends Bean> extends JSplitPane {
 			JOptionPane.showMessageDialog(DataPane.this, messages.getString("SaveFailedMessage"),
 					messages.getString("SaveFailedTitle"), JOptionPane.WARNING_MESSAGE);
 		} finally {
-			list.setSelectedIndex(-1); // TODO is this valid? (select nothing)
-			refreshList();
+			refreshList(list.getSelectedValue());
 		}
 	}
 
-	void refreshList() {
+	void refreshList(T selected) {
 		final SwingWorker<Void, T> worker = new SwingWorker<Void, T>() {
 
 			@Override
@@ -216,6 +216,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 				for (final T bean : chunks) {
 					LOGGER.debug("Adding element: {}", bean);
 					model.addElement(bean);
+					list.setSelectedIndex(model.getSize() - 1);
 				}
 			};
 		};

@@ -3,18 +3,23 @@ package net.cadrian.clef.ui;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.cadrian.clef.model.Bean;
 
 public class BeanForm<T extends Bean> extends JPanel {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(BeanForm.class);
 
 	private static final long serialVersionUID = -2371381405618937355L;
 
@@ -24,7 +29,7 @@ public class BeanForm<T extends Bean> extends JPanel {
 		final Method getter;
 		final Method setter;
 
-		final JComponent view;
+		final JTextField view;
 
 		FieldModel(final String name, final Method getter, final Method setter) {
 			this.name = name;
@@ -35,8 +40,29 @@ public class BeanForm<T extends Bean> extends JPanel {
 			view = new JTextField(); // TODO depends on actual type
 		}
 
+		void load(final T bean) {
+			// TODO depends on actual type
+			if (type == String.class) {
+				try {
+					view.setText((String) getter.invoke(bean));
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					LOGGER.warn("Could not get value!!", e);
+				}
+			}
+		}
+
 		void save(final T bean) {
-			// TODO
+			if (setter != null) {
+				// TODO depends on actual type
+				if (type == String.class) {
+					final String value = view.getText();
+					try {
+						setter.invoke(bean, value);
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						LOGGER.warn("Could not set value!!", e);
+					}
+				}
+			}
 		}
 	}
 
@@ -97,6 +123,12 @@ public class BeanForm<T extends Bean> extends JPanel {
 					fields.put(fieldName, fd);
 				}
 			}
+		}
+	}
+
+	void load() {
+		for (FieldModel<T> field : fields.values()) {
+			field.load(bean);
 		}
 	}
 
