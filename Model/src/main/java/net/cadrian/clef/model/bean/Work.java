@@ -16,6 +16,6 @@ public interface Work extends PropertyBean {
 
 	void setNotes(String notes);
 
-	Collection<Piece> getPieces();
+	Collection<? extends Piece> getPieces();
 
 }

@@ -4,35 +4,39 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-import net.cadrian.clef.database.DatabaseBean;
 import net.cadrian.clef.database.DatabaseException;
+import net.cadrian.clef.database.DatabasePropertyBean;
 
-abstract class AbstractPropertyBean<T extends DatabaseBean> extends AbstractBean<T> {
+abstract class AbstractPropertyBean<T extends DatabasePropertyBean> extends AbstractBean<T>
+		implements DatabasePropertyBean {
 
 	private static final List<Long> EMPTY_LIST = Arrays.asList();
 
-	private List<Long> properties = EMPTY_LIST;
+	private Collection<Long> properties = EMPTY_LIST;
 
 	AbstractPropertyBean(final Long id) {
 		super(id);
 	}
 
-	public List<Long> getProperties() {
+	@Override
+	public Collection<Long> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(final List<Long> properties) {
+	@Override
+	public void setProperties(final Collection<Long> properties) {
 		this.properties = properties == null ? EMPTY_LIST : properties;
 	}
 
 	@Override
-	public Collection<T> read(final Connection cnx) throws DatabaseException {
-		final Collection<T> result = super.read(cnx);
+	public Collection<T> read(final Connection cnx, final boolean onlyId) throws DatabaseException {
+		final Collection<T> result = super.read(cnx, onlyId);
 
 		final StringBuilder sql = new StringBuilder("SELECT property_id FROM ");
 		final String tableName = getTableName();
@@ -44,7 +48,7 @@ abstract class AbstractPropertyBean<T extends DatabaseBean> extends AbstractBean
 			for (final T bean : result) {
 				@SuppressWarnings("unchecked")
 				final AbstractPropertyBean<T> propertyBean = (AbstractPropertyBean<T>) bean;
-				final List<Long> propertyIds = new ArrayList<>();
+				final Set<Long> propertyIds = new TreeSet<>(); // force ascending ids => creation order
 				ps.setLong(1, propertyBean.getId());
 				try (ResultSet rs = ps.executeQuery()) {
 					while (rs.next()) {
@@ -65,7 +69,7 @@ abstract class AbstractPropertyBean<T extends DatabaseBean> extends AbstractBean
 
 		deleteOldProperties(result, cnx);
 
-		final List<Long> propertyIds = getProperties();
+		final Collection<Long> propertyIds = getProperties();
 		if (!propertyIds.isEmpty()) {
 			insertNewProperties(result, propertyIds, cnx);
 		}
@@ -88,7 +92,7 @@ abstract class AbstractPropertyBean<T extends DatabaseBean> extends AbstractBean
 		}
 	}
 
-	private void insertNewProperties(final Long id, final List<Long> propertyIds, final Connection cnx)
+	private void insertNewProperties(final Long id, final Collection<Long> propertyIds, final Connection cnx)
 			throws DatabaseException {
 		final String tableName = getTableName();
 		final StringBuilder sql = new StringBuilder("INSERT INTO ");

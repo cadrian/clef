@@ -1,10 +1,10 @@
 package net.cadrian.clef.model.bean;
 
-import java.util.Collection;
+import java.util.Map;
 
 public interface PropertyBean {
 
-	Collection<Property> getProperties();
+	Map<String, ? extends Property> getProperties();
 
 	Property getProperty(String propertyName);
 

@@ -69,7 +69,7 @@ public class DatabaseBeans<T extends DatabaseBean> {
 
 	private T readOne(final T template, final Connection cnx) throws DatabaseException {
 		@SuppressWarnings("unchecked")
-		final Collection<T> results = (Collection<T>) template.read(cnx);
+		final Collection<T> results = (Collection<T>) template.read(cnx, false);
 		logger.debug("{} returned {}", template, results);
 		if (results.isEmpty()) {
 			return null;
@@ -84,14 +84,15 @@ public class DatabaseBeans<T extends DatabaseBean> {
 	 * Read all beans matching the template.
 	 *
 	 * @param template
+	 * @param onlyId   if true, only get the object ids
 	 * @return the list of matching beans. Never <code>null</code>.
 	 * @throws DatabaseException
 	 */
-	public Map<Long, T> readMany(final T template) throws DatabaseException {
+	public Map<Long, T> readMany(final T template, final boolean onlyId) throws DatabaseException {
 		try (Connection cnx = dataSource.getConnection()) {
 			cnx.setAutoCommit(false);
 			@SuppressWarnings("unchecked")
-			final Collection<T> results = (Collection<T>) template.read(cnx);
+			final Collection<T> results = (Collection<T>) template.read(cnx, onlyId);
 			logger.debug("{} returned {}", template, results);
 			final Map<Long, T> result = new HashMap<>(results.size());
 			for (final DatabaseBean b : results) {

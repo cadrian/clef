@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.database.DatabaseException;
 import net.cadrian.clef.database.DatabaseManager;
-import net.cadrian.clef.database.model.DatabaseBeans;
+import net.cadrian.clef.database.model.ModelBeans;
 import net.cadrian.clef.ui.Application;
 
 public class Clef {
@@ -26,7 +26,7 @@ public class Clef {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				final Application app = new Application(new DatabaseBeans(manager));
+				final Application app = new Application(new ModelBeans(manager));
 				LOGGER.info("Starting Clef.");
 
 				app.addWindowListener(new WindowAdapter() {

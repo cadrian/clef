@@ -24,6 +24,6 @@ public interface Piece extends PropertyBean {
 
 	void setNotes(String notes);
 
-	Collection<Session> getSessions();
+	Collection<? extends Session> getSessions();
 
 }

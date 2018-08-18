@@ -21,10 +21,11 @@ public interface DatabaseBean {
 	 * Use the current object as template to find the data
 	 *
 	 * @param cnx
+	 * @param onlyId if true, the resulting objects will only have their id set.
 	 * @return a list of objects matching the template; never null
 	 * @throws DatabaseException
 	 */
-	Collection<? extends DatabaseBean> read(Connection cnx) throws DatabaseException;
+	Collection<? extends DatabaseBean> read(Connection cnx, boolean onlyId) throws DatabaseException;
 
 	/**
 	 * Insert or update

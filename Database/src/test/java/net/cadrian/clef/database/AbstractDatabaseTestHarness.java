@@ -1,4 +1,4 @@
-package net.cadrian.clef.database.bean;
+package net.cadrian.clef.database;
 
 import java.sql.SQLException;
 

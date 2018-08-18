@@ -38,14 +38,16 @@ public class ClobField<T extends DatabaseBean> extends AbstractField<T, String> 
 	public void setValue(final ResultSet rs, final T newBean) throws DatabaseException {
 		try (StringWriter w = new StringWriter()) {
 			final Clob clob = rs.getClob(getName());
-			try (Reader r = clob.getCharacterStream()) {
-				final char[] cbuf = new char[4096];
-				int n;
-				while ((n = r.read(cbuf)) >= 0) {
-					w.write(cbuf, 0, n);
+			if (clob != null) {
+				try (Reader r = clob.getCharacterStream()) {
+					final char[] cbuf = new char[4096];
+					int n;
+					while ((n = r.read(cbuf)) >= 0) {
+						w.write(cbuf, 0, n);
+					}
 				}
+				setter.set(newBean, w.toString());
 			}
-			setter.set(newBean, w.toString());
 		} catch (SQLException | IOException e) {
 			throw new DatabaseException(e);
 		}

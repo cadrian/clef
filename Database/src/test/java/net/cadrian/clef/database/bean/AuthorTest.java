@@ -1,11 +1,12 @@
 package net.cadrian.clef.database.bean;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import net.cadrian.clef.database.AbstractDatabaseTestHarness;
 import net.cadrian.clef.database.DatabaseBeans;
 import net.cadrian.clef.database.DatabaseException;
 
@@ -34,10 +35,10 @@ public class AuthorTest extends AbstractDatabaseTestHarness {
 		final Author checkAuthor = authors.readOne(authorTemplate);
 		Assert.assertNotNull(checkAuthor.getId());
 		Assert.assertEquals("POLOP", checkAuthor.getName());
-		final List<Long> authorProperties = checkAuthor.getProperties();
+		final Collection<Long> authorProperties = checkAuthor.getProperties();
 		Assert.assertEquals(1, authorProperties.size());
 
-		final Property propertyTemplate = new Property(authorProperties.get(0));
+		final Property propertyTemplate = new Property(authorProperties.iterator().next());
 		final Property checkAuthorProperty = properties.readOne(propertyTemplate);
 		Assert.assertEquals("FOO", checkAuthorProperty.getName());
 		Assert.assertEquals("BAR", checkAuthorProperty.getValue());

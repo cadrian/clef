@@ -23,8 +23,8 @@ public interface Beans {
 
 	Pricing createPricing();
 
-	Collection<Work> getWorksBy(Author author);
+	Collection<? extends Work> getWorksBy(Author author);
 
-	Collection<Work> getWorksPriced(Pricing pricing);
+	Collection<? extends Work> getWorksPriced(Pricing pricing);
 
 }

@@ -64,10 +64,15 @@ abstract class AbstractBean<T extends DatabaseBean> implements DatabaseBean {
 	}
 
 	@Override
-	public Collection<T> read(final Connection cnx) throws DatabaseException {
+	public Collection<T> read(final Connection cnx, final boolean onlyId) throws DatabaseException {
 		final List<T> result = new ArrayList<>();
 
-		final StringBuilder sql = new StringBuilder("SELECT * FROM ");
+		final StringBuilder sql = new StringBuilder();
+		if (onlyId) {
+			sql.append("SELECT id FROM ");
+		} else {
+			sql.append("SELECT * FROM ");
+		}
 		sql.append(getTableName());
 		final String readWhere = getReadWhere();
 		if (!readWhere.isEmpty()) {
@@ -81,8 +86,10 @@ abstract class AbstractBean<T extends DatabaseBean> implements DatabaseBean {
 				while (rs.next()) {
 					final Long id = rs.getLong("id");
 					final T newBean = createBean(id);
-					for (final Field<T> field : getFields()) {
-						field.setValue(rs, newBean);
+					if (!onlyId) {
+						for (final Field<T> field : getFields()) {
+							field.setValue(rs, newBean);
+						}
 					}
 					result.add(newBean);
 				}

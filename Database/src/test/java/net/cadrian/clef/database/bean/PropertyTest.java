@@ -5,6 +5,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import net.cadrian.clef.database.AbstractDatabaseTestHarness;
 import net.cadrian.clef.database.DatabaseBeans;
 import net.cadrian.clef.database.DatabaseException;
 
@@ -16,7 +17,7 @@ public class PropertyTest extends AbstractDatabaseTestHarness {
 		final Property template = new Property();
 		final int count = properties.count(template);
 		Assert.assertEquals(1, count);
-		final Map<Long, Property> propertyBeans = properties.readMany(template);
+		final Map<Long, Property> propertyBeans = properties.readMany(template, false);
 		Assert.assertEquals(1, propertyBeans.size());
 		final Property version = propertyBeans.values().iterator().next();
 		Assert.assertEquals("VERSION", version.getName());
