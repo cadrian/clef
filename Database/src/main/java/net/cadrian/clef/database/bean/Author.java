@@ -10,10 +10,12 @@ import net.cadrian.clef.database.io.StringField;
 public class Author extends AbstractPropertyBean<Author> {
 
 	private static final String TABLE_NAME = "author";
-	private static final List<Field<Author>> FIELDS = Arrays
-			.asList(new StringField<>("name", Author::getName, Author::setName, Condition.EQ));
+	private static final List<Field<Author>> FIELDS = Arrays.asList(
+			new StringField<>("name", Author::getName, Author::setName, Condition.EQ),
+			new StringField<>("notes", Author::getNotes, Author::setNotes, Condition.EQ));
 
 	private String name;
+	private String notes;
 
 	public Author() {
 		this(null);
@@ -29,6 +31,14 @@ public class Author extends AbstractPropertyBean<Author> {
 
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(final String notes) {
+		this.notes = notes;
 	}
 
 	@Override

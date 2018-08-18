@@ -1,8 +1,7 @@
 package net.cadrian.clef.database.model.bean;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -26,45 +25,25 @@ abstract class AbstractPropertyBean extends AbstractBean implements net.cadrian.
 	abstract void update();
 
 	@Override
-	public Map<String, ? extends net.cadrian.clef.model.bean.Property> getProperties() {
+	public Collection<? extends net.cadrian.clef.model.bean.Property> getProperties() {
 		final Collection<Long> ids = bean.getProperties();
 		final Collection<PropertyBean> properties = db.getProperties(ids);
-		final Map<String, PropertyBean> result = new HashMap<>();
+		final Set<PropertyBean> result = new HashSet<>();
 		for (final PropertyBean property : properties) {
-			result.put(property.getName(), property);
+			result.add(property);
 		}
 		return result;
 	}
 
 	@Override
-	public Property getProperty(final String propertyName) {
-		return getProperties().get(propertyName);
-	}
-
-	@Override
-	public void setProperty(final Property property) {
-		final Collection<Long> ids = bean.getProperties();
-		final Long newId = ((PropertyBean) property).getId();
-		if (!ids.contains(newId)) {
-			final Set<Long> newIds = new TreeSet<>(ids);
+	public void setProperties(Collection<? extends Property> properties) {
+		final Set<Long> newIds = new TreeSet<>();
+		for (final Property property : properties) {
+			final Long newId = ((PropertyBean) property).getId();
 			newIds.add(newId);
-			bean.setProperties(newIds);
-			update();
 		}
-	}
-
-	@Override
-	public Property delProperty(final String propertyName) {
-		final PropertyBean result = (PropertyBean) getProperty(propertyName);
-		final Collection<Long> ids = bean.getProperties();
-		final Long newId = result.getId();
-		if (ids.contains(newId)) {
-			final Set<Long> newIds = new TreeSet<>(ids);
-			newIds.remove(newId);
-			bean.setProperties(newIds);
-			update();
-		}
-		return result;
+		bean.setProperties(newIds);
+		update();
 	}
 
 }

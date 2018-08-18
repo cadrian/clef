@@ -6,4 +6,8 @@ public interface Author extends PropertyBean {
 
 	void setName(String name);
 
+	String getNotes();
+
+	void setNotes(String notes);
+
 }

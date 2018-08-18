@@ -34,12 +34,12 @@ class DataPane<T extends Bean> extends JSplitPane {
 	private static final long serialVersionUID = -6198568152980667836L;
 
 	@FunctionalInterface
-	public interface BeanGetter<T extends Bean> {
+	interface BeanGetter<T extends Bean> {
 		Collection<? extends T> getAllBeans();
 	}
 
 	@FunctionalInterface
-	public interface BeanCreator<T extends Bean> {
+	interface BeanCreator<T extends Bean> {
 		T createBean();
 	}
 
@@ -57,7 +57,8 @@ class DataPane<T extends Bean> extends JSplitPane {
 
 	private BeanForm<T> currentForm;
 
-	DataPane(final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final ResourceBundle messages) {
+	DataPane(final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final BeanFormModel<T> beanFormModel,
+			final ResourceBundle messages) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
 		this.beanGetter = beanGetter;
 		this.beanCreator = beanCreator;
@@ -77,7 +78,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 					current.removeAll();
 					if (selected != null) {
 						LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
-						currentForm = new BeanForm<>(selected);
+						currentForm = new BeanForm<>(selected, beanFormModel);
 						current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
 						currentForm.load();
 						delAction.setEnabled(true);
@@ -195,7 +196,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 		}
 	}
 
-	void refreshList(T selected) {
+	void refreshList(final T selected) {
 		final SwingWorker<Void, T> worker = new SwingWorker<Void, T>() {
 
 			@Override

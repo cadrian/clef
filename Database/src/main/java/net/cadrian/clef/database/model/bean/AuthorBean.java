@@ -25,6 +25,17 @@ public class AuthorBean extends AbstractPropertyBean implements net.cadrian.clef
 	}
 
 	@Override
+	public String getNotes() {
+		return bean.getNotes();
+	}
+
+	@Override
+	public void setNotes(final String notes) {
+		bean.setNotes(notes);
+		update();
+	}
+
+	@Override
 	void update() {
 		try {
 			db.getAuthors().update(bean);

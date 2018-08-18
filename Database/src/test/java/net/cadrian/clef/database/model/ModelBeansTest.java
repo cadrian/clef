@@ -1,6 +1,8 @@
 package net.cadrian.clef.database.model;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,9 +55,13 @@ public class ModelBeansTest extends AbstractDatabaseTestHarness {
 		Property copyright = beans.createProperty("COPYRIGHT");
 		copyright.setValue("This is a test, it has no rights");
 
-		lullaby.setProperty(copyright);
+		final Set<Property> propertiesToSet = new HashSet<>();
+		propertiesToSet.add(copyright);
+		lullaby.setProperties(propertiesToSet);
 
-		Assert.assertSame(copyright, lullaby.getProperty("COPYRIGHT"));
+		final Collection<? extends Property> properties = lullaby.getProperties();
+		Assert.assertEquals(1, properties.size());
+		Assert.assertSame(copyright, properties.iterator().next());
 	}
 
 }

@@ -1,17 +1,13 @@
 package net.cadrian.clef.model.bean;
 
-import java.util.Map;
+import java.util.Collection;
 
 import net.cadrian.clef.model.Bean;
 
 public interface PropertyBean extends Bean {
 
-	Map<String, ? extends Property> getProperties();
+	Collection<? extends Property> getProperties();
 
-	Property getProperty(String propertyName);
-
-	void setProperty(Property property);
-
-	Property delProperty(String propertyName);
+	void setProperties(Collection<? extends Property> properties);
 
 }
