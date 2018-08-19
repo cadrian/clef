@@ -17,13 +17,19 @@
 package net.cadrian.clef.ui;
 
 import java.awt.Font;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Resources {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Resources.class);
 
 	private final ResourceBundle messages;
 
@@ -32,7 +38,12 @@ public class Resources {
 	}
 
 	public String getMessage(final String key) {
-		return messages.getString(key);
+		try {
+			return messages.getString(key);
+		} catch (final MissingResourceException e) {
+			LOGGER.warn("Missing resource: {}", key);
+			return key;
+		}
 	}
 
 	public Icon getIcon(final String key) {
