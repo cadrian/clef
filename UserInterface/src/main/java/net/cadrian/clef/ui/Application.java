@@ -22,6 +22,7 @@ import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -65,7 +66,7 @@ public class Application extends JFrame {
 		return new Resources(messages);
 	}
 
-	private void setLookAndFeel(boolean system) {
+	private void setLookAndFeel(final boolean system) {
 		try {
 			if (system) {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -90,20 +91,20 @@ public class Application extends JFrame {
 	}
 
 	private void initComponents(final Resources rc) {
-		final JTabbedPane mainPane = new JTabbedPane(JTabbedPane.TOP);
+		final JTabbedPane mainPane = new JTabbedPane(SwingConstants.TOP);
 		getContentPane().add(mainPane);
 
-		final JTabbedPane mgtPane = new JTabbedPane(JTabbedPane.TOP);
+		final JTabbedPane mgtPane = new JTabbedPane(SwingConstants.TOP);
 
-		mainPane.addTab(rc.getMessage("Sessions"), new DataPane<>(beans::getSessions, new SessionCreator(beans, rc),
-				new SessionFormModel(Session.class), rc));
+		mainPane.addTab(rc.getMessage("Sessions"), new DataPane<>(rc, beans::getSessions, new SessionCreator(rc, beans),
+				new SessionFormModel(Session.class)));
 
 		mgtPane.addTab(rc.getMessage("Works"),
-				new DataPane<>(beans::getWorks, new WorkCreator(this, beans, rc), new WorkFormModel(Work.class), rc));
+				new DataPane<>(rc, beans::getWorks, new WorkCreator(rc, this, beans), new WorkFormModel(Work.class)));
 		mgtPane.addTab(rc.getMessage("Authors"),
-				new DataPane<>(beans::getAuthors, beans::createAuthor, new AuthorFormModel(Author.class), rc));
+				new DataPane<>(rc, beans::getAuthors, beans::createAuthor, new AuthorFormModel(Author.class)));
 		mgtPane.addTab(rc.getMessage("Pricings"),
-				new DataPane<>(beans::getPricings, beans::createPricing, new PricingFormModel(Pricing.class), rc));
+				new DataPane<>(rc, beans::getPricings, beans::createPricing, new PricingFormModel(Pricing.class)));
 		mainPane.addTab(rc.getMessage("Management"), mgtPane);
 
 		mainPane.addTab(rc.getMessage("Statistics"), new JPanel()); // TODO

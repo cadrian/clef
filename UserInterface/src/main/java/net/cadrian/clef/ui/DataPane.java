@@ -60,8 +60,8 @@ class DataPane<T extends Bean> extends JSplitPane {
 
 	private BeanForm<T> currentForm;
 
-	DataPane(final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final BeanFormModel<T> beanFormModel,
-			final Resources rc) {
+	DataPane(final Resources rc, final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator,
+			final BeanFormModel<T> beanFormModel) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
 		this.beanGetter = beanGetter;
 		this.beanCreator = beanCreator;
@@ -81,7 +81,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 					current.removeAll();
 					if (selected != null) {
 						LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
-						currentForm = new BeanForm<>(selected, beanFormModel, rc);
+						currentForm = new BeanForm<>(rc, selected, beanFormModel);
 						current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
 						currentForm.load();
 						delAction.setEnabled(true);

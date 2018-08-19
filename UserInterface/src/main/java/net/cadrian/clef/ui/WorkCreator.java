@@ -51,7 +51,7 @@ class WorkCreator implements BeanCreator<Work> {
 	private final Beans beans;
 	private final Resources rc;
 
-	public WorkCreator(final Application parent, final Beans beans, final Resources rc) {
+	public WorkCreator(final Resources rc, final Application parent, final Beans beans) {
 		this.parent = parent;
 		this.beans = beans;
 		this.rc = rc;

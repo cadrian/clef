@@ -22,11 +22,11 @@ import net.cadrian.clef.model.bean.Session;
 class SessionCreator implements BeanCreator<Session> {
 
 	private final Beans beans;
-	private final Resources messages;
+	private final Resources rc;
 
-	public SessionCreator(final Beans beans, final Resources messages) {
+	public SessionCreator(final Resources rc, final Beans beans) {
 		this.beans = beans;
-		this.messages = messages;
+		this.rc = rc;
 	}
 
 	@Override

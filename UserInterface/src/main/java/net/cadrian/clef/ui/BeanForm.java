@@ -72,7 +72,7 @@ class BeanForm<T extends Bean> extends JPanel {
 	private final T bean;
 	private final Map<String, FieldView<T, ?, ?>> fields = new LinkedHashMap<>();
 
-	public BeanForm(final T bean, final BeanFormModel<T> model, final Resources rc) {
+	public BeanForm(final Resources rc, final T bean, final BeanFormModel<T> model) {
 		super(new GridBagLayout());
 		this.bean = bean;
 
