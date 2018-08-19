@@ -19,12 +19,10 @@ package net.cadrian.clef.ui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
-import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -69,16 +67,16 @@ class DataPane<T extends Bean> extends JSplitPane {
 
 	private final BeanGetter<T> beanGetter;
 	private final BeanCreator<T> beanCreator;
-	private final ResourceBundle messages;
+	private final Resources rc;
 
 	private BeanForm<T> currentForm;
 
 	DataPane(final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final BeanFormModel<T> beanFormModel,
-			final ResourceBundle messages) {
+			final Resources rc) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
 		this.beanGetter = beanGetter;
 		this.beanCreator = beanCreator;
-		this.messages = messages;
+		this.rc = rc;
 
 		final JPanel left = new JPanel(new BorderLayout());
 
@@ -94,7 +92,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 					current.removeAll();
 					if (selected != null) {
 						LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
-						currentForm = new BeanForm<>(selected, beanFormModel, messages);
+						currentForm = new BeanForm<>(selected, beanFormModel, rc);
 						current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
 						currentForm.load();
 						delAction.setEnabled(true);
@@ -111,11 +109,11 @@ class DataPane<T extends Bean> extends JSplitPane {
 			}
 		});
 
-		final JToolBar buttons = new JToolBar(SwingConstants.CENTER);
+		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 		buttons.setFloatable(false);
 		left.add(buttons, BorderLayout.PAGE_END);
 
-		addAction = new AbstractAction(messages.getString("Add"), getIcon("Add")) {
+		addAction = new AbstractAction(rc.getMessage("Add"), rc.getIcon("Add")) {
 			private static final long serialVersionUID = -5722810007033837355L;
 
 			@Override
@@ -124,7 +122,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 			}
 		};
 
-		delAction = new AbstractAction(messages.getString("Del"), getIcon("Del")) {
+		delAction = new AbstractAction(rc.getMessage("Del"), rc.getIcon("Del")) {
 			private static final long serialVersionUID = -8206872556606892261L;
 
 			@Override
@@ -133,7 +131,7 @@ class DataPane<T extends Bean> extends JSplitPane {
 			}
 		};
 
-		saveAction = new AbstractAction(messages.getString("Save"), getIcon("Save")) {
+		saveAction = new AbstractAction(rc.getMessage("Save"), rc.getIcon("Save")) {
 			private static final long serialVersionUID = -8659808353683696964L;
 
 			@Override
@@ -156,10 +154,6 @@ class DataPane<T extends Bean> extends JSplitPane {
 		refreshList(null);
 	}
 
-	private ImageIcon getIcon(final String name) {
-		return new ImageIcon(DataPane.class.getResource("/icons/" + name + ".png"));
-	}
-
 	void addData() {
 		final SwingWorker<Void, T> worker = new SwingWorker<Void, T>() {
 
@@ -168,8 +162,8 @@ class DataPane<T extends Bean> extends JSplitPane {
 				try {
 					publish(beanCreator.createBean());
 				} catch (final ModelException e) {
-					JOptionPane.showMessageDialog(DataPane.this, messages.getString("CreateFailedMessage"),
-							messages.getString("CreateFailedTitle"), JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(DataPane.this, rc.getMessage("CreateFailedMessage"),
+							rc.getMessage("CreateFailedTitle"), JOptionPane.WARNING_MESSAGE);
 				}
 				return null;
 			}
@@ -188,13 +182,13 @@ class DataPane<T extends Bean> extends JSplitPane {
 	}
 
 	void delData() {
-		if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this, messages.getString("ConfirmDeleteMessage"),
-				messages.getString("ConfirmDeleteTitle"), JOptionPane.YES_NO_OPTION)) {
+		if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this, rc.getMessage("ConfirmDeleteMessage"),
+				rc.getMessage("ConfirmDeleteTitle"), JOptionPane.YES_NO_OPTION)) {
 			try {
 				list.getSelectedValue().delete();
 			} catch (final ModelException e) {
-				JOptionPane.showMessageDialog(DataPane.this, messages.getString("DeleteFailedMessage"),
-						messages.getString("DeleteFailedTitle"), JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(DataPane.this, rc.getMessage("DeleteFailedMessage"),
+						rc.getMessage("DeleteFailedTitle"), JOptionPane.WARNING_MESSAGE);
 			} finally {
 				refreshList(null);
 			}
@@ -205,8 +199,8 @@ class DataPane<T extends Bean> extends JSplitPane {
 		try {
 			currentForm.save();
 		} catch (final ModelException e) {
-			JOptionPane.showMessageDialog(DataPane.this, messages.getString("SaveFailedMessage"),
-					messages.getString("SaveFailedTitle"), JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(DataPane.this, rc.getMessage("SaveFailedMessage"),
+					rc.getMessage("SaveFailedTitle"), JOptionPane.WARNING_MESSAGE);
 		} finally {
 			refreshList(list.getSelectedValue());
 		}
@@ -222,8 +216,8 @@ class DataPane<T extends Bean> extends JSplitPane {
 						publish(bean);
 					}
 				} catch (final ModelException e) {
-					JOptionPane.showMessageDialog(DataPane.this, messages.getString("RefreshFailedMessage"),
-							messages.getString("RefreshFailedTitle"), JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(DataPane.this, rc.getMessage("RefreshFailedMessage"),
+							rc.getMessage("RefreshFailedTitle"), JOptionPane.WARNING_MESSAGE);
 				}
 				return null;
 			}

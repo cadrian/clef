@@ -16,17 +16,15 @@
  */
 package net.cadrian.clef.ui;
 
-import java.util.ResourceBundle;
-
 import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Session;
 
 class SessionCreator implements DataPane.BeanCreator<Session> {
 
 	private final Beans beans;
-	private final ResourceBundle messages;
+	private final Resources messages;
 
-	public SessionCreator(final Beans beans, final ResourceBundle messages) {
+	public SessionCreator(final Beans beans, final Resources messages) {
 		this.beans = beans;
 		this.messages = messages;
 	}

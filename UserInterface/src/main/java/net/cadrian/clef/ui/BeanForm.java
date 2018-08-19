@@ -23,7 +23,6 @@ import java.awt.Insets;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -73,7 +72,7 @@ class BeanForm<T extends Bean> extends JPanel {
 	private final T bean;
 	private final Map<String, FieldView<T, ?, ?>> fields = new LinkedHashMap<>();
 
-	public BeanForm(final T bean, final BeanFormModel<T> model, final ResourceBundle messages) {
+	public BeanForm(final T bean, final BeanFormModel<T> model, final Resources rc) {
 		super(new GridBagLayout());
 		this.bean = bean;
 
@@ -90,7 +89,7 @@ class BeanForm<T extends Bean> extends JPanel {
 			labelConstraints.gridy = gridy;
 			labelConstraints.anchor = GridBagConstraints.NORTHWEST;
 			labelConstraints.insets = new Insets(8, 2, 2, 2);
-			final String label = messages.getString("Field." + fieldView.model.name);
+			final String label = rc.getMessage("Field." + fieldView.model.name);
 			LOGGER.debug("Label for {} is {}", fieldView.model.name, label);
 			final JLabel jLabel = new JLabel(label);
 			final Font font = jLabel.getFont();

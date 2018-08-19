@@ -49,20 +49,20 @@ public class Application extends JFrame {
 	}
 
 	private void initUI() {
-		final ResourceBundle messages = getMessages();
+		final Resources rc = getResources();
 		setLookAndFeel(false);
-		setTitle(messages.getString("ClefTitle"));
+		setTitle(rc.getMessage("ClefTitle"));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		initComponents(messages);
+		initComponents(rc);
 		pack();
 	}
 
-	private ResourceBundle getMessages() {
+	private Resources getResources() {
 		final Locale locale = Locale.getDefault();
 		LOGGER.info("Current locale: {}", locale);
 		final ResourceBundle messages = ResourceBundle.getBundle("Clef");
-		return messages;
+		return new Resources(messages);
 	}
 
 	private void setLookAndFeel(boolean system) {
@@ -89,24 +89,24 @@ public class Application extends JFrame {
 		}
 	}
 
-	private void initComponents(final ResourceBundle messages) {
+	private void initComponents(final Resources rc) {
 		final JTabbedPane mainPane = new JTabbedPane(JTabbedPane.TOP);
 		getContentPane().add(mainPane);
 
 		final JTabbedPane mgtPane = new JTabbedPane(JTabbedPane.TOP);
 
-		mainPane.addTab(messages.getString("Sessions"), new DataPane<>(beans::getSessions,
-				new SessionCreator(beans, messages), new SessionFormModel(Session.class), messages));
+		mainPane.addTab(rc.getMessage("Sessions"), new DataPane<>(beans::getSessions, new SessionCreator(beans, rc),
+				new SessionFormModel(Session.class), rc));
 
-		mgtPane.addTab(messages.getString("Works"), new DataPane<>(beans::getWorks, new WorkCreator(beans, messages),
-				new WorkFormModel(Work.class), messages));
-		mgtPane.addTab(messages.getString("Authors"),
-				new DataPane<>(beans::getAuthors, beans::createAuthor, new AuthorFormModel(Author.class), messages));
-		mgtPane.addTab(messages.getString("Pricings"), new DataPane<>(beans::getPricings, beans::createPricing,
-				new PricingFormModel(Pricing.class), messages));
-		mainPane.addTab(messages.getString("Management"), mgtPane);
+		mgtPane.addTab(rc.getMessage("Works"),
+				new DataPane<>(beans::getWorks, new WorkCreator(this, beans, rc), new WorkFormModel(Work.class), rc));
+		mgtPane.addTab(rc.getMessage("Authors"),
+				new DataPane<>(beans::getAuthors, beans::createAuthor, new AuthorFormModel(Author.class), rc));
+		mgtPane.addTab(rc.getMessage("Pricings"),
+				new DataPane<>(beans::getPricings, beans::createPricing, new PricingFormModel(Pricing.class), rc));
+		mainPane.addTab(rc.getMessage("Management"), mgtPane);
 
-		mainPane.addTab(messages.getString("Statistics"), new JPanel()); // TODO
+		mainPane.addTab(rc.getMessage("Statistics"), new JPanel()); // TODO
 	}
 
 }
