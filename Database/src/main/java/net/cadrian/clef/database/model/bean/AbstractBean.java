@@ -28,4 +28,15 @@ abstract class AbstractBean implements Bean {
 		this.db = db;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		return getId().equals(((AbstractBean) obj).getId());
+	}
+
 }

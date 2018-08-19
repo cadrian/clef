@@ -88,6 +88,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 			@Override
 			public void valueChanged(final ListSelectionEvent e) {
 				if (e.getValueIsAdjusting()) {
+					LOGGER.debug("value still adjusting");
 					current.setEnabled(false);
 				} else {
 					final T selected = list.getSelectedValue();
@@ -108,6 +109,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 						saveAction.setEnabled(false);
 					}
 					current.setEnabled(true);
+					current.revalidate();
 				}
 			}
 		});
@@ -196,8 +198,13 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 					LOGGER.debug("Adding element: {}", bean);
 					model.addElement(bean);
 				}
-				list.setSelectedIndex(model.getSize() - 1);
 			};
+
+			@Override
+			protected void done() {
+				LOGGER.debug("Selecting last element");
+				list.setSelectedIndex(model.getSize() - 1);
+			}
 		};
 
 		worker.execute();
@@ -230,6 +237,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 
 	void refreshList(final T selected) {
 		final SwingWorker<Void, T> worker = new SwingWorker<Void, T>() {
+			private int selectedIndex = -1;
 
 			@Override
 			protected Void doInBackground() throws Exception {
@@ -247,11 +255,19 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 			@Override
 			protected void process(final java.util.List<T> chunks) {
 				for (final T bean : chunks) {
-					LOGGER.debug("Adding element: {}", bean);
+					LOGGER.debug("Adding element: {} (selected is {})", bean, selected);
+					if (bean.equals(selected)) {
+						selectedIndex = model.getSize();
+					}
 					model.addElement(bean);
-					list.setSelectedIndex(model.getSize() - 1);
 				}
 			};
+
+			@Override
+			protected void done() {
+				LOGGER.debug("Selecting element #{}", selectedIndex);
+				list.setSelectedIndex(selectedIndex);
+			}
 		};
 
 		LOGGER.debug("Removing all elements");
