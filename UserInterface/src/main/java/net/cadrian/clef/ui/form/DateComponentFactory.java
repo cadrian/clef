@@ -25,7 +25,7 @@ import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
-public class DateComponentFactory implements FieldComponentFactory<Date, JButton> {
+public class DateComponentFactory extends AbstractFieldComponentFactory<Date, JButton> {
 
 	private static class DateComponent implements FieldComponent<Date, JButton> {
 
@@ -33,16 +33,20 @@ public class DateComponentFactory implements FieldComponentFactory<Date, JButton
 		private Date date;
 		private final DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-		DateComponent() {
+		DateComponent(final boolean writable) {
 			component = new JButton("***/***");
-			component.addActionListener(new ActionListener() {
+			if (writable) {
+				component.addActionListener(new ActionListener() {
 
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					date = new Date();
-					component.setText(df.format(date));
-				}
-			});
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						date = new Date();
+						component.setText(df.format(date));
+					}
+				});
+			} else {
+				component.setEnabled(false);
+			}
 		}
 
 		@Override
@@ -74,9 +78,13 @@ public class DateComponentFactory implements FieldComponentFactory<Date, JButton
 
 	}
 
+	public DateComponentFactory(final boolean writable) {
+		super(writable);
+	}
+
 	@Override
 	public FieldComponent<Date, JButton> createComponent() {
-		return new DateComponent();
+		return new DateComponent(writable);
 	}
 
 	@Override

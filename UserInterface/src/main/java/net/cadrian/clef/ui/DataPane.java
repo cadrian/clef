@@ -18,7 +18,6 @@ package net.cadrian.clef.ui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.util.Collection;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -46,16 +45,6 @@ class DataPane<T extends Bean> extends JSplitPane {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DataPane.class);
 
 	private static final long serialVersionUID = -6198568152980667836L;
-
-	@FunctionalInterface
-	interface BeanGetter<T extends Bean> {
-		Collection<? extends T> getAllBeans();
-	}
-
-	@FunctionalInterface
-	interface BeanCreator<T extends Bean> {
-		T createBean();
-	}
 
 	private final DefaultListModel<T> model = new DefaultListModel<>();
 	private final JList<T> list = new JList<>(model);

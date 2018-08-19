@@ -35,18 +35,21 @@ import javax.swing.event.ListSelectionListener;
 
 import net.cadrian.clef.model.bean.Property;
 
-public class PropertiesComponentFactory implements FieldComponentFactory<Collection<? extends Property>, JSplitPane> {
+public class PropertiesComponentFactory
+		extends AbstractFieldComponentFactory<Collection<? extends Property>, JSplitPane> {
 
 	private static class PropertiesComponent implements FieldComponent<Collection<? extends Property>, JSplitPane> {
 
 		private final JSplitPane component;
 		private final DefaultListModel<Property> model = new DefaultListModel<>();
 		private final JList<Property> list;
+		private final boolean writable;
 
 		private Property current;
 		private JTextArea content;
 
-		PropertiesComponent() {
+		PropertiesComponent(final boolean writable) {
+			this.writable = writable;
 			component = new JSplitPane();
 			list = new JList<>(model);
 			component.setLeftComponent(new JScrollPane(list));
@@ -60,16 +63,10 @@ public class PropertiesComponentFactory implements FieldComponentFactory<Collect
 					}
 				}
 			});
-			component.addFocusListener(new FocusAdapter() {
-				@Override
-				public void focusLost(final FocusEvent e) {
-					saveProperty();
-				}
-			});
 		}
 
 		void saveProperty() {
-			if (current != null && content != null) {
+			if (writable && current != null && content != null) {
 				current.setValue(content.getText());
 			}
 		}
@@ -77,12 +74,16 @@ public class PropertiesComponentFactory implements FieldComponentFactory<Collect
 		void loadProperty(final Property selected) {
 			current = selected;
 			content = new JTextArea(selected.getValue());
-			content.addFocusListener(new FocusAdapter() {
-				@Override
-				public void focusLost(final FocusEvent e) {
-					saveProperty();
-				}
-			});
+			if (writable) {
+				content.addFocusListener(new FocusAdapter() {
+					@Override
+					public void focusLost(final FocusEvent e) {
+						saveProperty();
+					}
+				});
+			} else {
+				content.setEditable(false);
+			}
 			component.setRightComponent(content);
 		}
 
@@ -121,9 +122,13 @@ public class PropertiesComponentFactory implements FieldComponentFactory<Collect
 
 	}
 
+	public PropertiesComponentFactory(final boolean writable) {
+		super(writable);
+	}
+
 	@Override
 	public FieldComponent<Collection<? extends Property>, JSplitPane> createComponent() {
-		return new PropertiesComponent();
+		return new PropertiesComponent(writable);
 	}
 
 	@Override

@@ -22,4 +22,6 @@ public interface FieldComponentFactory<D, J extends JComponent> {
 	FieldComponent<D, J> createComponent();
 
 	Class<?> getDataType();
+
+	boolean isWritable();
 }

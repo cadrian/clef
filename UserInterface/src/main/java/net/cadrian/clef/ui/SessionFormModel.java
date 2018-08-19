@@ -31,9 +31,9 @@ class SessionFormModel extends BeanFormModel<Session> {
 
 	private static final Map<String, FieldComponentFactory<?, ? extends JComponent>> COMPONENT_FACTORIES = new LinkedHashMap<>();
 	static {
-		final DateComponentFactory stopFactory = new DateComponentFactory();
-		final TextAreaComponentFactory notesFactory = new TextAreaComponentFactory();
-		final PropertiesComponentFactory propertiesFactory = new PropertiesComponentFactory();
+		final DateComponentFactory stopFactory = new DateComponentFactory(true);
+		final TextAreaComponentFactory notesFactory = new TextAreaComponentFactory(true);
+		final PropertiesComponentFactory propertiesFactory = new PropertiesComponentFactory(true);
 		COMPONENT_FACTORIES.put("Stop", stopFactory);
 		COMPONENT_FACTORIES.put("Notes", notesFactory);
 		COMPONENT_FACTORIES.put("Properties", propertiesFactory);

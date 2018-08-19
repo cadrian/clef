@@ -68,9 +68,15 @@ abstract class BeanFormModel<T extends Bean> {
 				final Class<?> dataType = componentFactory.getDataType();
 				final Method getter = beanType.getMethod("get" + fieldName);
 				if (!getter.getReturnType().equals(dataType)) {
-					LOGGER.error("BUG: invalid field definition for {}", fieldName);
+					LOGGER.error("BUG: invalid field model for {}", fieldName);
 				} else {
-					final Method setter = beanType.getMethod("set" + fieldName, dataType);
+					final Method setter;
+					if (componentFactory.isWritable()) {
+						setter = beanType.getMethod("set" + fieldName, dataType);
+					} else {
+						setter = null;
+					}
+					LOGGER.info("Adding field model for {}", fieldName);
 					final FieldModel<T, ?, ?> model = new FieldModel<>(fieldName, getter, setter, componentFactory);
 					fields.put(fieldName, model);
 				}

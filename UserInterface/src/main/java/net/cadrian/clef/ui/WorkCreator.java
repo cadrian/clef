@@ -43,7 +43,7 @@ import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.Work;
 
-class WorkCreator implements DataPane.BeanCreator<Work> {
+class WorkCreator implements BeanCreator<Work> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkCreator.class);
 

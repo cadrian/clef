@@ -20,14 +20,15 @@ import java.text.NumberFormat;
 
 import javax.swing.JFormattedTextField;
 
-public class NumericFieldComponentFactory implements FieldComponentFactory<Long, JFormattedTextField> {
+public class NumericFieldComponentFactory extends AbstractFieldComponentFactory<Long, JFormattedTextField> {
 
 	private static class NumericFieldComponent implements FieldComponent<Long, JFormattedTextField> {
 
 		private final JFormattedTextField component;
 
-		NumericFieldComponent() {
+		NumericFieldComponent(final boolean writable) {
 			component = new JFormattedTextField(NumberFormat.getIntegerInstance());
+			component.setEditable(writable);
 		}
 
 		@Override
@@ -56,9 +57,13 @@ public class NumericFieldComponentFactory implements FieldComponentFactory<Long,
 
 	}
 
+	public NumericFieldComponentFactory(final boolean writable) {
+		super(writable);
+	}
+
 	@Override
 	public FieldComponent<Long, JFormattedTextField> createComponent() {
-		return new NumericFieldComponent();
+		return new NumericFieldComponent(writable);
 	}
 
 	@Override

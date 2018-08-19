@@ -30,8 +30,8 @@ class PricingFormModel extends BeanFormModel<Pricing> {
 
 	private static final Map<String, FieldComponentFactory<?, ? extends JComponent>> COMPONENT_FACTORIES = new LinkedHashMap<>();
 	static {
-		final TextFieldComponentFactory nameFactory = new TextFieldComponentFactory();
-		final TextAreaComponentFactory notesFactory = new TextAreaComponentFactory();
+		final TextFieldComponentFactory nameFactory = new TextFieldComponentFactory(true);
+		final TextAreaComponentFactory notesFactory = new TextAreaComponentFactory(true);
 		COMPONENT_FACTORIES.put("Name", nameFactory);
 		COMPONENT_FACTORIES.put("Notes", notesFactory);
 	}

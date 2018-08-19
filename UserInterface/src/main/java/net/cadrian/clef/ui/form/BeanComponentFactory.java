@@ -18,13 +18,15 @@ package net.cadrian.clef.ui.form;
 
 import javax.swing.JTextField;
 
-public class TextFieldComponentFactory extends AbstractFieldComponentFactory<String, JTextField> {
+import net.cadrian.clef.model.Bean;
 
-	private static class TextFieldComponent implements FieldComponent<String, JTextField> {
+public class BeanComponentFactory<T extends Bean> extends AbstractFieldComponentFactory<T, JTextField> {
+
+	private static class BeanComponent<T extends Bean> implements FieldComponent<T, JTextField> {
 
 		private final JTextField component;
 
-		TextFieldComponent(final boolean writable) {
+		BeanComponent(final boolean writable) {
 			component = new JTextField();
 			component.setEditable(writable);
 		}
@@ -35,13 +37,13 @@ public class TextFieldComponentFactory extends AbstractFieldComponentFactory<Str
 		}
 
 		@Override
-		public String getData() {
-			return component.getText();
+		public T getData() {
+			return null; // TODO
 		}
 
 		@Override
-		public void setData(final String data) {
-			component.setText(data);
+		public void setData(final T data) {
+			component.setText(data.toString());
 		}
 
 		@Override
@@ -51,18 +53,21 @@ public class TextFieldComponentFactory extends AbstractFieldComponentFactory<Str
 
 	}
 
-	public TextFieldComponentFactory(final boolean writable) {
-		super(writable);
+	private final Class<T> beanType;
+
+	public BeanComponentFactory(final Class<T> beanType) {
+		super(false);
+		this.beanType = beanType;
 	}
 
 	@Override
-	public FieldComponent<String, JTextField> createComponent() {
-		return new TextFieldComponent(writable);
+	public FieldComponent<T, JTextField> createComponent() {
+		return new BeanComponent<>(writable);
 	}
 
 	@Override
-	public Class<String> getDataType() {
-		return String.class;
+	public Class<T> getDataType() {
+		return beanType;
 	}
 
 }

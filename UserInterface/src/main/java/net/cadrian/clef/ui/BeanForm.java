@@ -77,10 +77,8 @@ class BeanForm<T extends Bean> extends JPanel {
 		this.bean = bean;
 
 		for (final FieldModel<T, ?, ?> fieldModel : model.getFields().values()) {
-			if (fieldModel.setter != null) {
-				final FieldView<T, ?, ?> fieldView = getFieldView(fieldModel);
-				fields.put(fieldView.model.name, fieldView);
-			}
+			final FieldView<T, ?, ?> fieldView = getFieldView(fieldModel);
+			fields.put(fieldView.model.name, fieldView);
 		}
 
 		int gridy = 0;

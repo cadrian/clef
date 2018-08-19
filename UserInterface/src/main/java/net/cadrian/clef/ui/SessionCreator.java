@@ -19,7 +19,7 @@ package net.cadrian.clef.ui;
 import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Session;
 
-class SessionCreator implements DataPane.BeanCreator<Session> {
+class SessionCreator implements BeanCreator<Session> {
 
 	private final Beans beans;
 	private final Resources messages;
