@@ -75,17 +75,21 @@ public class Application extends JFrame {
 		LOGGER.info("Current locale: {}", locale);
 		final ResourceBundle messages = ResourceBundle.getBundle("Clef");
 
-		final JTabbedPane mainPane = new JTabbedPane();
+		final JTabbedPane mainPane = new JTabbedPane(JTabbedPane.TOP);
 		getContentPane().add(mainPane);
+
+		final JTabbedPane mgtPane = new JTabbedPane(JTabbedPane.TOP);
 
 		mainPane.addTab(messages.getString("Sessions"), new DataPane<>(beans::getSessions,
 				new SessionCreator(beans, messages), new SessionFormModel(Session.class), messages));
-		mainPane.addTab(messages.getString("Works"), new DataPane<>(beans::getWorks, new WorkCreator(beans, messages),
+
+		mgtPane.addTab(messages.getString("Works"), new DataPane<>(beans::getWorks, new WorkCreator(beans, messages),
 				new WorkFormModel(Work.class), messages));
-		mainPane.addTab(messages.getString("Authors"),
+		mgtPane.addTab(messages.getString("Authors"),
 				new DataPane<>(beans::getAuthors, beans::createAuthor, new AuthorFormModel(Author.class), messages));
-		mainPane.addTab(messages.getString("Pricings"), new DataPane<>(beans::getPricings, beans::createPricing,
+		mgtPane.addTab(messages.getString("Pricings"), new DataPane<>(beans::getPricings, beans::createPricing,
 				new PricingFormModel(Pricing.class), messages));
+		mainPane.addTab(messages.getString("Management"), mgtPane);
 
 		mainPane.addTab(messages.getString("Statistics"), new JPanel()); // TODO
 	}
