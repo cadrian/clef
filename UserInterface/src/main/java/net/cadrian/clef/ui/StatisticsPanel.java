@@ -125,8 +125,8 @@ class StatisticsPanel extends JPanel {
 			tw += twp;
 		}
 
-		long mw = tw / nw;
-		long mp = tp / np;
+		long mw = nw == 0 ? 0 : tw / nw;
+		long mp = np == 0 ? 0 : tp / np;
 
 		long sw = 0;
 		long sp = 0;
