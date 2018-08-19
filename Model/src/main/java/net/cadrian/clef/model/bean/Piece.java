@@ -26,15 +26,15 @@ public interface Piece extends PropertyBean {
 
 	void setName(String name);
 
-	int getVersion();
+	Long getVersion();
 
 	Piece getPrevious();
 
 	void setPrevious(Piece piece);
 
-	long getDuration();
+	Long getDuration();
 
-	void setDuration(long duration);
+	void setDuration(Long duration);
 
 	String getNotes();
 

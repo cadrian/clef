@@ -43,7 +43,7 @@ public class NumericFieldComponentFactory<C> extends AbstractFieldComponentFacto
 			try {
 				return Long.parseLong(component.getText());
 			} catch (final NumberFormatException e) {
-				return 0L;
+				return null;
 			}
 		}
 

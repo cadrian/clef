@@ -49,7 +49,13 @@ class BeanForm<T extends Bean, C> extends JPanel {
 		final FieldComponent<D, J> component;
 
 		FieldView(final BeanFormModel.FieldModel<T, D, J, C> model, final FieldComponent<D, J> component) {
+			if (model == null) {
+				throw new NullPointerException("null model");
+			}
 			this.model = model;
+			if (component == null) {
+				throw new NullPointerException("null component");
+			}
 			this.component = component;
 		}
 
@@ -65,7 +71,11 @@ class BeanForm<T extends Bean, C> extends JPanel {
 
 		void save(final T bean) {
 			try {
-				model.setter.invoke(bean, component.getData());
+				if (model.setter == null) {
+					LOGGER.info("no setter for {}", model.name);
+				} else {
+					model.setter.invoke(bean, component.getData());
+				}
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				LOGGER.error("BUG: could not save value", e);
 			}
@@ -78,6 +88,9 @@ class BeanForm<T extends Bean, C> extends JPanel {
 	public BeanForm(final Resources rc, final C context, final T bean, final BeanFormModel<T, C> model,
 			final List<String> tabs) {
 		super(new BorderLayout());
+		if (bean == null) {
+			throw new NullPointerException("null bean");
+		}
 		this.bean = bean;
 
 		for (final FieldModel<T, ?, ?, C> fieldModel : model.getFields().values()) {

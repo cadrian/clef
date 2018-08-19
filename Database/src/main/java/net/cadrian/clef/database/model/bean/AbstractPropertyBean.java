@@ -30,6 +30,9 @@ abstract class AbstractPropertyBean extends AbstractBean implements net.cadrian.
 
 	AbstractPropertyBean(final DatabasePropertyBean bean, final DatabaseBeansHolder db) {
 		super(db);
+		if (bean == null) {
+			throw new NullPointerException("null bean");
+		}
 		this.bean = bean;
 	}
 

@@ -17,6 +17,7 @@
 package net.cadrian.clef.database.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -375,7 +376,11 @@ public class ModelBeans implements Beans {
 			if (author == null) {
 				final net.cadrian.clef.database.bean.Author template = new net.cadrian.clef.database.bean.Author(id);
 				try {
-					author = new AuthorBean(authorsDatabase.readOne(template), db);
+					final net.cadrian.clef.database.bean.Author bean = authorsDatabase.readOne(template);
+					if (bean == null) {
+						return Arrays.asList((AuthorBean) null);
+					}
+					author = new AuthorBean(bean, db);
 				} catch (final DatabaseException e) {
 					throw new ModelException(e);
 				}
@@ -392,7 +397,11 @@ public class ModelBeans implements Beans {
 			if (session == null) {
 				final net.cadrian.clef.database.bean.Session template = new net.cadrian.clef.database.bean.Session(id);
 				try {
-					session = new SessionBean(sessionsDatabase.readOne(template), db);
+					net.cadrian.clef.database.bean.Session bean = sessionsDatabase.readOne(template);
+					if (bean == null) {
+						return Arrays.asList((SessionBean) null);
+					}
+					session = new SessionBean(bean, db);
 				} catch (final DatabaseException e) {
 					throw new ModelException(e);
 				}
@@ -409,7 +418,11 @@ public class ModelBeans implements Beans {
 			if (piece == null) {
 				final net.cadrian.clef.database.bean.Piece template = new net.cadrian.clef.database.bean.Piece(id);
 				try {
-					piece = new PieceBean(piecesDatabase.readOne(template), db);
+					final net.cadrian.clef.database.bean.Piece bean = piecesDatabase.readOne(template);
+					if (bean == null) {
+						return Arrays.asList((PieceBean) null);
+					}
+					piece = new PieceBean(bean, db);
 				} catch (final DatabaseException e) {
 					throw new ModelException(e);
 				}
@@ -426,7 +439,11 @@ public class ModelBeans implements Beans {
 			if (work == null) {
 				final net.cadrian.clef.database.bean.Work template = new net.cadrian.clef.database.bean.Work(id);
 				try {
-					work = new WorkBean(worksDatabase.readOne(template), db);
+					final net.cadrian.clef.database.bean.Work bean = worksDatabase.readOne(template);
+					if (bean == null) {
+						return Arrays.asList((WorkBean) null);
+					}
+					work = new WorkBean(bean, db);
 				} catch (final DatabaseException e) {
 					throw new ModelException(e);
 				}
@@ -443,7 +460,11 @@ public class ModelBeans implements Beans {
 			if (pricing == null) {
 				final net.cadrian.clef.database.bean.Pricing template = new net.cadrian.clef.database.bean.Pricing(id);
 				try {
-					pricing = new PricingBean(pricingsDatabase.readOne(template), db);
+					final net.cadrian.clef.database.bean.Pricing bean = pricingsDatabase.readOne(template);
+					if (bean == null) {
+						return Arrays.asList((PricingBean) null);
+					}
+					pricing = new PricingBean(bean, db);
 				} catch (final DatabaseException e) {
 					throw new ModelException(e);
 				}
@@ -461,7 +482,11 @@ public class ModelBeans implements Beans {
 				final net.cadrian.clef.database.bean.Property template = new net.cadrian.clef.database.bean.Property(
 						id);
 				try {
-					property = new PropertyBean(propertiesDatabase.readOne(template), db);
+					final net.cadrian.clef.database.bean.Property bean = propertiesDatabase.readOne(template);
+					if (bean == null) {
+						return null;
+					}
+					property = new PropertyBean(bean, db);
 				} catch (final DatabaseException e) {
 					throw new ModelException(e);
 				}

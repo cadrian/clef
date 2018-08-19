@@ -19,6 +19,9 @@ package net.cadrian.clef.database.model.bean;
 import java.util.Collection;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.cadrian.clef.database.DatabaseException;
 import net.cadrian.clef.database.bean.Piece;
 import net.cadrian.clef.model.ModelException;
@@ -26,6 +29,8 @@ import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.model.bean.Work;
 
 public class PieceBean extends AbstractPropertyBean implements net.cadrian.clef.model.bean.Piece {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PieceBean.class);
 
 	private final Piece bean;
 
@@ -51,17 +56,22 @@ public class PieceBean extends AbstractPropertyBean implements net.cadrian.clef.
 	}
 
 	@Override
-	public int getVersion() {
+	public Long getVersion() {
 		final net.cadrian.clef.model.bean.Piece previous = getPrevious();
 		if (previous == null) {
-			return 1;
+			return 1L;
 		}
 		return 1 + previous.getVersion();
 	}
 
 	@Override
 	public net.cadrian.clef.model.bean.Piece getPrevious() {
-		return db.getPiece(bean.getPreviousId());
+		final Long previousId = bean.getPreviousId();
+		if (previousId == null) {
+			return null;
+		}
+		LOGGER.debug("looking for previous piece {}", previousId);
+		return db.getPiece(previousId);
 	}
 
 	@Override
@@ -71,12 +81,12 @@ public class PieceBean extends AbstractPropertyBean implements net.cadrian.clef.
 	}
 
 	@Override
-	public long getDuration() {
+	public Long getDuration() {
 		return bean.getDuration();
 	}
 
 	@Override
-	public void setDuration(final long duration) {
+	public void setDuration(final Long duration) {
 		bean.setDuration(duration);
 		update();
 	}
