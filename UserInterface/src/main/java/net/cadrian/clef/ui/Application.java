@@ -49,6 +49,23 @@ public class Application extends JFrame {
 	}
 
 	private void initUI() {
+		final ResourceBundle messages = getMessages();
+		setLookAndFeel();
+		setTitle(messages.getString("ClefTitle"));
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		initComponents(messages);
+		pack();
+	}
+
+	private ResourceBundle getMessages() {
+		final Locale locale = Locale.getDefault();
+		LOGGER.info("Current locale: {}", locale);
+		final ResourceBundle messages = ResourceBundle.getBundle("Clef");
+		return messages;
+	}
+
+	private void setLookAndFeel() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 			for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -62,19 +79,9 @@ public class Application extends JFrame {
 				| UnsupportedLookAndFeelException e) {
 			LOGGER.info("Could not load L&F", e);
 		}
-
-		setTitle("Clef");
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		initComponents();
-		pack();
 	}
 
-	private void initComponents() {
-		final Locale locale = Locale.getDefault();
-		LOGGER.info("Current locale: {}", locale);
-		final ResourceBundle messages = ResourceBundle.getBundle("Clef");
-
+	private void initComponents(final ResourceBundle messages) {
 		final JTabbedPane mainPane = new JTabbedPane(JTabbedPane.TOP);
 		getContentPane().add(mainPane);
 
