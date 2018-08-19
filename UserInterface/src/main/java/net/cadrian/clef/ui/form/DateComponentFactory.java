@@ -17,7 +17,6 @@
 package net.cadrian.clef.ui.form;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,7 +28,6 @@ import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -79,21 +77,15 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 			picker.setDateTimeStrict(ldt);
 
 			final JButton datePickerButton = picker.getDatePicker().getComponentToggleCalendarButton();
-			datePickerButton.setText("");
-			final Icon datePickerIcon = rc.getIcon("DatePicker");
-			datePickerButton.setIcon(datePickerIcon);
-			datePickerButton.setPreferredSize(
-					new Dimension(datePickerIcon.getIconWidth() + 6, datePickerIcon.getIconHeight() + 6));
+			datePickerButton.setText("DatePicker");
+			rc.awesome(datePickerButton);
 			final JButton timePickerButton = picker.getTimePicker().getComponentToggleTimeMenuButton();
-			timePickerButton.setText("");
-			final Icon timePickerIcon = rc.getIcon("TimePicker");
-			timePickerButton.setIcon(timePickerIcon);
-			timePickerButton.setPreferredSize(
-					new Dimension(timePickerIcon.getIconWidth() + 6, timePickerIcon.getIconHeight() + 6));
+			timePickerButton.setText("TimePicker");
+			rc.awesome(timePickerButton);
 
 			pickerPanel.add(picker, BorderLayout.CENTER);
 
-			final Action saveAction = new AbstractAction(rc.getMessage("Save"), rc.getIcon("Save")) {
+			final Action saveAction = new AbstractAction("Save") {
 				private static final long serialVersionUID = -8659808353683696964L;
 
 				@Override
@@ -107,7 +99,7 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 			final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 			buttons.setFloatable(false);
 			buttons.add(saveAction);
-			pickerPanel.add(buttons, BorderLayout.SOUTH);
+			pickerPanel.add(rc.awesome(buttons), BorderLayout.SOUTH);
 
 			pack();
 			setLocationRelativeTo(parent);
@@ -135,7 +127,7 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 			display = new JTextField();
 			display.setEditable(false);
 
-			refresh = new AbstractAction(rc.getMessage("Refresh"), rc.getIcon("Refresh")) {
+			refresh = new AbstractAction("Refresh") {
 				private static final long serialVersionUID = -3091414439330672834L;
 
 				@Override
@@ -146,7 +138,7 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 
 			};
 
-			setDate = new AbstractAction(rc.getMessage("Calendar"), rc.getIcon("Calendar")) {
+			setDate = new AbstractAction("Calendar") {
 				private static final long serialVersionUID = 7862670744497256762L;
 
 				@Override
@@ -168,7 +160,7 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 			buttons.add(setDate);
 
 			component.add(display);
-			component.add(buttons);
+			component.add(rc.awesome(buttons));
 		}
 
 		@Override

@@ -107,7 +107,8 @@ class WorkCreator implements BeanCreator<Work> {
 
 		paramsContent.add(lists, BorderLayout.CENTER);
 
-		final Action saveAction = new AbstractAction(rc.getMessage("Save"), rc.getIcon("Save")) {
+		final AtomicBoolean saved = new AtomicBoolean(false);
+		final Action saveAction = new AbstractAction("Save") {
 			private static final long serialVersionUID = -8659808353683696964L;
 
 			@Override
@@ -115,6 +116,7 @@ class WorkCreator implements BeanCreator<Work> {
 				final Author author = authors.getSelectedValue();
 				final Pricing pricing = pricings.getSelectedValue();
 				if (author != null && pricing != null) {
+					saved.set(true);
 					params.setVisible(false);
 				}
 			}
@@ -129,6 +131,7 @@ class WorkCreator implements BeanCreator<Work> {
 				if (!e.getValueIsAdjusting()) {
 					authorsSelected.set(true);
 					saveAction.setEnabled(pricingsSelected.get());
+					saved.set(false);
 				}
 			}
 		});
@@ -138,6 +141,7 @@ class WorkCreator implements BeanCreator<Work> {
 				if (!e.getValueIsAdjusting()) {
 					pricingsSelected.set(true);
 					saveAction.setEnabled(authorsSelected.get());
+					saved.set(false);
 				}
 			}
 		});
@@ -145,7 +149,7 @@ class WorkCreator implements BeanCreator<Work> {
 		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 		buttons.setFloatable(false);
 		buttons.add(saveAction);
-		paramsContent.add(buttons, BorderLayout.SOUTH);
+		paramsContent.add(rc.awesome(buttons), BorderLayout.SOUTH);
 
 		params.pack();
 		params.setLocationRelativeTo(parent);
@@ -155,6 +159,10 @@ class WorkCreator implements BeanCreator<Work> {
 		final Author author = authors.getSelectedValue();
 		final Pricing pricing = pricings.getSelectedValue();
 
+		if (!saved.get()) {
+			LOGGER.debug("Not saved, not creating work");
+			return null;
+		}
 		if (author == null || pricing == null) {
 			LOGGER.debug("Missing data, not creating work");
 			return null;

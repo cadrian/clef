@@ -16,13 +16,15 @@
  */
 package net.cadrian.clef.ui;
 
+import java.awt.Component;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JToolBar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +34,24 @@ public class Resources {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Resources.class);
 
 	private final ResourceBundle messages;
+	private final Font awesomeFont;
 
 	public Resources(final ResourceBundle messages) {
 		this.messages = messages;
+
+		Font ft = null;
+		for (final String f : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
+			if (f.equals("FontAwesome")) {
+				LOGGER.debug("Awesome!");
+				ft = Font.decode(f);
+				break;
+			}
+		}
+		if (ft == null) {
+			throw new RuntimeException("Missing some Awesome.");
+		}
+		awesomeFont = new Font(ft.getName(), ft.getStyle(), 20);
+		LOGGER.debug("Font Awesome: {}", awesomeFont);
 	}
 
 	public String getMessage(final String key) {
@@ -46,8 +63,20 @@ public class Resources {
 		}
 	}
 
-	public Icon getIcon(final String key) {
-		return new ImageIcon(Resources.class.getResource("/icons/" + key + ".png"));
+	public JButton awesome(final JButton button) {
+		button.setText(getMessage("Awesome." + button.getText()));
+		button.setFont(awesomeFont);
+		return button;
+	}
+
+	public JToolBar awesome(final JToolBar toolbar) {
+		toolbar.setFont(awesomeFont);
+		for (final Component component : toolbar.getComponents()) {
+			if (component instanceof JButton) {
+				awesome((JButton) component);
+			}
+		}
+		return toolbar;
 	}
 
 	public JLabel bolden(final JLabel label) {

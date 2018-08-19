@@ -118,9 +118,8 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 
 		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 		buttons.setFloatable(false);
-		left.add(buttons, BorderLayout.PAGE_END);
 
-		addAction = new AbstractAction(rc.getMessage("Add"), rc.getIcon("Add")) {
+		addAction = new AbstractAction("Add") {
 			private static final long serialVersionUID = -5722810007033837355L;
 
 			@Override
@@ -129,7 +128,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 			}
 		};
 
-		delAction = new AbstractAction(rc.getMessage("Del"), rc.getIcon("Del")) {
+		delAction = new AbstractAction("Del") {
 			private static final long serialVersionUID = -8206872556606892261L;
 
 			@Override
@@ -138,7 +137,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 			}
 		};
 
-		saveAction = new AbstractAction(rc.getMessage("Save"), rc.getIcon("Save")) {
+		saveAction = new AbstractAction("Save") {
 			private static final long serialVersionUID = -8659808353683696964L;
 
 			@Override
@@ -154,6 +153,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 		buttons.add(saveAction);
 		buttons.add(new JSeparator());
 		buttons.add(delAction);
+		left.add(rc.awesome(buttons), BorderLayout.PAGE_END);
 
 		setLeftComponent(left);
 		setRightComponent(current);

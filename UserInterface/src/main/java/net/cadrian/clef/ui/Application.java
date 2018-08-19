@@ -111,5 +111,4 @@ public class Application extends JFrame {
 
 		mainPane.addTab(rc.getMessage("Statistics"), new StatisticsPanel(rc, beans));
 	}
-
 }

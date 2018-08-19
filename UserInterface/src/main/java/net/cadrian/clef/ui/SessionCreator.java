@@ -122,7 +122,8 @@ class SessionCreator implements BeanCreator<Session> {
 
 		paramsContent.add(lists, BorderLayout.CENTER);
 
-		final Action saveAction = new AbstractAction(rc.getMessage("Save"), rc.getIcon("Save")) {
+		final AtomicBoolean saved = new AtomicBoolean(false);
+		final Action saveAction = new AbstractAction("Save") {
 			private static final long serialVersionUID = -8659808353683696964L;
 
 			@Override
@@ -130,6 +131,7 @@ class SessionCreator implements BeanCreator<Session> {
 				final Work work = works.getSelectedValue();
 				final Piece piece = pieces.getSelectedValue();
 				if (work != null && piece != null) {
+					saved.set(true);
 					params.setVisible(false);
 				}
 			}
@@ -144,6 +146,7 @@ class SessionCreator implements BeanCreator<Session> {
 				if (!e.getValueIsAdjusting()) {
 					worksSelected.set(true);
 					saveAction.setEnabled(piecesSelected.get());
+					saved.set(false);
 				}
 			}
 		});
@@ -153,6 +156,7 @@ class SessionCreator implements BeanCreator<Session> {
 				if (!e.getValueIsAdjusting()) {
 					piecesSelected.set(true);
 					saveAction.setEnabled(worksSelected.get());
+					saved.set(false);
 				}
 			}
 		});
@@ -160,7 +164,7 @@ class SessionCreator implements BeanCreator<Session> {
 		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 		buttons.setFloatable(false);
 		buttons.add(saveAction);
-		paramsContent.add(buttons, BorderLayout.SOUTH);
+		paramsContent.add(rc.awesome(buttons), BorderLayout.SOUTH);
 
 		params.pack();
 		params.setLocationRelativeTo(parent);
@@ -169,6 +173,10 @@ class SessionCreator implements BeanCreator<Session> {
 
 		final Piece piece = pieces.getSelectedValue();
 
+		if (!saved.get()) {
+			LOGGER.debug("Not saved, not creating session");
+			return null;
+		}
 		if (piece == null) {
 			LOGGER.debug("Missing data, not creating session");
 			return null;
