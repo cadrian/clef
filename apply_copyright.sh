@@ -1,3 +1,13 @@
+#!/usr/bin/env bash
+
+find $(readlink -f $(dirname $0)) -name \*.java | while read f; do
+    if [ $f~ -nt $f ]; then
+        echo "Skipping $f: backup exists"
+    else
+        echo "Adding copyright to $f"
+        mv -n $f $f~
+        {
+            cat - $f~ <<EOF
 /*
  * This file is part of Clef.
  *
@@ -14,25 +24,7 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.model;
-
-public class ModelException extends RuntimeException {
-
-	private static final long serialVersionUID = 2404476401209345358L;
-
-	public ModelException() {
-	}
-
-	public ModelException(final String msg) {
-		super(msg);
-	}
-
-	public ModelException(final Throwable cause) {
-		super(cause);
-	}
-
-	public ModelException(final String msg, final Throwable cause) {
-		super(msg, cause);
-	}
-
-}
+EOF
+        } > $f
+    fi
+done
