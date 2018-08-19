@@ -16,6 +16,7 @@
  */
 package net.cadrian.clef.database.model;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -191,6 +192,7 @@ public class ModelBeans implements Beans {
 		try {
 			final net.cadrian.clef.database.bean.Session template = new net.cadrian.clef.database.bean.Session();
 			template.setPieceId(((PieceBean) piece).getId());
+			template.setStart(new Timestamp(System.currentTimeMillis()));
 			final net.cadrian.clef.database.bean.Session bean = db.getSessions().insert(template);
 			result = new SessionBean(bean, db);
 			sessionsCache.put(bean.getId(), result);

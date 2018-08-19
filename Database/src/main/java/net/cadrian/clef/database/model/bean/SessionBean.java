@@ -102,11 +102,31 @@ public class SessionBean extends AbstractPropertyBean implements net.cadrian.cle
 	@Override
 	public String toString() {
 		final StringBuilder result = new StringBuilder();
-		if (getStart() != null) {
-			final DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			result.append(df.format(getStart())).append(" - ");
+		final Date start = getStart();
+		final Date stop = getStop();
+		final DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		result.append(df.format(start)).append(" - ").append(getPiece().getName());
+		if (stop != null) {
+			final long duration = stop.getTime() - start.getTime();
+			long s = duration / 1000;
+			long m = s / 60;
+			s -= m * 60;
+			final long h = m / 24;
+			m -= h * 24;
+			result.append(" (");
+			if (h < 10) {
+				result.append("0");
+			}
+			result.append(h).append(":");
+			if (m < 10) {
+				result.append("0");
+			}
+			result.append(m).append(":");
+			if (s < 10) {
+				result.append("0");
+			}
+			result.append(s).append(")");
 		}
-		result.append(getPiece().getName());
 		return result.toString();
 	}
 

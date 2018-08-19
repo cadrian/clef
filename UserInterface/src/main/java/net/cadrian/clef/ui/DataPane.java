@@ -183,6 +183,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 						publish(newBean);
 					}
 				} catch (final ModelException e) {
+					LOGGER.error("Creation failed", e);
 					JOptionPane.showMessageDialog(DataPane.this, rc.getMessage("CreateFailedMessage"),
 							rc.getMessage("CreateFailedTitle"), JOptionPane.WARNING_MESSAGE);
 				}

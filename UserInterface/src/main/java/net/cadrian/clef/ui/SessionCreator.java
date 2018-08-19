@@ -16,25 +16,164 @@
  */
 package net.cadrian.clef.ui;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.cadrian.clef.model.Beans;
+import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Session;
+import net.cadrian.clef.model.bean.Work;
 
 class SessionCreator implements BeanCreator<Session> {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(SessionCreator.class);
+
+	private final Application parent;
 	private final Beans beans;
 	private final Resources rc;
 
-	public SessionCreator(final Resources rc, final Beans beans) {
+	public SessionCreator(final Resources rc, final Application parent, final Beans beans) {
+		this.parent = parent;
 		this.beans = beans;
 		this.rc = rc;
 	}
 
 	@Override
 	public Session createBean() {
-		// TODO Auto-generated method stub
-		// must ask for the right Piece to attach the Session to
-		// (note: no Piece => return null + popup "create Piece first")
-		// and the start date will be set to "now"
-		return null;
+
+		final Collection<? extends Work> allWorks = beans.getWorks();
+		if (allWorks.isEmpty()) {
+			JOptionPane.showMessageDialog(parent, rc.getMessage("SessionCreatorNoWorksMessage"),
+					rc.getMessage("SessionCreatorNoWorksTitle"), JOptionPane.WARNING_MESSAGE);
+			return null;
+		}
+		boolean foundPieces = false;
+		for (final Work work : allWorks) {
+			if (!work.getPieces().isEmpty()) {
+				foundPieces = true;
+				break;
+			}
+		}
+		if (!foundPieces) {
+			JOptionPane.showMessageDialog(parent, rc.getMessage("SessionCreatorNoPiecesMessage"),
+					rc.getMessage("SessionCreatorNoPiecesTitle"), JOptionPane.WARNING_MESSAGE);
+			return null;
+		}
+
+		final DefaultListModel<Work> worksModel = new DefaultListModel<>();
+		for (final Work work : allWorks) {
+			worksModel.addElement(work);
+		}
+
+		final DefaultListModel<Piece> piecesModel = new DefaultListModel<>();
+
+		final JDialog params = new JDialog(parent, rc.getMessage("SessionCreatorTitle"), true);
+
+		final JPanel paramsContent = new JPanel(new BorderLayout());
+		params.getContentPane().add(paramsContent);
+		paramsContent.add(new JLabel(rc.getMessage("SessionCreatorMessage")), BorderLayout.NORTH);
+
+		final JList<Work> works = new JList<>(worksModel);
+		final JPanel worksPanel = new JPanel(new BorderLayout());
+		worksPanel.add(rc.bolden(new JLabel(rc.getMessage("SessionCreatorWorksTitle"))), BorderLayout.NORTH);
+		worksPanel.add(new JScrollPane(works), BorderLayout.CENTER);
+		works.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) {
+					// TODO swing niceties using an async worker
+					for (final Piece piece : works.getSelectedValue().getPieces()) {
+						piecesModel.addElement(piece);
+					}
+				}
+			}
+		});
+
+		final JList<Piece> pieces = new JList<>(piecesModel);
+		final JPanel piecesPanel = new JPanel(new BorderLayout());
+		piecesPanel.add(rc.bolden(new JLabel(rc.getMessage("SessionCreatorPiecesTitle"))), BorderLayout.NORTH);
+		piecesPanel.add(new JScrollPane(pieces), BorderLayout.CENTER);
+
+		final JPanel lists = new JPanel();
+		lists.setLayout(new BoxLayout(lists, BoxLayout.X_AXIS));
+		lists.add(worksPanel);
+		lists.add(piecesPanel);
+
+		paramsContent.add(lists, BorderLayout.CENTER);
+
+		final Action saveAction = new AbstractAction(rc.getMessage("Save"), rc.getIcon("Save")) {
+			private static final long serialVersionUID = -8659808353683696964L;
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final Work work = works.getSelectedValue();
+				final Piece piece = pieces.getSelectedValue();
+				if (work != null && piece != null) {
+					params.setVisible(false);
+				}
+			}
+		};
+		saveAction.setEnabled(false);
+
+		final AtomicBoolean worksSelected = new AtomicBoolean(false);
+		final AtomicBoolean piecesSelected = new AtomicBoolean(false);
+		works.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(final ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) {
+					worksSelected.set(true);
+					saveAction.setEnabled(piecesSelected.get());
+				}
+			}
+		});
+		pieces.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(final ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) {
+					piecesSelected.set(true);
+					saveAction.setEnabled(worksSelected.get());
+				}
+			}
+		});
+
+		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
+		buttons.setFloatable(false);
+		buttons.add(saveAction);
+		paramsContent.add(buttons, BorderLayout.SOUTH);
+
+		params.pack();
+		params.setLocationRelativeTo(parent);
+		LOGGER.debug("Showing SessionCreator dialog");
+		params.setVisible(true);
+
+		final Piece piece = pieces.getSelectedValue();
+
+		if (piece == null) {
+			LOGGER.debug("Missing data, not creating session");
+			return null;
+		}
+
+		return beans.createSession(piece);
 	}
 }

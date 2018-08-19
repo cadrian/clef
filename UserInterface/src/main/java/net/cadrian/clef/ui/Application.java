@@ -97,8 +97,8 @@ public class Application extends JFrame {
 
 		final JTabbedPane mgtPane = new JTabbedPane(SwingConstants.TOP);
 
-		mainPane.addTab(rc.getMessage("Sessions"), new DataPane<>(rc, beans::getSessions, new SessionCreator(rc, beans),
-				new SessionFormModel(Session.class)));
+		mainPane.addTab(rc.getMessage("Sessions"), new DataPane<>(rc, beans::getSessions,
+				new SessionCreator(rc, this, beans), new SessionFormModel(Session.class)));
 
 		mgtPane.addTab(rc.getMessage("Works"),
 				new DataPane<>(rc, (pane) -> pane.getSelection(), beans::getWorks, new WorkCreator(rc, this, beans),
