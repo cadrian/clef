@@ -80,6 +80,8 @@ CREATE INDEX IF NOT EXISTS author_property_idx ON author_property (author_id);
 
 CREATE TABLE IF NOT EXISTS pricing (
 	id BIGINT AUTO_INCREMENT NOT NULL,
+	name VARCHAR(4096),
+	notes CLOB,
 	PRIMARY KEY(id)
 );
 

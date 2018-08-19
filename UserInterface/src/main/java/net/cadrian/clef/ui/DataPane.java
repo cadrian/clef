@@ -160,7 +160,12 @@ class DataPane<T extends Bean> extends JSplitPane {
 			@Override
 			protected Void doInBackground() throws Exception {
 				try {
-					publish(beanCreator.createBean());
+					final T newBean = beanCreator.createBean();
+					if (newBean == null) {
+						LOGGER.info("null bean, aborting creation");
+					} else {
+						publish(newBean);
+					}
 				} catch (final ModelException e) {
 					JOptionPane.showMessageDialog(DataPane.this, rc.getMessage("CreateFailedMessage"),
 							rc.getMessage("CreateFailedTitle"), JOptionPane.WARNING_MESSAGE);

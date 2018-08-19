@@ -35,12 +35,51 @@ public class PricingBean extends AbstractBean implements net.cadrian.clef.model.
 	}
 
 	@Override
+	public String getName() {
+		return bean.getName();
+	}
+
+	@Override
+	public void setName(final String name) {
+		bean.setName(name);
+		update();
+	}
+
+	@Override
+	public String getNotes() {
+		return bean.getNotes();
+	}
+
+	@Override
+	public void setNotes(final String notes) {
+		bean.setNotes(notes);
+		update();
+	}
+
+	void update() {
+		try {
+			db.getPricings().update(bean);
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+	}
+
+	@Override
 	public void delete() {
 		try {
 			db.getPricings().delete(bean);
 		} catch (final DatabaseException e) {
 			throw new ModelException(e);
 		}
+	}
+
+	@Override
+	public String toString() {
+		final String name = getName();
+		if (name == null || name.isEmpty()) {
+			return "(no name)";
+		}
+		return name;
 	}
 
 }

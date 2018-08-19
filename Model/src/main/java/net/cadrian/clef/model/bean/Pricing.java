@@ -20,4 +20,12 @@ import net.cadrian.clef.model.Bean;
 
 public interface Pricing extends Bean {
 
+	String getName();
+
+	void setName(String name);
+
+	String getNotes();
+
+	void setNotes(String notes);
+
 }

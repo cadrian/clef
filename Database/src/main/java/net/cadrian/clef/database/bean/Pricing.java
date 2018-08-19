@@ -19,12 +19,19 @@ package net.cadrian.clef.database.bean;
 import java.util.Arrays;
 import java.util.List;
 
+import net.cadrian.clef.database.io.Condition;
 import net.cadrian.clef.database.io.Field;
+import net.cadrian.clef.database.io.StringField;
 
 public class Pricing extends AbstractBean<Pricing> {
 
 	private static final String TABLE_NAME = "pricing";
-	private static final List<Field<Pricing>> FIELDS = Arrays.asList();
+	private static final List<Field<Pricing>> FIELDS = Arrays.asList(
+			new StringField<>("name", Pricing::getName, Pricing::setName, Condition.EQ),
+			new StringField<>("notes", Pricing::getNotes, Pricing::setNotes, Condition.EQ));
+
+	private String name;
+	private String notes;
 
 	public Pricing() {
 		this(null);
@@ -32,6 +39,22 @@ public class Pricing extends AbstractBean<Pricing> {
 
 	public Pricing(final Long id) {
 		super(id);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 	@Override
