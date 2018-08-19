@@ -1,0 +1,5 @@
+
+com.github.lgooddatepicker LGoodDatePicker jar s/.*/debian/ * *
+net.cadrian.clef Model jar s/.*/debian/ * *
+net.cadrian.clef Root pom s/.*/debian/ * *
+net.cadrian.clef UserInterface jar s/.*/debian/ * *

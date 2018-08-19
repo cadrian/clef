@@ -1,0 +1,21 @@
+Source: clef-root
+Section: java
+Priority: optional
+Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
+Uploaders: Cyril Adrian <cyril.adrian+apt@gmail.com>
+Build-Depends: debhelper (>= 11), default-jdk, maven-debian-helper (>= 2.1)
+Build-Depends-Indep: junit4 (>= 4.12), liblogback-java (>= 1.2.3), libslf4j-java (>= 1.7.25)
+Standards-Version: 4.1.4
+Vcs-Git: https://salsa.debian.org/java-team/clef-root.git
+Vcs-Browser: https://salsa.debian.org/java-team/clef-root
+Homepage:
+
+Package: libclef-root-java
+Architecture: all
+Depends: ${misc:Depends}, ${maven:Depends}
+Suggests: ${maven:OptionalDepends}
+Description: Manage musical productions
+ Clef allows one to manage musical productions (pieces, works,
+ authors, pricing)
+ .
+ This package contains the root maven module for Clef modules

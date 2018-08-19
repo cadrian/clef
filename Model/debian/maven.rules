@@ -1,0 +1,3 @@
+
+net.cadrian.clef Model jar s/.*/debian/ * *
+net.cadrian.clef Root pom s/.*/debian/ * *

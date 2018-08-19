@@ -1,0 +1,5 @@
+
+commons-dbcp commons-dbcp jar s/.*/debian/ * *
+net.cadrian.clef Database jar s/.*/debian/ * *
+net.cadrian.clef Model jar s/.*/debian/ * *
+net.cadrian.clef Root pom s/.*/debian/ * *

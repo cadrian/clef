@@ -1,0 +1,23 @@
+Source: clef-application
+Section: java
+Priority: optional
+Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
+Uploaders: Cyril Adrian <cyril.adrian+apt@gmail.com>
+Build-Depends: debhelper (>= 11), default-jdk, maven-debian-helper (>= 2.1)
+Build-Depends-Indep: libclef-database-java (>= 0.0.1-SNAPSHOT), libclef-model-java (>= 0.0.1-SNAPSHOT),
+ libclef-root-java (>= 0.0.1-SNAPSHOT), libclef-user-interface-java (>= 0.0.1-SNAPSHOT),
+ liblogback-java (>= 1.2.3)
+Standards-Version: 4.1.4
+Vcs-Git: https://salsa.debian.org/java-team/clef-application.git
+Vcs-Browser: https://salsa.debian.org/java-team/clef-application
+Homepage:
+
+Package: libclef-application-java
+Architecture: all
+Depends: ${misc:Depends}, ${maven:Depends}
+Suggests: ${maven:OptionalDepends}
+Description: Manage musical productions
+ Clef allows one to manage musical productions (pieces, works,
+ authors, pricing)
+ .
+ This package contains the application starter of Clef
