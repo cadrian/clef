@@ -77,6 +77,12 @@ public class PropertiesComponentFactory implements FieldComponentFactory<Collect
 		void loadProperty(final Property selected) {
 			current = selected;
 			content = new JTextArea(selected.getValue());
+			content.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusLost(final FocusEvent e) {
+					saveProperty();
+				}
+			});
 			component.setRightComponent(content);
 		}
 
