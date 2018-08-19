@@ -88,14 +88,19 @@ class WorkCreator implements DataPane.BeanCreator<Work> {
 
 		final JPanel paramsContent = new JPanel(new BorderLayout());
 		params.getContentPane().add(paramsContent);
-		final JLabel explanation = new JLabel(rc.getMessage("WorkCreatorMessage"));
-		paramsContent.add(explanation, BorderLayout.NORTH);
+		paramsContent.add(new JLabel(rc.getMessage("WorkCreatorMessage")), BorderLayout.NORTH);
 
 		final JList<Author> authors = new JList<>(authorsModel);
-		paramsContent.add(new JScrollPane(authors), BorderLayout.WEST);
+		final JPanel authorsPanel = new JPanel(new BorderLayout());
+		authorsPanel.add(new JLabel(rc.getMessage("WorkCreatorAuthorsTitle")), BorderLayout.NORTH);
+		authorsPanel.add(new JScrollPane(authors), BorderLayout.CENTER);
+		paramsContent.add(authorsPanel, BorderLayout.CENTER);
 
 		final JList<Pricing> pricings = new JList<>(pricingsModel);
-		paramsContent.add(new JScrollPane(pricings), BorderLayout.EAST);
+		final JPanel pricingsPanel = new JPanel(new BorderLayout());
+		pricingsPanel.add(new JLabel(rc.getMessage("WorkCreatorPricingsTitle")), BorderLayout.NORTH);
+		pricingsPanel.add(new JScrollPane(pricings), BorderLayout.CENTER);
+		paramsContent.add(pricingsPanel, BorderLayout.EAST);
 
 		final Action saveAction = new AbstractAction(rc.getMessage("Save"), rc.getIcon("Save")) {
 			private static final long serialVersionUID = -8659808353683696964L;
@@ -138,6 +143,7 @@ class WorkCreator implements DataPane.BeanCreator<Work> {
 		paramsContent.add(buttons, BorderLayout.SOUTH);
 
 		params.pack();
+		params.setLocationRelativeTo(parent);
 		LOGGER.debug("Showing WorkCreator dialog");
 		params.setVisible(true);
 
@@ -145,9 +151,11 @@ class WorkCreator implements DataPane.BeanCreator<Work> {
 		final Pricing pricing = pricings.getSelectedValue();
 
 		if (author == null || pricing == null) {
+			LOGGER.debug("Missing data, not creating work");
 			return null;
 		}
 
+		LOGGER.info("Creating new Work with author: {} and pricing: {}", author, pricing);
 		return beans.createWork(author, pricing);
 	}
 }
