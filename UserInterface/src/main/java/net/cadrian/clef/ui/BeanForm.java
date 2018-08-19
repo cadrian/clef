@@ -17,7 +17,6 @@
 package net.cadrian.clef.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -124,11 +123,7 @@ class BeanForm<T extends Bean, C> extends JPanel {
 				labelConstraints.insets = new Insets(8, 2, 2, 2);
 				final String label = rc.getMessage("Field." + fieldView.model.name);
 				LOGGER.debug("Label for {} is {}", fieldView.model.name, label);
-				final JLabel jLabel = new JLabel(label);
-				final Font font = jLabel.getFont();
-				final Font boldFont = new Font(font.getFontName(), Font.BOLD, font.getSize());
-				jLabel.setFont(boldFont);
-				panel.add(jLabel, labelConstraints);
+				panel.add(rc.bolden(new JLabel(label)), labelConstraints);
 
 				final GridBagConstraints fieldConstraints = new GridBagConstraints();
 				fieldConstraints.gridx = 1;

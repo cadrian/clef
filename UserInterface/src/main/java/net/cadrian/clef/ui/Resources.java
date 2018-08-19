@@ -16,10 +16,12 @@
  */
 package net.cadrian.clef.ui;
 
+import java.awt.Font;
 import java.util.ResourceBundle;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 public class Resources {
 
@@ -35,6 +37,12 @@ public class Resources {
 
 	public Icon getIcon(final String key) {
 		return new ImageIcon(Resources.class.getResource("/icons/" + key + ".png"));
+	}
+
+	public JLabel bolden(final JLabel label) {
+		final Font font = label.getFont();
+		label.setFont(new Font(font.getFontName(), Font.BOLD, font.getSize()));
+		return label;
 	}
 
 }

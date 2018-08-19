@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -59,7 +60,6 @@ class WorkCreator implements BeanCreator<Work> {
 
 	@Override
 	public Work createBean() {
-		LOGGER.debug("XXX");
 		final Collection<? extends Author> allAuthors = beans.getAuthors();
 		if (allAuthors.isEmpty()) {
 			JOptionPane.showMessageDialog(parent, rc.getMessage("WorkCreatorNoAuthorsMessage"),
@@ -92,15 +92,20 @@ class WorkCreator implements BeanCreator<Work> {
 
 		final JList<Author> authors = new JList<>(authorsModel);
 		final JPanel authorsPanel = new JPanel(new BorderLayout());
-		authorsPanel.add(new JLabel(rc.getMessage("WorkCreatorAuthorsTitle")), BorderLayout.NORTH);
+		authorsPanel.add(rc.bolden(new JLabel(rc.getMessage("WorkCreatorAuthorsTitle"))), BorderLayout.NORTH);
 		authorsPanel.add(new JScrollPane(authors), BorderLayout.CENTER);
-		paramsContent.add(authorsPanel, BorderLayout.CENTER);
 
 		final JList<Pricing> pricings = new JList<>(pricingsModel);
 		final JPanel pricingsPanel = new JPanel(new BorderLayout());
-		pricingsPanel.add(new JLabel(rc.getMessage("WorkCreatorPricingsTitle")), BorderLayout.NORTH);
+		pricingsPanel.add(rc.bolden(new JLabel(rc.getMessage("WorkCreatorPricingsTitle"))), BorderLayout.NORTH);
 		pricingsPanel.add(new JScrollPane(pricings), BorderLayout.CENTER);
-		paramsContent.add(pricingsPanel, BorderLayout.EAST);
+
+		final JPanel lists = new JPanel();
+		lists.setLayout(new BoxLayout(lists, BoxLayout.X_AXIS));
+		lists.add(authorsPanel);
+		lists.add(pricingsPanel);
+
+		paramsContent.add(lists, BorderLayout.CENTER);
 
 		final Action saveAction = new AbstractAction(rc.getMessage("Save"), rc.getIcon("Save")) {
 			private static final long serialVersionUID = -8659808353683696964L;
