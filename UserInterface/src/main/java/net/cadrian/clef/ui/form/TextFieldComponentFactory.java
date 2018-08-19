@@ -18,7 +18,9 @@ package net.cadrian.clef.ui.form;
 
 import javax.swing.JTextField;
 
-public class TextFieldComponentFactory extends AbstractFieldComponentFactory<String, JTextField> {
+import net.cadrian.clef.ui.Resources;
+
+public class TextFieldComponentFactory<C> extends AbstractFieldComponentFactory<String, JTextField, C> {
 
 	private static class TextFieldComponent implements FieldComponent<String, JTextField> {
 
@@ -52,11 +54,15 @@ public class TextFieldComponentFactory extends AbstractFieldComponentFactory<Str
 	}
 
 	public TextFieldComponentFactory(final boolean writable) {
-		super(writable);
+		this(writable, null);
+	}
+
+	public TextFieldComponentFactory(final boolean writable, final String tab) {
+		super(writable, tab);
 	}
 
 	@Override
-	public FieldComponent<String, JTextField> createComponent() {
+	public FieldComponent<String, JTextField> createComponent(final Resources rc, final C context) {
 		return new TextFieldComponent(writable);
 	}
 

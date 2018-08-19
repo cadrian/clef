@@ -18,10 +18,14 @@ package net.cadrian.clef.ui.form;
 
 import javax.swing.JComponent;
 
-public interface FieldComponentFactory<D, J extends JComponent> {
-	FieldComponent<D, J> createComponent();
+import net.cadrian.clef.ui.Resources;
+
+public interface FieldComponentFactory<D, J extends JComponent, C> {
+	FieldComponent<D, J> createComponent(Resources rc, C context);
 
 	Class<?> getDataType();
 
 	boolean isWritable();
+
+	String getTab();
 }

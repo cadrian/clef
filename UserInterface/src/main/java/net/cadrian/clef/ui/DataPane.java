@@ -18,6 +18,9 @@ package net.cadrian.clef.ui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -40,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 
-class DataPane<T extends Bean> extends JSplitPane {
+public class DataPane<T extends Bean, C> extends JSplitPane {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DataPane.class);
 
@@ -58,10 +61,20 @@ class DataPane<T extends Bean> extends JSplitPane {
 	private final BeanCreator<T> beanCreator;
 	private final Resources rc;
 
-	private BeanForm<T> currentForm;
+	private BeanForm<T, C> currentForm;
 
-	DataPane(final Resources rc, final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator,
-			final BeanFormModel<T> beanFormModel) {
+	@FunctionalInterface
+	public interface ContextGetter<T extends Bean, C> {
+		C getContext(DataPane<T, C> pane);
+	}
+
+	public DataPane(final Resources rc, final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator,
+			final BeanFormModel<T, C> beanFormModel) {
+		this(rc, (pane) -> null, beanGetter, beanCreator, beanFormModel, null);
+	}
+
+	public DataPane(final Resources rc, final ContextGetter<T, C> contextGetter, final BeanGetter<T> beanGetter,
+			final BeanCreator<T> beanCreator, final BeanFormModel<T, C> beanFormModel, final List<String> tabs) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
 		this.beanGetter = beanGetter;
 		this.beanCreator = beanCreator;
@@ -81,7 +94,8 @@ class DataPane<T extends Bean> extends JSplitPane {
 					current.removeAll();
 					if (selected != null) {
 						LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
-						currentForm = new BeanForm<>(rc, selected, beanFormModel);
+						currentForm = new BeanForm<>(rc, contextGetter.getContext(DataPane.this), selected,
+								beanFormModel, tabs);
 						current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
 						currentForm.load();
 						delAction.setEnabled(true);
@@ -141,6 +155,19 @@ class DataPane<T extends Bean> extends JSplitPane {
 		setRightComponent(current);
 
 		refreshList(null);
+	}
+
+	public Collection<T> getList() {
+		List<T> result = new ArrayList<>();
+		int n = model.getSize();
+		for (int i = 0; i < n; i++) {
+			result.add(model.getElementAt(i));
+		}
+		return result;
+	}
+
+	public T getSelection() {
+		return list.getSelectedValue();
 	}
 
 	void addData() {

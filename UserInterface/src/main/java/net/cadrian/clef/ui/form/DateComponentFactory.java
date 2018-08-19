@@ -25,7 +25,9 @@ import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
-public class DateComponentFactory extends AbstractFieldComponentFactory<Date, JButton> {
+import net.cadrian.clef.ui.Resources;
+
+public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date, JButton, C> {
 
 	private static class DateComponent implements FieldComponent<Date, JButton> {
 
@@ -79,11 +81,15 @@ public class DateComponentFactory extends AbstractFieldComponentFactory<Date, JB
 	}
 
 	public DateComponentFactory(final boolean writable) {
-		super(writable);
+		this(writable, null);
+	}
+
+	public DateComponentFactory(final boolean writable, final String tab) {
+		super(writable, tab);
 	}
 
 	@Override
-	public FieldComponent<Date, JButton> createComponent() {
+	public FieldComponent<Date, JButton> createComponent(final Resources rc, final C context) {
 		return new DateComponent(writable);
 	}
 

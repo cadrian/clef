@@ -26,12 +26,12 @@ import net.cadrian.clef.ui.form.FieldComponentFactory;
 import net.cadrian.clef.ui.form.TextAreaComponentFactory;
 import net.cadrian.clef.ui.form.TextFieldComponentFactory;
 
-class PricingFormModel extends BeanFormModel<Pricing> {
+class PricingFormModel extends BeanFormModel<Pricing, Void> {
 
-	private static final Map<String, FieldComponentFactory<?, ? extends JComponent>> COMPONENT_FACTORIES = new LinkedHashMap<>();
+	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, Void>> COMPONENT_FACTORIES = new LinkedHashMap<>();
 	static {
-		final TextFieldComponentFactory nameFactory = new TextFieldComponentFactory(true);
-		final TextAreaComponentFactory notesFactory = new TextAreaComponentFactory(true);
+		final TextFieldComponentFactory<Void> nameFactory = new TextFieldComponentFactory<>(true);
+		final TextAreaComponentFactory<Void> notesFactory = new TextAreaComponentFactory<>(true);
 		COMPONENT_FACTORIES.put("Name", nameFactory);
 		COMPONENT_FACTORIES.put("Notes", notesFactory);
 	}

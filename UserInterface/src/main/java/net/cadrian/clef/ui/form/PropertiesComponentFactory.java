@@ -34,9 +34,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.cadrian.clef.model.bean.Property;
+import net.cadrian.clef.ui.Resources;
 
-public class PropertiesComponentFactory
-		extends AbstractFieldComponentFactory<Collection<? extends Property>, JSplitPane> {
+public class PropertiesComponentFactory<C>
+		extends AbstractFieldComponentFactory<Collection<? extends Property>, JSplitPane, C> {
 
 	private static class PropertiesComponent implements FieldComponent<Collection<? extends Property>, JSplitPane> {
 
@@ -123,11 +124,16 @@ public class PropertiesComponentFactory
 	}
 
 	public PropertiesComponentFactory(final boolean writable) {
-		super(writable);
+		this(writable, null);
+	}
+
+	public PropertiesComponentFactory(final boolean writable, final String tab) {
+		super(writable, tab);
 	}
 
 	@Override
-	public FieldComponent<Collection<? extends Property>, JSplitPane> createComponent() {
+	public FieldComponent<Collection<? extends Property>, JSplitPane> createComponent(final Resources rc,
+			final C context) {
 		return new PropertiesComponent(writable);
 	}
 

@@ -16,6 +16,7 @@
  */
 package net.cadrian.clef.ui;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -100,7 +101,8 @@ public class Application extends JFrame {
 				new SessionFormModel(Session.class)));
 
 		mgtPane.addTab(rc.getMessage("Works"),
-				new DataPane<>(rc, beans::getWorks, new WorkCreator(rc, this, beans), new WorkFormModel(Work.class)));
+				new DataPane<>(rc, (pane) -> pane.getSelection(), beans::getWorks, new WorkCreator(rc, this, beans),
+						new WorkFormModel(beans, Work.class), Arrays.asList("Description", "Pieces")));
 		mgtPane.addTab(rc.getMessage("Authors"),
 				new DataPane<>(rc, beans::getAuthors, beans::createAuthor, new AuthorFormModel(Author.class)));
 		mgtPane.addTab(rc.getMessage("Pricings"),

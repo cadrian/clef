@@ -20,7 +20,9 @@ import java.text.NumberFormat;
 
 import javax.swing.JFormattedTextField;
 
-public class NumericFieldComponentFactory extends AbstractFieldComponentFactory<Long, JFormattedTextField> {
+import net.cadrian.clef.ui.Resources;
+
+public class NumericFieldComponentFactory<C> extends AbstractFieldComponentFactory<Long, JFormattedTextField, C> {
 
 	private static class NumericFieldComponent implements FieldComponent<Long, JFormattedTextField> {
 
@@ -58,11 +60,15 @@ public class NumericFieldComponentFactory extends AbstractFieldComponentFactory<
 	}
 
 	public NumericFieldComponentFactory(final boolean writable) {
-		super(writable);
+		this(writable, null);
+	}
+
+	public NumericFieldComponentFactory(final boolean writable, final String tab) {
+		super(writable, tab);
 	}
 
 	@Override
-	public FieldComponent<Long, JFormattedTextField> createComponent() {
+	public FieldComponent<Long, JFormattedTextField> createComponent(final Resources rc, final C context) {
 		return new NumericFieldComponent(writable);
 	}
 
