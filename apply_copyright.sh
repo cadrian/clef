@@ -3,11 +3,14 @@
 find $(readlink -f $(dirname $0)) -name \*.java | while read f; do
     if [ $f~ -nt $f ]; then
         echo "Skipping $f: backup exists"
-    elif grep -q "This file is part of Clef." $f; then
-        echo "Skipping $f: copyright exists"
     else
         echo "Adding copyright to $f"
-        mv -n $f $f~
+        awk '
+BEGIN  { state=0 }
+/\/\*/ { if (state == 0) {state = 1; next} }
+/\*\// { if (state == 1) {state = 2; next} }
+{ if (state == 0) state = 2; if (state != 1) print }
+' < $f > $f~
         {
             cat - $f~ <<EOF
 /*
