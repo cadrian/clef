@@ -34,7 +34,7 @@ class PieceFormModel extends BeanFormModel<Piece, Work> {
 	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, Work>> COMPONENT_FACTORIES = new LinkedHashMap<>();
 	static {
 		final TextFieldComponentFactory<Work> nameFactory = new TextFieldComponentFactory<>(true);
-		final NumericFieldComponentFactory<Work> versionFactory = new NumericFieldComponentFactory<>(true);
+		final NumericFieldComponentFactory<Work> versionFactory = new NumericFieldComponentFactory<>(false);
 		final NumericFieldComponentFactory<Work> durationFactory = new NumericFieldComponentFactory<>(true);
 		final PropertiesComponentFactory<Work> propertiesFactory = new PropertiesComponentFactory<>(true);
 		final TextAreaComponentFactory<Work> notesFactory = new TextAreaComponentFactory<>(true);
