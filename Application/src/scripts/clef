@@ -13,6 +13,7 @@ EOF
     cat > $HOME/.clef.d/logback.xml <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+        <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
         <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
                 <layout class="ch.qos.logback.classic.PatternLayout">
@@ -57,5 +58,6 @@ EOF
 }
 
 exec java \
+     -Dlogback.configurationFile=$HOME/.clef.d/logback.xml \
      -classpath $HOME/.clef.d:/usr/share/java/Application.jar:%CLASSPATH% \
      net.cadrian.clef.Clef
