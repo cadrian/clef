@@ -10,3 +10,4 @@ debian
 *.buildinfo
 *.changes
 *~
+pkg

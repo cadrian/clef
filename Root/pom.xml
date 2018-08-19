@@ -9,9 +9,6 @@
         <name>ClefRoot</name>
 
         <properties>
-                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-                <maven.compiler.source>1.8</maven.compiler.source>
-                <maven.compiler.target>1.8</maven.compiler.target>
                 <debian.hasPackageVersion/>
                 <debian.originalVersion>0.0.1-SNAPSHOT</debian.originalVersion>
                 <debian.package>libclef-root-java</debian.package>
@@ -35,13 +32,5 @@
                         <version>4.x</version>
                         <scope>test</scope>
                 </dependency>
-                <!--
-                <dependency>
-                        <groupId>org.mockito</groupId>
-                        <artifactId>mockito-all</artifactId>
-                        <version>debian</version>
-                        <scope>test</scope>
-                </dependency>
-                -->
         </dependencies>
 </project>

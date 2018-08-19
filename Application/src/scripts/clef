@@ -1,0 +1,61 @@
+#!/bin/bash
+
+test -d $HOME/.clef.d || {
+    echo "First time, creating default configuration files in $HOME/.clef.d"
+
+    mkdir -p $HOME/.clef.d/db $HOME/.clef.d/logs
+    cat > $HOME/.clef.d/clef.properties <<EOF
+db.path = $HOME/clef.d/db/clef
+db.username = sa
+db.password =
+EOF
+
+    cat > $HOME/.clef.d/logback.xml <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+                <layout class="ch.qos.logback.classic.PatternLayout">
+                        <Pattern>
+                                %d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n
+                        </Pattern>
+                </layout>
+        </appender>
+
+        <appender name="LOG"
+                class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>$HOME/clef.d/logs/debug.log</file>
+                <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                        <Pattern>
+                                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+                        </Pattern>
+                </encoder>
+
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                        <!-- rollover daily -->
+                        <fileNamePattern>
+                                $HOME/clef.d/logs/debug.%d{yyyy-MM-dd}.%i.log
+                        </fileNamePattern>
+                        <timeBasedFileNamingAndTriggeringPolicy
+                                class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                                <maxFileSize>10MB</maxFileSize>
+                        </timeBasedFileNamingAndTriggeringPolicy>
+                </rollingPolicy>
+        </appender>
+
+        <logger name="net.cadrian.clef" level="info"
+                additivity="false">
+                <appender-ref ref="LOG" />
+        </logger>
+
+        <root level="error">
+                <appender-ref ref="STDOUT" />
+        </root>
+
+</configuration>
+EOF
+}
+
+exec java \
+     -classpath $HOME/.clef.d:/usr/share/java/Application.jar:%CLASSPATH% \
+     net.cadrian.clef.Clef

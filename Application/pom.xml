@@ -9,23 +9,30 @@
                 <relativePath>../Root/pom.xml</relativePath>
         </parent>
         <artifactId>Application</artifactId>
+        <packaging>jar</packaging>
         <name>ClefApplication</name>
+
+        <properties>
+                <debian.hasPackageVersion/>
+                <debian.originalVersion>0.0.1-SNAPSHOT</debian.originalVersion>
+                <debian.package>libclef-application-java</debian.package>
+        </properties>
 
         <dependencies>
                 <dependency>
                         <groupId>net.cadrian.clef</groupId>
                         <artifactId>Model</artifactId>
-                        <version>debian</version>
+                        <version>${project.version}</version>
                 </dependency>
                 <dependency>
                         <groupId>net.cadrian.clef</groupId>
                         <artifactId>Database</artifactId>
-                        <version>debian</version>
+                        <version>${project.version}</version>
                 </dependency>
                 <dependency>
                         <groupId>net.cadrian.clef</groupId>
                         <artifactId>UserInterface</artifactId>
-                        <version>debian</version>
+                        <version>${project.version}</version>
                 </dependency>
                 <dependency>
                         <groupId>ch.qos.logback</groupId>
