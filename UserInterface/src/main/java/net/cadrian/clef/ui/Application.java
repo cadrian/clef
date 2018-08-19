@@ -50,7 +50,7 @@ public class Application extends JFrame {
 
 	private void initUI() {
 		final ResourceBundle messages = getMessages();
-		setLookAndFeel();
+		setLookAndFeel(false);
 		setTitle(messages.getString("ClefTitle"));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -65,14 +65,22 @@ public class Application extends JFrame {
 		return messages;
 	}
 
-	private void setLookAndFeel() {
+	private void setLookAndFeel(boolean system) {
 		try {
-			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-			for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
-					LOGGER.info("Using Nimbus L&F");
-					UIManager.setLookAndFeel(info.getClassName());
-					break;
+			if (system) {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} else {
+				boolean foundNimbus = false;
+				for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+					if ("Nimbus".equals(info.getName())) {
+						LOGGER.info("Using Nimbus L&F");
+						UIManager.setLookAndFeel(info.getClassName());
+						foundNimbus = true;
+						break;
+					}
+				}
+				if (!foundNimbus) {
+					UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 				}
 			}
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException

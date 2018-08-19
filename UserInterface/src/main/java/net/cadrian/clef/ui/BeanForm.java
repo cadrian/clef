@@ -16,6 +16,7 @@
  */
 package net.cadrian.clef.ui;
 
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -67,7 +68,6 @@ class BeanForm<T extends Bean> extends JPanel {
 				LOGGER.error("BUG: could not save value", e);
 			}
 		}
-
 	}
 
 	private final T bean;
@@ -88,11 +88,15 @@ class BeanForm<T extends Bean> extends JPanel {
 		for (final FieldView<T, ?, ?> fieldView : fields.values()) {
 			final GridBagConstraints labelConstraints = new GridBagConstraints();
 			labelConstraints.gridy = gridy;
-			labelConstraints.anchor = GridBagConstraints.WEST;
-			labelConstraints.insets = new Insets(2, 2, 2, 2);
+			labelConstraints.anchor = GridBagConstraints.NORTHWEST;
+			labelConstraints.insets = new Insets(8, 2, 2, 2);
 			final String label = messages.getString("Field." + fieldView.model.name);
 			LOGGER.debug("Label for {} is {}", fieldView.model.name, label);
-			add(new JLabel(label), labelConstraints);
+			final JLabel jLabel = new JLabel(label);
+			final Font font = jLabel.getFont();
+			final Font boldFont = new Font(font.getFontName(), Font.BOLD, font.getSize());
+			jLabel.setFont(boldFont);
+			add(jLabel, labelConstraints);
 
 			final GridBagConstraints fieldConstraints = new GridBagConstraints();
 			fieldConstraints.gridx = 1;
