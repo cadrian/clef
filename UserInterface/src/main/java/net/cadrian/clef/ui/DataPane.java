@@ -25,6 +25,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -68,13 +69,14 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 		C getContext(DataPane<T, C> pane);
 	}
 
-	public DataPane(final Resources rc, final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator,
-			final BeanFormModel<T, C> beanFormModel) {
-		this(rc, (pane) -> null, beanGetter, beanCreator, beanFormModel, null);
+	public DataPane(final Resources rc, final JFrame parent, final BeanGetter<T> beanGetter,
+			final BeanCreator<T> beanCreator, final BeanFormModel<T, C> beanFormModel) {
+		this(rc, parent, (pane) -> null, beanGetter, beanCreator, beanFormModel, null);
 	}
 
-	public DataPane(final Resources rc, final ContextGetter<T, C> contextGetter, final BeanGetter<T> beanGetter,
-			final BeanCreator<T> beanCreator, final BeanFormModel<T, C> beanFormModel, final List<String> tabs) {
+	public DataPane(final Resources rc, final JFrame parent, final ContextGetter<T, C> contextGetter,
+			final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final BeanFormModel<T, C> beanFormModel,
+			final List<String> tabs) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
 		this.beanGetter = beanGetter;
 		this.beanCreator = beanCreator;
@@ -95,7 +97,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 					current.removeAll();
 					if (selected != null) {
 						LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
-						currentForm = new BeanForm<>(rc, contextGetter.getContext(DataPane.this), selected,
+						currentForm = new BeanForm<>(rc, contextGetter.getContext(DataPane.this), parent, selected,
 								beanFormModel, tabs);
 						current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
 						currentForm.load();

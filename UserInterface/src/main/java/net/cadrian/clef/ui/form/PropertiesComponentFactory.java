@@ -24,6 +24,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -133,7 +134,7 @@ public class PropertiesComponentFactory<C>
 
 	@Override
 	public FieldComponent<Collection<? extends Property>, JSplitPane> createComponent(final Resources rc,
-			final C context) {
+			final C context, JFrame parent) {
 		return new PropertiesComponent(writable);
 	}
 

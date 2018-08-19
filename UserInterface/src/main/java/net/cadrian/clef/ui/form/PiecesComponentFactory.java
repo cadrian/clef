@@ -18,6 +18,8 @@ package net.cadrian.clef.ui.form;
 
 import java.util.Collection;
 
+import javax.swing.JFrame;
+
 import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Work;
@@ -34,9 +36,9 @@ public class PiecesComponentFactory
 
 		private final DataPane<Piece, Work> component;
 
-		public PiecesComponent(final Resources rc, final BeanGetter<Piece> beanGetter,
+		public PiecesComponent(final Resources rc, JFrame parent, final BeanGetter<Piece> beanGetter,
 				final BeanCreator<Piece> beanCreator, final BeanFormModel<Piece, Work> beanFormModel) {
-			component = new DataPane<>(rc, beanGetter, beanCreator, beanFormModel);
+			component = new DataPane<>(rc, parent, beanGetter, beanCreator, beanFormModel);
 		}
 
 		@Override
@@ -72,7 +74,7 @@ public class PiecesComponentFactory
 
 	@Override
 	public FieldComponent<Collection<Piece>, DataPane<Piece, Work>> createComponent(final Resources rc,
-			final Work context) {
+			final Work context, JFrame parent) {
 		final BeanGetter<Piece> beanGetter = () -> context.getPieces();
 		final BeanCreator<Piece> beanCreator = new BeanCreator<Piece>() {
 
@@ -81,7 +83,7 @@ public class PiecesComponentFactory
 				return beans.createPiece(context);
 			}
 		};
-		return new PiecesComponent(rc, beanGetter, beanCreator, beanFormModel);
+		return new PiecesComponent(rc, parent, beanGetter, beanCreator, beanFormModel);
 	}
 
 	@Override

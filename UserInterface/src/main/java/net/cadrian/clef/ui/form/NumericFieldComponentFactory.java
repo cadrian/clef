@@ -19,6 +19,7 @@ package net.cadrian.clef.ui.form;
 import java.text.NumberFormat;
 
 import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
 
 import net.cadrian.clef.ui.Resources;
 
@@ -68,7 +69,7 @@ public class NumericFieldComponentFactory<C> extends AbstractFieldComponentFacto
 	}
 
 	@Override
-	public FieldComponent<Long, JFormattedTextField> createComponent(final Resources rc, final C context) {
+	public FieldComponent<Long, JFormattedTextField> createComponent(final Resources rc, final C context, JFrame parent) {
 		return new NumericFieldComponent(writable);
 	}
 

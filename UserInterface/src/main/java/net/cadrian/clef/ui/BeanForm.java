@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -84,8 +85,8 @@ class BeanForm<T extends Bean, C> extends JPanel {
 	private final T bean;
 	private final Map<String, FieldView<T, ?, ?, C>> fields = new LinkedHashMap<>();
 
-	public BeanForm(final Resources rc, final C context, final T bean, final BeanFormModel<T, C> model,
-			final List<String> tabs) {
+	public BeanForm(final Resources rc, final C context, final JFrame parent, final T bean,
+			final BeanFormModel<T, C> model, final List<String> tabs) {
 		super(new BorderLayout());
 		if (bean == null) {
 			throw new NullPointerException("null bean");
@@ -93,7 +94,7 @@ class BeanForm<T extends Bean, C> extends JPanel {
 		this.bean = bean;
 
 		for (final FieldModel<T, ?, ?, C> fieldModel : model.getFields().values()) {
-			final FieldView<T, ?, ?, C> fieldView = getFieldView(rc, context, fieldModel);
+			final FieldView<T, ?, ?, C> fieldView = getFieldView(rc, context, parent, fieldModel);
 			fields.put(fieldView.model.name, fieldView);
 		}
 
@@ -142,8 +143,8 @@ class BeanForm<T extends Bean, C> extends JPanel {
 	}
 
 	private <D, J extends JComponent> FieldView<T, D, J, C> getFieldView(final Resources rc, final C context,
-			final FieldModel<T, D, J, C> model) {
-		final FieldComponent<D, J> component = model.componentFactory.createComponent(rc, context);
+			final JFrame parent, final FieldModel<T, D, J, C> model) {
+		final FieldComponent<D, J> component = model.componentFactory.createComponent(rc, context, parent);
 		return new FieldView<>(model, component);
 	}
 

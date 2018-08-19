@@ -17,5 +17,10 @@
 			<artifactId>Model</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.lgooddatepicker</groupId>
+			<artifactId>LGoodDatePicker</artifactId>
+			<version>debian</version>
+		</dependency>
 	</dependencies>
 </project>

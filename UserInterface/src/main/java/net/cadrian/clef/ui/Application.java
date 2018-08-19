@@ -97,16 +97,17 @@ public class Application extends JFrame {
 
 		final JTabbedPane mgtPane = new JTabbedPane(SwingConstants.TOP);
 
-		mainPane.addTab(rc.getMessage("Sessions"), new DataPane<>(rc, beans::getSessions,
+		mainPane.addTab(rc.getMessage("Sessions"), new DataPane<>(rc, this, beans::getSessions,
 				new SessionCreator(rc, this, beans), new SessionFormModel(Session.class)));
 
 		mgtPane.addTab(rc.getMessage("Works"),
-				new DataPane<>(rc, (pane) -> pane.getSelection(), beans::getWorks, new WorkCreator(rc, this, beans),
-						new WorkFormModel(beans, Work.class), Arrays.asList("Description", "Pieces")));
+				new DataPane<>(rc, this, (pane) -> pane.getSelection(), beans::getWorks,
+						new WorkCreator(rc, this, beans), new WorkFormModel(beans, Work.class),
+						Arrays.asList("Description", "Pieces")));
 		mgtPane.addTab(rc.getMessage("Authors"),
-				new DataPane<>(rc, beans::getAuthors, beans::createAuthor, new AuthorFormModel(Author.class)));
-		mgtPane.addTab(rc.getMessage("Pricings"),
-				new DataPane<>(rc, beans::getPricings, beans::createPricing, new PricingFormModel(Pricing.class)));
+				new DataPane<>(rc, this, beans::getAuthors, beans::createAuthor, new AuthorFormModel(Author.class)));
+		mgtPane.addTab(rc.getMessage("Pricings"), new DataPane<>(rc, this, beans::getPricings, beans::createPricing,
+				new PricingFormModel(Pricing.class)));
 		mainPane.addTab(rc.getMessage("Management"), mgtPane);
 
 		mainPane.addTab(rc.getMessage("Statistics"), new JPanel()); // TODO
