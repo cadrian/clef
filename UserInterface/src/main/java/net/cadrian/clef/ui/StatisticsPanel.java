@@ -1,6 +1,5 @@
 package net.cadrian.clef.ui;
 
-import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -9,9 +8,9 @@ import java.awt.event.FocusEvent;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ class StatisticsPanel extends JPanel {
 	private final JLabel stdevPerPiece;
 
 	StatisticsPanel(final Resources rc, final Beans beans) {
-		super(new BorderLayout());
+		super(new GridBagLayout());
 		this.beans = beans;
 
 		final JPanel panel = new JPanel(new GridBagLayout());
@@ -50,7 +49,12 @@ class StatisticsPanel extends JPanel {
 		labels.put("StdDeviationPerPiece", stdevPerPiece);
 		addLabels(rc, labels, panel);
 
-		add(new JScrollPane(panel), BorderLayout.CENTER);
+		panel.setBorder(BorderFactory.createEtchedBorder());
+
+		final GridBagConstraints constraints = new GridBagConstraints();
+		constraints.anchor = GridBagConstraints.CENTER;
+		constraints.fill = GridBagConstraints.BOTH;
+		add(panel, constraints);
 
 		addFocusListener(new FocusAdapter() {
 			@Override
