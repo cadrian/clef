@@ -21,7 +21,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -110,7 +109,7 @@ public class Application extends JFrame {
 				new PricingFormModel(Pricing.class)));
 		mainPane.addTab(rc.getMessage("Management"), mgtPane);
 
-		mainPane.addTab(rc.getMessage("Statistics"), new JPanel()); // TODO
+		mainPane.addTab(rc.getMessage("Statistics"), new StatisticsPanel(rc, beans));
 	}
 
 }
