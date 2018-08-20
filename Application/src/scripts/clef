@@ -5,7 +5,7 @@ test -d $HOME/.clef.d || {
 
     mkdir -p $HOME/.clef.d/db $HOME/.clef.d/logs
     cat > $HOME/.clef.d/clef.properties <<EOF
-db.path = $HOME/clef.d/db/clef
+db.path = $HOME/.clef.d/db/clef
 db.username = sa
 db.password =
 EOF
