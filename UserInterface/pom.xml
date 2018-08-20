@@ -26,7 +26,7 @@
                 <dependency>
                         <groupId>com.github.lgooddatepicker</groupId>
                         <artifactId>LGoodDatePicker</artifactId>
-                        <version>debian</version>
+                        <version>8.3.0</version>
                 </dependency>
         </dependencies>
 </project>

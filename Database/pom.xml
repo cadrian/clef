@@ -27,12 +27,12 @@
                 <dependency>
                         <groupId>com.h2database</groupId>
                         <artifactId>h2</artifactId>
-                        <version>debian</version>
+                        <version>1.4.196</version>
                 </dependency>
                 <dependency>
                         <groupId>commons-dbcp</groupId>
                         <artifactId>commons-dbcp</artifactId>
-                        <version>debian</version>
+                        <version>1.4</version>
                 </dependency>
         </dependencies>
 </project>
