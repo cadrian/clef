@@ -69,7 +69,8 @@ public class NumericFieldComponentFactory<C> extends AbstractFieldComponentFacto
 	}
 
 	@Override
-	public FieldComponent<Long, JFormattedTextField> createComponent(final Resources rc, final C context, JFrame parent) {
+	public FieldComponent<Long, JFormattedTextField> createComponent(final Resources rc, final C context,
+			JFrame parent) {
 		return new NumericFieldComponent(writable);
 	}
 
