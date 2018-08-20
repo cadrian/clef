@@ -30,17 +30,21 @@ import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.Property;
+import net.cadrian.clef.model.bean.PropertyDescriptor;
+import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.model.bean.Work;
 
 public class ModelBeansTest extends AbstractDatabaseTestHarness {
 
 	private ModelBeans beans;
+	private PropertyDescriptor copyrightPropertyDescriptor;
 
 	@Before
 	@Override
 	public void setup() throws DatabaseException {
 		super.setup();
 		beans = new ModelBeans(getManager());
+		copyrightPropertyDescriptor = beans.createPropertyDescriptor(Entity.piece);
 	}
 
 	@Test
@@ -68,7 +72,7 @@ public class ModelBeansTest extends AbstractDatabaseTestHarness {
 		Assert.assertTrue(pieces.contains(lullaby));
 		Assert.assertTrue(pieces.contains(waltz));
 
-		Property copyright = beans.createProperty("COPYRIGHT");
+		Property copyright = beans.createProperty(copyrightPropertyDescriptor);
 		copyright.setValue("This is a test, it has no rights");
 
 		final Set<Property> propertiesToSet = new HashSet<>();

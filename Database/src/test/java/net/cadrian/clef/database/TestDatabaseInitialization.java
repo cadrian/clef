@@ -16,6 +16,8 @@
  */
 package net.cadrian.clef.database;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -28,8 +30,6 @@ import java.sql.SQLException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.cadrian.clef.database.DatabaseManager;
-
 /**
  * Low-level database initialization test. Does not use the DatabaseBeans
  * framework.
@@ -39,26 +39,50 @@ public class TestDatabaseInitialization extends AbstractDatabaseTestHarness {
 	@Test
 	public void testInitialization() throws Exception {
 		final DatabaseManager mgr = getManager();
-		readProperties(mgr, "1.0.0");
-		incrementVersion(mgr);
-		readProperties(mgr, "42");
+
+		Long versionPD = readPropertyDescriptor(mgr, "meta", "VERSION");
+		assertNotNull(versionPD);
+
+		readProperties(mgr, versionPD, "1.0.0");
+		incrementVersion(mgr, versionPD);
+		readProperties(mgr, versionPD, "42");
 
 		// check if second init keeps the database data
-		readProperties(new DatabaseManager(getDataSource()), "42");
+		readProperties(new DatabaseManager(getDataSource()), versionPD, "42");
 	}
 
-	private void readProperties(final DatabaseManager mgr, final String expectedVersion) throws Exception {
+	private Long readPropertyDescriptor(final DatabaseManager mgr, final String entity, final String name)
+			throws Exception {
+		final Long result;
+		try (Connection cnx = mgr.getConnection();
+				PreparedStatement ps = cnx
+						.prepareStatement("SELECT id FROM property_descriptor WHERE entity=? and name=?")) {
+			ps.setString(1, entity);
+			ps.setString(2, name);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					result = rs.getLong("id");
+				} else {
+					result = null;
+				}
+			}
+		}
+		return result;
+	}
+
+	private void readProperties(final DatabaseManager mgr, final long versionPD, final String expectedVersion)
+			throws Exception {
 		try (Connection cnx = mgr.getConnection();
 				PreparedStatement ps = cnx.prepareStatement("SELECT * FROM property");
 				ResultSet rs = ps.executeQuery()) {
 			Assert.assertTrue(rs.next());
 			final long id = rs.getLong("id");
-			final String name = rs.getString("name");
+			final long pdId = rs.getLong("property_descriptor_id");
 			final String value = readClob("value", rs);
 			Assert.assertFalse(rs.next());
 
 			Assert.assertEquals(1L, id);
-			Assert.assertEquals("VERSION", name);
+			Assert.assertEquals(versionPD, pdId);
 			Assert.assertEquals(expectedVersion, value);
 		}
 	}
@@ -79,15 +103,16 @@ public class TestDatabaseInitialization extends AbstractDatabaseTestHarness {
 		return result;
 	}
 
-	private void incrementVersion(final DatabaseManager mgr) throws Exception {
+	private void incrementVersion(final DatabaseManager mgr, final long versionPD) throws Exception {
 		try (Connection cnx = mgr.getConnection()) {
 			cnx.setAutoCommit(false);
-			try (PreparedStatement ps = cnx.prepareStatement("UPDATE property SET value=? WHERE name=?")) {
+			try (PreparedStatement ps = cnx
+					.prepareStatement("UPDATE property SET value=? WHERE property_descriptor_id=?")) {
 				final Clob value = cnx.createClob();
 				value.setString(1, "42"); // new fancy version number
 
 				ps.setClob(1, value);
-				ps.setString(2, "VERSION");
+				ps.setLong(2, versionPD);
 
 				ps.execute();
 			}

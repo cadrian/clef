@@ -22,16 +22,17 @@ import java.util.List;
 import net.cadrian.clef.database.io.ClobField;
 import net.cadrian.clef.database.io.Condition;
 import net.cadrian.clef.database.io.Field;
-import net.cadrian.clef.database.io.StringField;
+import net.cadrian.clef.database.io.LongField;
 
 public class Property extends AbstractBean<Property> {
 
 	private static final String TABLE_NAME = "property";
 	private static final List<Field<Property>> FIELDS = Arrays.asList(
-			new StringField<>("name", Property::getName, Property::setName, Condition.EQ),
+			new LongField<>("property_descriptor_id", Property::getPropertyDescriptorId,
+					Property::setPropertyDescriptorId, Condition.EQ),
 			new ClobField<>("value", Property::getValue, Property::setValue));
 
-	private String name;
+	private Long propertyDescriptorId;
 	private String value;
 
 	public Property() {
@@ -42,12 +43,12 @@ public class Property extends AbstractBean<Property> {
 		super(id);
 	}
 
-	public String getName() {
-		return name;
+	public Long getPropertyDescriptorId() {
+		return propertyDescriptorId;
 	}
 
-	public void setName(final String name) {
-		this.name = name;
+	public void setPropertyDescriptorId(Long dictionaryId) {
+		this.propertyDescriptorId = dictionaryId;
 	}
 
 	public String getValue() {

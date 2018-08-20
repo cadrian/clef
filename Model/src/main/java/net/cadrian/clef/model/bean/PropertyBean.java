@@ -22,6 +22,8 @@ import net.cadrian.clef.model.Bean;
 
 public interface PropertyBean extends Bean {
 
+	PropertyDescriptor.Entity getEntity();
+
 	Collection<? extends Property> getProperties();
 
 	void setProperties(Collection<? extends Property> properties);

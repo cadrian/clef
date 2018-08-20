@@ -16,7 +16,14 @@
  */
 package net.cadrian.clef.model.bean;
 
+import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
+
 public interface Author extends PropertyBean {
+
+	@Override
+	default PropertyDescriptor.Entity getEntity() {
+		return Entity.author;
+	}
 
 	String getName();
 

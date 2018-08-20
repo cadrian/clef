@@ -18,12 +18,21 @@ package net.cadrian.clef.model.bean;
 
 import net.cadrian.clef.model.Bean;
 
-public interface Property extends Bean {
+public interface PropertyDescriptor extends Bean {
 
-	PropertyDescriptor getPropertyDescriptor();
+	public static enum Entity {
+		// keep meta out (low-level management only)
+		author, work, piece, session;
+	}
 
-	String getValue();
+	Entity getEntity();
 
-	void setValue(String value);
+	String getName();
+
+	void setName(String name);
+
+	String getDescription();
+
+	void setDescription(String description);
 
 }

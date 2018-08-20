@@ -128,8 +128,8 @@ abstract class AbstractPropertyBean<T extends DatabasePropertyBean> extends Abst
 
 	@Override
 	public void delete(final Connection cnx) throws DatabaseException {
-		super.delete(cnx);
 		deleteOldProperties(getId(), cnx);
+		super.delete(cnx);
 	}
 
 }

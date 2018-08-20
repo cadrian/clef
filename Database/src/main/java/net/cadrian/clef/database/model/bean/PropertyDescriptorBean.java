@@ -17,15 +17,14 @@
 package net.cadrian.clef.database.model.bean;
 
 import net.cadrian.clef.database.DatabaseException;
-import net.cadrian.clef.database.bean.Property;
+import net.cadrian.clef.database.bean.PropertyDescriptor;
 import net.cadrian.clef.model.ModelException;
-import net.cadrian.clef.model.bean.PropertyDescriptor;
 
-public class PropertyBean extends AbstractBean implements net.cadrian.clef.model.bean.Property {
+public class PropertyDescriptorBean extends AbstractBean implements net.cadrian.clef.model.bean.PropertyDescriptor {
 
-	private final Property bean;
+	private final PropertyDescriptor bean;
 
-	public PropertyBean(final Property bean, final DatabaseBeansHolder db) {
+	public PropertyDescriptorBean(final PropertyDescriptor bean, final DatabaseBeansHolder db) {
 		super(db);
 		this.bean = bean;
 	}
@@ -36,24 +35,34 @@ public class PropertyBean extends AbstractBean implements net.cadrian.clef.model
 	}
 
 	@Override
-	public PropertyDescriptor getPropertyDescriptor() {
-		return db.getPropertyDescriptor(bean.getPropertyDescriptorId());
+	public Entity getEntity() {
+		return Entity.valueOf(bean.getEntity());
 	}
 
 	@Override
-	public String getValue() {
-		return bean.getValue();
+	public String getName() {
+		return bean.getName();
 	}
 
 	@Override
-	public void setValue(final String value) {
-		bean.setValue(value);
+	public void setName(String name) {
+		bean.setName(name);
+	}
+
+	@Override
+	public String getDescription() {
+		return bean.getDescription();
+	}
+
+	@Override
+	public void setDescription(final String description) {
+		bean.setDescription(description);
 		update();
 	}
 
 	private void update() {
 		try {
-			db.getProperties().update(bean);
+			db.getPropertyDescriptors().update(bean);
 		} catch (final DatabaseException e) {
 			throw new ModelException(e);
 		}
@@ -62,7 +71,7 @@ public class PropertyBean extends AbstractBean implements net.cadrian.clef.model
 	@Override
 	public void delete() {
 		try {
-			db.getProperties().delete(bean);
+			db.getPropertyDescriptors().delete(bean);
 		} catch (final DatabaseException e) {
 			throw new ModelException(e);
 		}
@@ -70,8 +79,7 @@ public class PropertyBean extends AbstractBean implements net.cadrian.clef.model
 
 	@Override
 	public String toString() {
-		final PropertyDescriptor propertyDescriptor = getPropertyDescriptor();
-		final String name = propertyDescriptor.getName();
+		final String name = getName();
 		if (name == null || name.isEmpty()) {
 			return "(no name)";
 		}

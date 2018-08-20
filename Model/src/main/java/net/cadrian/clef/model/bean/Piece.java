@@ -18,7 +18,14 @@ package net.cadrian.clef.model.bean;
 
 import java.util.Collection;
 
+import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
+
 public interface Piece extends PropertyBean {
+
+	@Override
+	default PropertyDescriptor.Entity getEntity() {
+		return Entity.piece;
+	}
 
 	Work getWork();
 

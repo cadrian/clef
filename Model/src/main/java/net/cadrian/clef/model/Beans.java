@@ -22,6 +22,7 @@ import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.Property;
+import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.model.bean.Work;
 
@@ -29,7 +30,9 @@ public interface Beans {
 
 	Session createSession(Piece piece);
 
-	Property createProperty(String name);
+	Property createProperty(PropertyDescriptor propertyDescriptor);
+
+	PropertyDescriptor createPropertyDescriptor(PropertyDescriptor.Entity entity);
 
 	Piece createPiece(Work work);
 
@@ -39,18 +42,20 @@ public interface Beans {
 
 	Pricing createPricing();
 
+	Collection<? extends Pricing> getPricings();
+
+	Collection<? extends Author> getAuthors();
+
+	Collection<? extends Work> getWorks();
+
 	Collection<? extends Work> getWorksBy(Author author);
 
 	Collection<? extends Work> getWorksPriced(Pricing pricing);
 
-	Collection<? extends Work> getWorks();
-
 	Collection<? extends Piece> getPieces();
 
-	Collection<? extends Author> getAuthors();
-
-	Collection<? extends Pricing> getPricings();
-
 	Collection<? extends Session> getSessions();
+
+	Collection<? extends PropertyDescriptor> getPropertyDescriptors(PropertyDescriptor.Entity entity);
 
 }

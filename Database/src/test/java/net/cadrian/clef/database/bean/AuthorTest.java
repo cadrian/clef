@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import net.cadrian.clef.database.AbstractDatabaseTestHarness;
@@ -27,6 +28,22 @@ import net.cadrian.clef.database.DatabaseBeans;
 import net.cadrian.clef.database.DatabaseException;
 
 public class AuthorTest extends AbstractDatabaseTestHarness {
+
+	private Long fooPropertyDescriptorId;
+
+	@Override
+	@Before
+	public void setup() throws DatabaseException {
+		super.setup();
+
+		final DatabaseBeans<PropertyDescriptor> propertyDescriptors = new DatabaseBeans<>(getDataSource(),
+				PropertyDescriptor.class);
+		final PropertyDescriptor template = new PropertyDescriptor();
+		template.setEntity("author");
+		template.setName("FOO");
+		PropertyDescriptor inserted = propertyDescriptors.insert(template);
+		fooPropertyDescriptorId = inserted.getId();
+	}
 
 	@Test
 	public void testLoad() throws DatabaseException {
@@ -56,7 +73,7 @@ public class AuthorTest extends AbstractDatabaseTestHarness {
 
 		final Property propertyTemplate = new Property(authorProperties.iterator().next());
 		final Property checkAuthorProperty = properties.readOne(propertyTemplate);
-		Assert.assertEquals("FOO", checkAuthorProperty.getName());
+		Assert.assertEquals(fooPropertyDescriptorId, checkAuthorProperty.getPropertyDescriptorId());
 		Assert.assertEquals("BAR", checkAuthorProperty.getValue());
 	}
 
@@ -76,8 +93,6 @@ public class AuthorTest extends AbstractDatabaseTestHarness {
 
 		final int count = authors.count(authorTemplate);
 		Assert.assertEquals(0, count);
-
-		// TODO: how to check that all properties where effectively removed?
 	}
 
 	private void insertTestAuthor(final DatabaseBeans<Author> authors, final DatabaseBeans<Property> properties)
@@ -85,7 +100,7 @@ public class AuthorTest extends AbstractDatabaseTestHarness {
 		Author newAuthor = new Author(null);
 		newAuthor.setName("POLOP");
 		Property newAuthorProperty = new Property();
-		newAuthorProperty.setName("FOO");
+		newAuthorProperty.setPropertyDescriptorId(fooPropertyDescriptorId);
 		newAuthorProperty.setValue("BAR");
 
 		newAuthorProperty = properties.insert(newAuthorProperty);
