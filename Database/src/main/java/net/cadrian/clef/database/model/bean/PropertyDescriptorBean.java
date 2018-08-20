@@ -17,6 +17,7 @@
 package net.cadrian.clef.database.model.bean;
 
 import net.cadrian.clef.database.DatabaseException;
+import net.cadrian.clef.database.bean.Property;
 import net.cadrian.clef.database.bean.PropertyDescriptor;
 import net.cadrian.clef.model.ModelException;
 
@@ -45,7 +46,7 @@ public class PropertyDescriptorBean extends AbstractBean implements net.cadrian.
 	}
 
 	@Override
-	public void setName(String name) {
+	public void setName(final String name) {
 		bean.setName(name);
 	}
 
@@ -58,6 +59,17 @@ public class PropertyDescriptorBean extends AbstractBean implements net.cadrian.
 	public void setDescription(final String description) {
 		bean.setDescription(description);
 		update();
+	}
+
+	@Override
+	public int countUsages() {
+		try {
+			final Property template = new Property();
+			template.setPropertyDescriptorId(getId());
+			return db.getProperties().count(template);
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
 	}
 
 	private void update() {

@@ -110,5 +110,7 @@ public class Application extends JFrame {
 		mainPane.addTab(rc.getMessage("Management"), mgtPane);
 
 		mainPane.addTab(rc.getMessage("Statistics"), new StatisticsPanel(rc, beans));
+
+		mainPane.addTab(rc.getMessage("Configuration"), new ConfigurationPanel(rc, beans));
 	}
 }

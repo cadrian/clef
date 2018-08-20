@@ -54,9 +54,9 @@ public class Resources {
 		LOGGER.debug("Font Awesome: {}", awesomeFont);
 	}
 
-	public String getMessage(final String key) {
+	public String getMessage(final String key, final Object... args) {
 		try {
-			return messages.getString(key);
+			return String.format(messages.getString(key), args);
 		} catch (final MissingResourceException e) {
 			LOGGER.warn("Missing resource: {}", key);
 			return key;

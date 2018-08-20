@@ -35,4 +35,6 @@ public interface PropertyDescriptor extends Bean {
 
 	void setDescription(String description);
 
+	int countUsages();
+
 }
