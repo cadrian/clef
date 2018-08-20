@@ -19,8 +19,8 @@ package net.cadrian.clef.ui;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -58,7 +58,7 @@ class StatisticsPanel extends JPanel {
 		stdevPerWork = new JLabel();
 		meanPerPiece = new JLabel();
 		stdevPerPiece = new JLabel();
-		Map<String, JLabel> labels = new LinkedHashMap<>();
+		final Map<String, JLabel> labels = new LinkedHashMap<>();
 		labels.put("MeanPerWork", meanPerWork);
 		labels.put("StdDeviationPerWork", stdevPerWork);
 		labels.put("MeanPerPiece", meanPerPiece);
@@ -72,9 +72,9 @@ class StatisticsPanel extends JPanel {
 		constraints.fill = GridBagConstraints.BOTH;
 		add(panel, constraints);
 
-		addFocusListener(new FocusAdapter() {
+		addComponentListener(new ComponentAdapter() {
 			@Override
-			public void focusGained(FocusEvent e) {
+			public void componentShown(final ComponentEvent e) {
 				refresh();
 			}
 		});
@@ -82,7 +82,7 @@ class StatisticsPanel extends JPanel {
 		refresh();
 	}
 
-	private void addLabels(Resources rc, Map<String, JLabel> labels, JPanel panel) {
+	private void addLabels(final Resources rc, final Map<String, JLabel> labels, final JPanel panel) {
 		int gridy = 0;
 		for (final Map.Entry<String, JLabel> entry : labels.entrySet()) {
 			final GridBagConstraints labelConstraints = new GridBagConstraints();
@@ -115,7 +115,7 @@ class StatisticsPanel extends JPanel {
 			nw++;
 			long twp = 0;
 			for (final Piece piece : work.getPieces()) {
-				Long duration = piece.getDuration();
+				final Long duration = piece.getDuration();
 				if (duration != null) {
 					twp += duration;
 					tp += duration;
@@ -125,8 +125,8 @@ class StatisticsPanel extends JPanel {
 			tw += twp;
 		}
 
-		long mw = nw == 0 ? 0 : tw / nw;
-		long mp = np == 0 ? 0 : tp / np;
+		final long mw = nw == 0 ? 0 : tw / nw;
+		final long mp = np == 0 ? 0 : tp / np;
 
 		long sw = 0;
 		long sp = 0;
@@ -134,14 +134,14 @@ class StatisticsPanel extends JPanel {
 		for (final Work work : beans.getWorks()) {
 			long twp = 0;
 			for (final Piece piece : work.getPieces()) {
-				Long duration = piece.getDuration();
+				final Long duration = piece.getDuration();
 				if (duration != null) {
 					twp += duration;
-					long dp = mp - duration;
+					final long dp = mp - duration;
 					sp += dp * dp;
 				}
 			}
-			long dp = mw - twp;
+			final long dp = mw - twp;
 			sw += dp * dp;
 		}
 
@@ -154,8 +154,8 @@ class StatisticsPanel extends JPanel {
 		stdevPerPiece.setText(format(sp));
 	}
 
-	private final String format(long time) {
-		StringBuilder result = new StringBuilder();
+	private final String format(final long time) {
+		final StringBuilder result = new StringBuilder();
 		long s = time;
 		long m = s / 60;
 		s -= m * 60;
