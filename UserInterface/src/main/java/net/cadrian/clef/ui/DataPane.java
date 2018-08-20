@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
@@ -85,6 +86,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 		final JPanel left = new JPanel(new BorderLayout());
 
 		left.add(new JScrollPane(list), BorderLayout.CENTER);
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -123,7 +125,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 			private static final long serialVersionUID = -5722810007033837355L;
 
 			@Override
-			public void actionPerformed(final ActionEvent arg0) {
+			public void actionPerformed(final ActionEvent e) {
 				addData();
 			}
 		};
@@ -132,7 +134,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 			private static final long serialVersionUID = -8206872556606892261L;
 
 			@Override
-			public void actionPerformed(final ActionEvent arg0) {
+			public void actionPerformed(final ActionEvent e) {
 				delData();
 			}
 		};
@@ -141,7 +143,7 @@ public class DataPane<T extends Bean, C> extends JSplitPane {
 			private static final long serialVersionUID = -8659808353683696964L;
 
 			@Override
-			public void actionPerformed(final ActionEvent arg0) {
+			public void actionPerformed(final ActionEvent e) {
 				saveData();
 			}
 		};
