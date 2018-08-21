@@ -48,6 +48,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Property;
@@ -58,6 +61,8 @@ import net.cadrian.clef.ui.Presentation;
 
 public class PropertiesComponentFactory<C extends Bean>
 		extends AbstractFieldComponentFactory<Collection<? extends Property>, JSplitPane, C> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesComponentFactory.class);
 
 	private static class PropertiesComponent implements FieldComponent<Collection<? extends Property>, JSplitPane> {
 
@@ -201,6 +206,7 @@ public class PropertiesComponentFactory<C extends Bean>
 					@Override
 					public void actionPerformed(final ActionEvent e) {
 						addData(list.getSelectedIndex());
+						setEnabled(!getAddableDescriptors().isEmpty());
 					}
 				};
 
@@ -210,6 +216,7 @@ public class PropertiesComponentFactory<C extends Bean>
 					@Override
 					public void actionPerformed(final ActionEvent e) {
 						delData(list.getSelectedIndex());
+						addAction.setEnabled(true);
 					}
 				};
 
@@ -217,6 +224,17 @@ public class PropertiesComponentFactory<C extends Bean>
 				buttons.add(new JSeparator());
 				buttons.add(delAction);
 				left.add(context.getPresentation().awesome(buttons), BorderLayout.SOUTH);
+
+				list.addListSelectionListener(new ListSelectionListener() {
+
+					@Override
+					public void valueChanged(ListSelectionEvent e) {
+						delAction.setEnabled(!list.isSelectionEmpty());
+					}
+				});
+
+				addAction.setEnabled(!getAddableDescriptors().isEmpty());
+				delAction.setEnabled(false);
 			}
 
 			component.setLeftComponent(left);
@@ -302,17 +320,27 @@ public class PropertiesComponentFactory<C extends Bean>
 			return 1;
 		}
 
-		void addData(final int index) {
+		Collection<PropertyDescriptor> getAddableDescriptors() {
 			final Set<PropertyDescriptor> descriptors = new HashSet<>(
 					context.getBeans().getPropertyDescriptors(entity));
+
+			LOGGER.debug("descriptors for {}: {}", entity, descriptors);
 
 			final Enumeration<EditableProperty> elements = model.elements();
 			while (elements.hasMoreElements()) {
 				final EditableProperty property = elements.nextElement();
-				descriptors.remove(property.getPropertyDescriptor());
+				PropertyDescriptor propertyDescriptor = property.getPropertyDescriptor();
+				LOGGER.debug("property: {} (descriptor: {}) => removed", property, propertyDescriptor);
+				descriptors.remove(propertyDescriptor);
 			}
 
-			final List<PropertyDescriptor> addableDescriptors = new ArrayList<>(descriptors);
+			LOGGER.debug("remaining descriptors for {}: {}", entity, descriptors);
+
+			return descriptors;
+		}
+
+		void addData(final int index) {
+			final List<PropertyDescriptor> addableDescriptors = new ArrayList<>(getAddableDescriptors());
 			addableDescriptors.sort((d1, d2) -> d1.getName().compareTo(d2.getName()));
 
 			final AddPropertyChooser chooser = new AddPropertyChooser(context, entity, addableDescriptors);

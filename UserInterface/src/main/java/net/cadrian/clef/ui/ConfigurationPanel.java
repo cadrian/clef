@@ -37,6 +37,8 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import org.slf4j.Logger;
@@ -127,6 +129,15 @@ class ConfigurationPanel extends JTabbedPane {
 		buttons.add(new JSeparator());
 		buttons.add(delAction);
 		result.add(context.getPresentation().awesome(buttons), BorderLayout.SOUTH);
+
+		delAction.setEnabled(false);
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				delAction.setEnabled(model.canDelRow(table.getSelectedRow()));
+			}
+		});
 
 		return result;
 	}
@@ -227,20 +238,23 @@ class ConfigurationPanel extends JTabbedPane {
 			fireTableRowsInserted(row, row);
 		}
 
+		public boolean canDelRow(final int row) {
+			if (row != -1) {
+				final EditableBean deleted = editableBeans.get(row);
+				return canBeDeleted(deleted.getBean());
+			}
+			return false;
+		}
+
 		public void delRow(final int row) {
 			if (row != -1) {
 				final EditableBean deleted = editableBeans.get(row);
-				if (canBeDeleted(deleted.getBean())) {
+				final PropertyDescriptor bean = deleted.getBean();
+				if (canBeDeleted(bean)) {
 					editableBeans.remove(row);
 					deletedBeans.add(deleted);
 					fireTableRowsDeleted(row, row);
-				}
-			}
-		}
-
-		private boolean canBeDeleted(final PropertyDescriptor bean) {
-			if (bean != null) {
-				if (bean.countUsages() > 0) {
+				} else {
 					final String name = bean.getName();
 					LOGGER.error("Cannot delete: there are occurrences of the {} property for entity {}", name,
 							configurableBean.entity);
@@ -248,6 +262,13 @@ class ConfigurationPanel extends JTabbedPane {
 					JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
 							presentation.getMessage("CannotDeletePropertyMessage", name),
 							presentation.getMessage("CannotDeletePropertyTitle"), JOptionPane.WARNING_MESSAGE);
+				}
+			}
+		}
+
+		private boolean canBeDeleted(final PropertyDescriptor bean) {
+			if (bean != null) {
+				if (bean.countUsages() > 0) {
 					return false;
 				}
 			}

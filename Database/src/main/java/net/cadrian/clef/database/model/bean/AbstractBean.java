@@ -39,4 +39,10 @@ abstract class AbstractBean implements Bean {
 		return getId().equals(((AbstractBean) obj).getId());
 	}
 
+	@Override
+	public int hashCode() {
+		final Long id = getId();
+		return id == null ? 0 : id.hashCode();
+	}
+
 }
