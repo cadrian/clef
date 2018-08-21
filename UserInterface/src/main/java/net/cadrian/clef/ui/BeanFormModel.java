@@ -28,11 +28,11 @@ import org.slf4j.LoggerFactory;
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.form.FieldComponentFactory;
 
-public abstract class BeanFormModel<T extends Bean, C> {
+public abstract class BeanFormModel<T extends Bean, C extends Bean> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BeanFormModel.class);
 
-	static class FieldModel<T extends Bean, D, J extends JComponent, C> {
+	static class FieldModel<T extends Bean, D, J extends JComponent, C extends Bean> {
 		final String name;
 		final Class<D> type;
 		final Method getter;

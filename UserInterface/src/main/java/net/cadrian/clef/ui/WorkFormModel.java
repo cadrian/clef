@@ -21,9 +21,9 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
-import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.Pricing;
+import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.form.BeanComponentFactory;
 import net.cadrian.clef.ui.form.FieldComponentFactory;
@@ -34,29 +34,27 @@ import net.cadrian.clef.ui.form.TextFieldComponentFactory;
 
 class WorkFormModel extends BeanFormModel<Work, Work> {
 
-	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, Work>> getComponentFactories(
-			Beans beans) {
-		final Map<String, FieldComponentFactory<?, ? extends JComponent, Work>> result = new LinkedHashMap<>();
+	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, Work>> COMPONENT_FACTORIES = new LinkedHashMap<>();
+	static {
 		final TextFieldComponentFactory<Work> nameFactory = new TextFieldComponentFactory<>(true, "Description");
 		final TextAreaComponentFactory<Work> notesFactory = new TextAreaComponentFactory<>(true, "Description");
-		final PropertiesComponentFactory<Work> propertiesFactory = new PropertiesComponentFactory<>(true,
+		final PropertiesComponentFactory<Work> propertiesFactory = new PropertiesComponentFactory<>(Entity.work, true,
 				"Description");
 		final BeanComponentFactory<Author, Work> authorFactory = new BeanComponentFactory<>(Author.class,
 				"Description");
 		final BeanComponentFactory<Pricing, Work> pricingFactory = new BeanComponentFactory<>(Pricing.class,
 				"Description");
-		final PiecesComponentFactory piecesFactory = new PiecesComponentFactory(beans, new PieceFormModel(), "Pieces");
-		result.put("Author", authorFactory);
-		result.put("Pricing", pricingFactory);
-		result.put("Name", nameFactory);
-		result.put("Notes", notesFactory);
-		result.put("Properties", propertiesFactory);
-		result.put("Pieces", piecesFactory);
-		return result;
+		final PiecesComponentFactory piecesFactory = new PiecesComponentFactory(new PieceFormModel(), "Pieces");
+		COMPONENT_FACTORIES.put("Author", authorFactory);
+		COMPONENT_FACTORIES.put("Pricing", pricingFactory);
+		COMPONENT_FACTORIES.put("Name", nameFactory);
+		COMPONENT_FACTORIES.put("Notes", notesFactory);
+		COMPONENT_FACTORIES.put("Properties", propertiesFactory);
+		COMPONENT_FACTORIES.put("Pieces", piecesFactory);
 	}
 
-	WorkFormModel(final Beans beans, final Class<Work> beanType) {
-		super(beanType, getComponentFactories(beans));
+	WorkFormModel(final Class<Work> beanType) {
+		super(beanType, COMPONENT_FACTORIES);
 	}
 
 }

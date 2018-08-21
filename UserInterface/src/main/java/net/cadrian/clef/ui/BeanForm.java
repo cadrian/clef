@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -38,13 +37,13 @@ import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.BeanFormModel.FieldModel;
 import net.cadrian.clef.ui.form.FieldComponent;
 
-class BeanForm<T extends Bean, C> extends JPanel {
+class BeanForm<T extends Bean, C extends Bean> extends JPanel {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BeanForm.class);
 
 	private static final long serialVersionUID = -2371381405618937355L;
 
-	private static class FieldView<T extends Bean, D, J extends JComponent, C> {
+	private static class FieldView<T extends Bean, D, J extends JComponent, C extends Bean> {
 		final BeanFormModel.FieldModel<T, D, J, C> model;
 		final FieldComponent<D, J> component;
 
@@ -85,7 +84,7 @@ class BeanForm<T extends Bean, C> extends JPanel {
 	private final T bean;
 	private final Map<String, FieldView<T, ?, ?, C>> fields = new LinkedHashMap<>();
 
-	public BeanForm(final Resources rc, final C context, final JFrame parent, final T bean,
+	public BeanForm(final ApplicationContext context, final C contextBean, final T bean,
 			final BeanFormModel<T, C> model, final List<String> tabs) {
 		super(new BorderLayout());
 		if (bean == null) {
@@ -94,27 +93,29 @@ class BeanForm<T extends Bean, C> extends JPanel {
 		this.bean = bean;
 
 		for (final FieldModel<T, ?, ?, C> fieldModel : model.getFields().values()) {
-			final FieldView<T, ?, ?, C> fieldView = getFieldView(rc, context, parent, fieldModel);
+			final FieldView<T, ?, ?, C> fieldView = getFieldView(context, contextBean, fieldModel);
 			fields.put(fieldView.model.name, fieldView);
 		}
 
+		final Presentation presentation = context.getPresentation();
+
 		if (tabs == null) {
 			final JPanel panel = new JPanel(new GridBagLayout());
-			addFields(rc, panel, null);
+			addFields(presentation, panel, null);
 			add(panel, BorderLayout.CENTER);
 		} else {
 			final JTabbedPane tabbedPane = new JTabbedPane();
 			for (final String tab : tabs) {
 				LOGGER.info("Adding tab: {}", tab);
 				final JPanel panel = new JPanel(new GridBagLayout());
-				addFields(rc, panel, tab);
-				tabbedPane.add(rc.getMessage(tab), panel);
+				addFields(presentation, panel, tab);
+				tabbedPane.add(presentation.getMessage(tab), panel);
 			}
 			add(tabbedPane, BorderLayout.CENTER);
 		}
 	}
 
-	private void addFields(final Resources rc, final JPanel panel, final String tab) {
+	private void addFields(final Presentation presentation, final JPanel panel, final String tab) {
 		int gridy = 0;
 		for (final FieldView<T, ?, ?, C> fieldView : fields.values()) {
 			if (tab == null || tab.equals(fieldView.model.componentFactory.getTab())) {
@@ -122,9 +123,9 @@ class BeanForm<T extends Bean, C> extends JPanel {
 				labelConstraints.gridy = gridy;
 				labelConstraints.anchor = GridBagConstraints.NORTHWEST;
 				labelConstraints.insets = new Insets(8, 2, 2, 2);
-				final String label = rc.getMessage("Field." + fieldView.model.name);
+				final String label = presentation.getMessage("Field." + fieldView.model.name);
 				LOGGER.debug("Label for {} is {}", fieldView.model.name, label);
-				panel.add(rc.bolden(new JLabel(label)), labelConstraints);
+				panel.add(presentation.bold(new JLabel(label)), labelConstraints);
 
 				final GridBagConstraints fieldConstraints = new GridBagConstraints();
 				fieldConstraints.gridx = 1;
@@ -142,9 +143,9 @@ class BeanForm<T extends Bean, C> extends JPanel {
 		}
 	}
 
-	private <D, J extends JComponent> FieldView<T, D, J, C> getFieldView(final Resources rc, final C context,
-			final JFrame parent, final FieldModel<T, D, J, C> model) {
-		final FieldComponent<D, J> component = model.componentFactory.createComponent(rc, context, parent);
+	private <D, J extends JComponent> FieldView<T, D, J, C> getFieldView(final ApplicationContext context,
+			final C contextBean, final FieldModel<T, D, J, C> model) {
+		final FieldComponent<D, J> component = model.componentFactory.createComponent(context, contextBean);
 		return new FieldView<>(model, component);
 	}
 

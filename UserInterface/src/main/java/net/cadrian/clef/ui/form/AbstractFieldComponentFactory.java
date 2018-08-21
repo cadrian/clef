@@ -18,7 +18,10 @@ package net.cadrian.clef.ui.form;
 
 import javax.swing.JComponent;
 
-abstract class AbstractFieldComponentFactory<D, J extends JComponent, C> implements FieldComponentFactory<D, J, C> {
+import net.cadrian.clef.model.Bean;
+
+abstract class AbstractFieldComponentFactory<D, J extends JComponent, C extends Bean>
+		implements FieldComponentFactory<D, J, C> {
 
 	protected final boolean writable;
 	private final String tab;

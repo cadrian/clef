@@ -17,7 +17,6 @@
 package net.cadrian.clef.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +42,6 @@ import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.Piece;
@@ -75,19 +73,20 @@ class ConfigurationPanel extends JTabbedPane {
 			new ConfigurableBeanDescription(Entity.piece, Piece.class),
 			new ConfigurableBeanDescription(Entity.session, Session.class));
 
-	ConfigurationPanel(final Resources rc, final Beans beans) {
+	ConfigurationPanel(final ApplicationContext context) {
 		super();
 
+		final Presentation presentation = context.getPresentation();
 		for (final ConfigurableBeanDescription configurableBean : CONFIGURABLE_BEANS) {
-			addTab(rc.getMessage(configurableBean.name), configurationPanel(beans, rc, configurableBean));
+			addTab(presentation.getMessage(configurableBean.name), configurationPanel(context, configurableBean));
 		}
 	}
 
-	private JPanel configurationPanel(final Beans beans, final Resources rc,
+	private JPanel configurationPanel(final ApplicationContext context,
 			final ConfigurableBeanDescription configurableBean) {
 		final JPanel result = new JPanel(new BorderLayout());
 
-		final PropertyDescriptorTableModel model = new PropertyDescriptorTableModel(beans, rc, this, configurableBean);
+		final PropertyDescriptorTableModel model = new PropertyDescriptorTableModel(context, configurableBean);
 
 		final JTable table = new JTable(model);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -101,8 +100,7 @@ class ConfigurationPanel extends JTabbedPane {
 
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				final int row = table.getSelectedRow();
-				model.addRow(row);
+				model.addRow(table.getSelectedRow());
 			}
 		};
 
@@ -111,8 +109,7 @@ class ConfigurationPanel extends JTabbedPane {
 
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				final int row = table.getSelectedRow();
-				model.delRow(row);
+				model.delRow(table.getSelectedRow());
 			}
 		};
 
@@ -129,7 +126,7 @@ class ConfigurationPanel extends JTabbedPane {
 		buttons.add(saveAction);
 		buttons.add(new JSeparator());
 		buttons.add(delAction);
-		result.add(rc.awesome(buttons), BorderLayout.SOUTH);
+		result.add(context.getPresentation().awesome(buttons), BorderLayout.SOUTH);
 
 		return result;
 	}
@@ -194,28 +191,25 @@ class ConfigurationPanel extends JTabbedPane {
 			}
 		}
 
-		private final Beans beans;
-		private final Resources rc;
+		private final ApplicationContext context;
 		private final ConfigurableBeanDescription configurableBean;
-		private final Component parent;
 
 		private final String[] columnNames;
 
 		final List<EditableBean> editableBeans = new ArrayList<>();
 		final List<EditableBean> deletedBeans = new ArrayList<>();
 
-		PropertyDescriptorTableModel(final Beans beans, final Resources rc, final Component parent,
+		PropertyDescriptorTableModel(final ApplicationContext context,
 				final ConfigurableBeanDescription configurableBean) {
-			this.beans = beans;
-			this.rc = rc;
+			this.context = context;
 			this.configurableBean = configurableBean;
-			this.parent = parent;
-			columnNames = new String[] { rc.getMessage("Name"), rc.getMessage("Description") };
+			columnNames = new String[] { context.getPresentation().getMessage("Name"),
+					context.getPresentation().getMessage("Description") };
 			refresh();
 		}
 
 		private void refresh() {
-			final Collection<? extends PropertyDescriptor> propertyDescriptors = beans
+			final Collection<? extends PropertyDescriptor> propertyDescriptors = context.getBeans()
 					.getPropertyDescriptors(configurableBean.entity);
 
 			for (final PropertyDescriptor bean : propertyDescriptors) {
@@ -250,8 +244,10 @@ class ConfigurationPanel extends JTabbedPane {
 					final String name = bean.getName();
 					LOGGER.error("Cannot delete: there are occurrences of the {} property for entity {}", name,
 							configurableBean.entity);
-					JOptionPane.showMessageDialog(parent, rc.getMessage("CannotDeletePropertyMessage", name),
-							rc.getMessage("CannotDeletePropertyTitle"), JOptionPane.WARNING_MESSAGE);
+					final Presentation presentation = context.getPresentation();
+					JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
+							presentation.getMessage("CannotDeletePropertyMessage", name),
+							presentation.getMessage("CannotDeletePropertyTitle"), JOptionPane.WARNING_MESSAGE);
 					return false;
 				}
 			}
@@ -269,7 +265,8 @@ class ConfigurationPanel extends JTabbedPane {
 					}
 					for (final EditableBean editableBean : editableBeans) {
 						if (editableBean.getBean() == null) {
-							final PropertyDescriptor bean = beans.createPropertyDescriptor(configurableBean.entity);
+							final PropertyDescriptor bean = context.getBeans()
+									.createPropertyDescriptor(configurableBean.entity);
 							editableBean.setBean(bean);
 						}
 						editableBean.save();
@@ -277,8 +274,10 @@ class ConfigurationPanel extends JTabbedPane {
 					deletedBeans.clear();
 				} catch (final ModelException e) {
 					LOGGER.error("Save failed", e);
-					JOptionPane.showMessageDialog(parent, rc.getMessage("SaveFailedMessage"),
-							rc.getMessage("SaveFailedTitle"), JOptionPane.WARNING_MESSAGE);
+					final Presentation presentation = context.getPresentation();
+					JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
+							presentation.getMessage("SaveFailedMessage"), presentation.getMessage("SaveFailedTitle"),
+							JOptionPane.WARNING_MESSAGE);
 				}
 			}
 		}
@@ -290,8 +289,10 @@ class ConfigurationPanel extends JTabbedPane {
 				if (names.contains(name)) {
 					LOGGER.error("Cannot save: the {} property is defined twice for entity {}", name,
 							configurableBean.entity);
-					JOptionPane.showMessageDialog(parent, rc.getMessage("CannotSavePropertiesMessage", name),
-							rc.getMessage("CannotSavePropertiesTitle"), JOptionPane.WARNING_MESSAGE);
+					final Presentation presentation = context.getPresentation();
+					JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
+							presentation.getMessage("CannotSavePropertiesMessage", name),
+							presentation.getMessage("CannotSavePropertiesTitle"), JOptionPane.WARNING_MESSAGE);
 					return false;
 				} else {
 					names.add(name);

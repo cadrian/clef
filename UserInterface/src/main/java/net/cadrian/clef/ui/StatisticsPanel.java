@@ -41,16 +41,16 @@ class StatisticsPanel extends JPanel {
 
 	private static final long serialVersionUID = -2023860576290261246L;
 
-	private final Beans beans;
+	private final ApplicationContext context;
 
 	private final JLabel meanPerWork;
 	private final JLabel stdevPerWork;
 	private final JLabel meanPerPiece;
 	private final JLabel stdevPerPiece;
 
-	StatisticsPanel(final Resources rc, final Beans beans) {
+	StatisticsPanel(final ApplicationContext context) {
 		super(new GridBagLayout());
-		this.beans = beans;
+		this.context = context;
 
 		final JPanel panel = new JPanel(new GridBagLayout());
 
@@ -63,7 +63,7 @@ class StatisticsPanel extends JPanel {
 		labels.put("StdDeviationPerWork", stdevPerWork);
 		labels.put("MeanPerPiece", meanPerPiece);
 		labels.put("StdDeviationPerPiece", stdevPerPiece);
-		addLabels(rc, labels, panel);
+		addLabels(labels, panel);
 
 		panel.setBorder(BorderFactory.createEtchedBorder());
 
@@ -82,16 +82,16 @@ class StatisticsPanel extends JPanel {
 		refresh();
 	}
 
-	private void addLabels(final Resources rc, final Map<String, JLabel> labels, final JPanel panel) {
+	private void addLabels(final Map<String, JLabel> labels, final JPanel panel) {
 		int gridy = 0;
 		for (final Map.Entry<String, JLabel> entry : labels.entrySet()) {
 			final GridBagConstraints labelConstraints = new GridBagConstraints();
 			labelConstraints.gridy = gridy;
 			labelConstraints.anchor = GridBagConstraints.WEST;
 			labelConstraints.insets = new Insets(4, 2, 4, 5);
-			final String label = rc.getMessage("Statistics." + entry.getKey());
+			final String label = context.getPresentation().getMessage("Statistics." + entry.getKey());
 			LOGGER.debug("Label for {} is {}", entry.getKey(), label);
-			panel.add(rc.bolden(new JLabel(label)), labelConstraints);
+			panel.add(context.getPresentation().bold(new JLabel(label)), labelConstraints);
 
 			final GridBagConstraints fieldConstraints = new GridBagConstraints();
 			fieldConstraints.gridx = 1;
@@ -110,6 +110,8 @@ class StatisticsPanel extends JPanel {
 		long tw = 0;
 		long np = 0;
 		long tp = 0;
+
+		final Beans beans = context.getBeans();
 
 		for (final Work work : beans.getWorks()) {
 			nw++;

@@ -16,12 +16,12 @@
  */
 package net.cadrian.clef.ui.form;
 
-import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
-import net.cadrian.clef.ui.Resources;
+import net.cadrian.clef.model.Bean;
+import net.cadrian.clef.ui.ApplicationContext;
 
-public class TextAreaComponentFactory<C> extends AbstractFieldComponentFactory<String, JTextArea, C> {
+public class TextAreaComponentFactory<C extends Bean> extends AbstractFieldComponentFactory<String, JTextArea, C> {
 
 	private static class TextAreaComponent implements FieldComponent<String, JTextArea> {
 
@@ -63,7 +63,7 @@ public class TextAreaComponentFactory<C> extends AbstractFieldComponentFactory<S
 	}
 
 	@Override
-	public FieldComponent<String, JTextArea> createComponent(final Resources rc, final C context, JFrame parent) {
+	public FieldComponent<String, JTextArea> createComponent(final ApplicationContext context, final C contextBean) {
 		return new TextAreaComponent(writable);
 	}
 

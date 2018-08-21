@@ -42,28 +42,50 @@ public class Application extends JFrame {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
-	private final Beans beans;
+	private static class ApplicationContextImpl implements ApplicationContext {
+
+		private final Beans beans;
+		private final Presentation presentation;
+
+		ApplicationContextImpl(final Beans beans, final Presentation presentation) {
+			this.beans = beans;
+			this.presentation = presentation;
+		}
+
+		@Override
+		public Beans getBeans() {
+			return beans;
+		}
+
+		@Override
+		public Presentation getPresentation() {
+			return presentation;
+		}
+
+	}
+
+	private final ApplicationContextImpl context;
 
 	public Application(final Beans beans) {
-		this.beans = beans;
+		final Presentation presentation = getPresentation();
+		this.context = new ApplicationContextImpl(beans, presentation);
 		initUI();
 	}
 
 	private void initUI() {
-		final Resources rc = getResources();
 		setLookAndFeel(false);
-		setTitle(rc.getMessage("ClefTitle"));
+		setTitle(context.getPresentation().getMessage("ClefTitle"));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		initComponents(rc);
+		initComponents();
 		pack();
 	}
 
-	private Resources getResources() {
+	private Presentation getPresentation() {
 		final Locale locale = Locale.getDefault();
 		LOGGER.info("Current locale: {}", locale);
 		final ResourceBundle messages = ResourceBundle.getBundle("Clef");
-		return new Resources(messages);
+		return new Presentation(messages, this);
 	}
 
 	private void setLookAndFeel(final boolean system) {
@@ -90,27 +112,26 @@ public class Application extends JFrame {
 		}
 	}
 
-	private void initComponents(final Resources rc) {
+	private void initComponents() {
 		final JTabbedPane mainPane = new JTabbedPane(SwingConstants.TOP);
 		getContentPane().add(mainPane);
 
 		final JTabbedPane mgtPane = new JTabbedPane(SwingConstants.TOP);
+		final Beans beans = context.getBeans();
 
-		mainPane.addTab(rc.getMessage("Sessions"), new DataPane<>(rc, this, beans::getSessions,
-				new SessionCreator(rc, this, beans), new SessionFormModel(Session.class)));
+		mainPane.addTab(context.getPresentation().getMessage("Sessions"), new DataPane<>(context, true,
+				beans::getSessions, new SessionCreator(context), new SessionFormModel(Session.class)));
 
-		mgtPane.addTab(rc.getMessage("Works"),
-				new DataPane<>(rc, this, (pane) -> pane.getSelection(), beans::getWorks,
-						new WorkCreator(rc, this, beans), new WorkFormModel(beans, Work.class),
-						Arrays.asList("Description", "Pieces")));
-		mgtPane.addTab(rc.getMessage("Authors"),
-				new DataPane<>(rc, this, beans::getAuthors, beans::createAuthor, new AuthorFormModel(Author.class)));
-		mgtPane.addTab(rc.getMessage("Pricings"), new DataPane<>(rc, this, beans::getPricings, beans::createPricing,
-				new PricingFormModel(Pricing.class)));
-		mainPane.addTab(rc.getMessage("Management"), mgtPane);
+		mgtPane.addTab(context.getPresentation().getMessage("Works"), new DataPane<>(context, true, beans::getWorks,
+				new WorkCreator(context), new WorkFormModel(Work.class), Arrays.asList("Description", "Pieces")));
+		mgtPane.addTab(context.getPresentation().getMessage("Authors"), new DataPane<>(context, true, beans::getAuthors,
+				beans::createAuthor, new AuthorFormModel(Author.class)));
+		mgtPane.addTab(context.getPresentation().getMessage("Pricings"), new DataPane<>(context, true,
+				beans::getPricings, beans::createPricing, new PricingFormModel(Pricing.class)));
+		mainPane.addTab(context.getPresentation().getMessage("Management"), mgtPane);
 
-		mainPane.addTab(rc.getMessage("Statistics"), new StatisticsPanel(rc, beans));
+		mainPane.addTab(context.getPresentation().getMessage("Statistics"), new StatisticsPanel(context));
 
-		mainPane.addTab(rc.getMessage("Configuration"), new ConfigurationPanel(rc, beans));
+		mainPane.addTab(context.getPresentation().getMessage("Configuration"), new ConfigurationPanel(context));
 	}
 }

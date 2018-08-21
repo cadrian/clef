@@ -22,18 +22,20 @@ import java.util.Map;
 import javax.swing.JComponent;
 
 import net.cadrian.clef.model.bean.Author;
+import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.ui.form.FieldComponentFactory;
 import net.cadrian.clef.ui.form.PropertiesComponentFactory;
 import net.cadrian.clef.ui.form.TextAreaComponentFactory;
 import net.cadrian.clef.ui.form.TextFieldComponentFactory;
 
-class AuthorFormModel extends BeanFormModel<Author, Void> {
+class AuthorFormModel extends BeanFormModel<Author, NoBean> {
 
-	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, Void>> COMPONENT_FACTORIES = new LinkedHashMap<>();
+	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, NoBean>> COMPONENT_FACTORIES = new LinkedHashMap<>();
 	static {
-		final TextFieldComponentFactory<Void> nameFactory = new TextFieldComponentFactory<>(true);
-		final TextAreaComponentFactory<Void> notesFactory = new TextAreaComponentFactory<>(true);
-		final PropertiesComponentFactory<Void> propertiesFactory = new PropertiesComponentFactory<>(true);
+		final TextFieldComponentFactory<NoBean> nameFactory = new TextFieldComponentFactory<>(true);
+		final TextAreaComponentFactory<NoBean> notesFactory = new TextAreaComponentFactory<>(true);
+		final PropertiesComponentFactory<NoBean> propertiesFactory = new PropertiesComponentFactory<>(Entity.author,
+				true);
 		COMPONENT_FACTORIES.put("Name", nameFactory);
 		COMPONENT_FACTORIES.put("Notes", notesFactory);
 		COMPONENT_FACTORIES.put("Properties", propertiesFactory);

@@ -23,21 +23,24 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Resources {
+public class Presentation {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Resources.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Presentation.class);
 
 	private final ResourceBundle messages;
+	private final JFrame frame;
 	private final Font awesomeFont;
 
-	public Resources(final ResourceBundle messages) {
+	public Presentation(final ResourceBundle messages, final JFrame frame) {
 		this.messages = messages;
+		this.frame = frame;
 
 		Font ft = null;
 		for (final String f : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
@@ -79,10 +82,14 @@ public class Resources {
 		return toolbar;
 	}
 
-	public JLabel bolden(final JLabel label) {
+	public JLabel bold(final JLabel label) {
 		final Font font = label.getFont();
 		label.setFont(new Font(font.getFontName(), Font.BOLD, font.getSize()));
 		return label;
+	}
+
+	public JFrame getApplicationFrame() {
+		return frame;
 	}
 
 }

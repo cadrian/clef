@@ -30,7 +30,6 @@ import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -42,9 +41,10 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.components.DateTimePicker;
 import com.github.lgooddatepicker.components.TimePickerSettings;
 
-import net.cadrian.clef.ui.Resources;
+import net.cadrian.clef.model.Bean;
+import net.cadrian.clef.ui.ApplicationContext;
 
-public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date, JPanel, C> {
+public class DateComponentFactory<C extends Bean> extends AbstractFieldComponentFactory<Date, JPanel, C> {
 
 	private static class DateComponentPicker extends JDialog {
 
@@ -52,13 +52,14 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 
 		private Date date;
 
-		DateComponentPicker(final Resources rc, final JFrame parent, final Date date) {
-			super(parent, rc.getMessage("DatePickerTitle"), true);
+		DateComponentPicker(final ApplicationContext context, final Date date) {
+			super(context.getPresentation().getApplicationFrame(),
+					context.getPresentation().getMessage("DatePickerTitle"), true);
 			this.date = date;
 
 			final JPanel pickerPanel = new JPanel(new BorderLayout());
 			getContentPane().add(pickerPanel);
-			pickerPanel.add(new JLabel(rc.getMessage("DatePickerMessage")), BorderLayout.NORTH);
+			pickerPanel.add(new JLabel(context.getPresentation().getMessage("DatePickerMessage")), BorderLayout.NORTH);
 
 			final ZoneId zone = ZoneId.systemDefault();
 			final LocalDateTime ldt = LocalDateTime.ofInstant(date.toInstant(), zone);
@@ -78,10 +79,10 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 
 			final JButton datePickerButton = picker.getDatePicker().getComponentToggleCalendarButton();
 			datePickerButton.setText("DatePicker");
-			rc.awesome(datePickerButton);
+			context.getPresentation().awesome(datePickerButton);
 			final JButton timePickerButton = picker.getTimePicker().getComponentToggleTimeMenuButton();
 			timePickerButton.setText("TimePicker");
-			rc.awesome(timePickerButton);
+			context.getPresentation().awesome(timePickerButton);
 
 			pickerPanel.add(picker, BorderLayout.CENTER);
 
@@ -99,10 +100,10 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 			final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 			buttons.setFloatable(false);
 			buttons.add(saveAction);
-			pickerPanel.add(rc.awesome(buttons), BorderLayout.SOUTH);
+			pickerPanel.add(context.getPresentation().awesome(buttons), BorderLayout.SOUTH);
 
 			pack();
-			setLocationRelativeTo(parent);
+			setLocationRelativeTo(context.getPresentation().getApplicationFrame());
 		}
 
 		Date getDate() {
@@ -120,7 +121,7 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 		private Date date;
 		private final DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-		DateComponent(final Resources rc, final JFrame parent, final boolean writable) {
+		DateComponent(final ApplicationContext context, final boolean writable) {
 			component = new JPanel();
 			component.setLayout(new BoxLayout(component, BoxLayout.X_AXIS));
 
@@ -143,7 +144,7 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final DateComponentPicker picker = new DateComponentPicker(rc, parent, date);
+					final DateComponentPicker picker = new DateComponentPicker(context, date);
 					picker.setVisible(true);
 					date = picker.getDate();
 					display.setText(df.format(date));
@@ -160,7 +161,7 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 			buttons.add(setDate);
 
 			component.add(display);
-			component.add(rc.awesome(buttons));
+			component.add(context.getPresentation().awesome(buttons));
 		}
 
 		@Override
@@ -201,8 +202,8 @@ public class DateComponentFactory<C> extends AbstractFieldComponentFactory<Date,
 	}
 
 	@Override
-	public FieldComponent<Date, JPanel> createComponent(final Resources rc, final C context, final JFrame parent) {
-		return new DateComponent(rc, parent, writable);
+	public FieldComponent<Date, JPanel> createComponent(final ApplicationContext context, final C contextBean) {
+		return new DateComponent(context, writable);
 	}
 
 	@Override

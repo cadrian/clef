@@ -17,12 +17,12 @@
 package net.cadrian.clef.ui.form;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 
-import net.cadrian.clef.ui.Resources;
+import net.cadrian.clef.model.Bean;
+import net.cadrian.clef.ui.ApplicationContext;
 
-public interface FieldComponentFactory<D, J extends JComponent, C> {
-	FieldComponent<D, J> createComponent(Resources rc, C context, JFrame parent);
+public interface FieldComponentFactory<D, J extends JComponent, C extends Bean> {
+	FieldComponent<D, J> createComponent(final ApplicationContext context, C contextBean);
 
 	Class<?> getDataType();
 

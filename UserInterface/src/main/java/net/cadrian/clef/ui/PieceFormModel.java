@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 
 import net.cadrian.clef.model.bean.Piece;
+import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.form.FieldComponentFactory;
 import net.cadrian.clef.ui.form.NumericFieldComponentFactory;
@@ -36,7 +37,7 @@ class PieceFormModel extends BeanFormModel<Piece, Work> {
 		final TextFieldComponentFactory<Work> nameFactory = new TextFieldComponentFactory<>(true);
 		final NumericFieldComponentFactory<Work> versionFactory = new NumericFieldComponentFactory<>(false);
 		final NumericFieldComponentFactory<Work> durationFactory = new NumericFieldComponentFactory<>(true);
-		final PropertiesComponentFactory<Work> propertiesFactory = new PropertiesComponentFactory<>(true);
+		final PropertiesComponentFactory<Work> propertiesFactory = new PropertiesComponentFactory<>(Entity.piece, true);
 		final TextAreaComponentFactory<Work> notesFactory = new TextAreaComponentFactory<>(true);
 		COMPONENT_FACTORIES.put("Name", nameFactory);
 		COMPONENT_FACTORIES.put("Version", versionFactory);

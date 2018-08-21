@@ -39,7 +39,6 @@ import javax.swing.event.ListSelectionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.model.bean.Work;
@@ -48,23 +47,21 @@ class SessionCreator implements BeanCreator<Session> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionCreator.class);
 
-	private final Application parent;
-	private final Beans beans;
-	private final Resources rc;
+	private final ApplicationContext context;
 
-	public SessionCreator(final Resources rc, final Application parent, final Beans beans) {
-		this.parent = parent;
-		this.beans = beans;
-		this.rc = rc;
+	public SessionCreator(final ApplicationContext context) {
+		this.context = context;
 	}
 
 	@Override
 	public Session createBean() {
+		final Presentation presentation = context.getPresentation();
 
-		final Collection<? extends Work> allWorks = beans.getWorks();
+		final Collection<? extends Work> allWorks = context.getBeans().getWorks();
 		if (allWorks.isEmpty()) {
-			JOptionPane.showMessageDialog(parent, rc.getMessage("SessionCreatorNoWorksMessage"),
-					rc.getMessage("SessionCreatorNoWorksTitle"), JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
+					presentation.getMessage("SessionCreatorNoWorksMessage"),
+					presentation.getMessage("SessionCreatorNoWorksTitle"), JOptionPane.WARNING_MESSAGE);
 			return null;
 		}
 		boolean foundPieces = false;
@@ -75,8 +72,9 @@ class SessionCreator implements BeanCreator<Session> {
 			}
 		}
 		if (!foundPieces) {
-			JOptionPane.showMessageDialog(parent, rc.getMessage("SessionCreatorNoPiecesMessage"),
-					rc.getMessage("SessionCreatorNoPiecesTitle"), JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
+					presentation.getMessage("SessionCreatorNoPiecesMessage"),
+					presentation.getMessage("SessionCreatorNoPiecesTitle"), JOptionPane.WARNING_MESSAGE);
 			return null;
 		}
 
@@ -87,15 +85,17 @@ class SessionCreator implements BeanCreator<Session> {
 
 		final DefaultListModel<Piece> piecesModel = new DefaultListModel<>();
 
-		final JDialog params = new JDialog(parent, rc.getMessage("SessionCreatorTitle"), true);
+		final JDialog params = new JDialog(presentation.getApplicationFrame(),
+				presentation.getMessage("SessionCreatorTitle"), true);
 
 		final JPanel paramsContent = new JPanel(new BorderLayout());
 		params.getContentPane().add(paramsContent);
-		paramsContent.add(new JLabel(rc.getMessage("SessionCreatorMessage")), BorderLayout.NORTH);
+		paramsContent.add(new JLabel(presentation.getMessage("SessionCreatorMessage")), BorderLayout.NORTH);
 
 		final JList<Work> works = new JList<>(worksModel);
 		final JPanel worksPanel = new JPanel(new BorderLayout());
-		worksPanel.add(rc.bolden(new JLabel(rc.getMessage("SessionCreatorWorksTitle"))), BorderLayout.NORTH);
+		worksPanel.add(presentation.bold(new JLabel(presentation.getMessage("SessionCreatorWorksTitle"))),
+				BorderLayout.NORTH);
 		worksPanel.add(new JScrollPane(works), BorderLayout.CENTER);
 		works.addListSelectionListener(new ListSelectionListener() {
 
@@ -112,7 +112,8 @@ class SessionCreator implements BeanCreator<Session> {
 
 		final JList<Piece> pieces = new JList<>(piecesModel);
 		final JPanel piecesPanel = new JPanel(new BorderLayout());
-		piecesPanel.add(rc.bolden(new JLabel(rc.getMessage("SessionCreatorPiecesTitle"))), BorderLayout.NORTH);
+		piecesPanel.add(presentation.bold(new JLabel(presentation.getMessage("SessionCreatorPiecesTitle"))),
+				BorderLayout.NORTH);
 		piecesPanel.add(new JScrollPane(pieces), BorderLayout.CENTER);
 
 		final JPanel lists = new JPanel();
@@ -164,10 +165,10 @@ class SessionCreator implements BeanCreator<Session> {
 		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 		buttons.setFloatable(false);
 		buttons.add(saveAction);
-		paramsContent.add(rc.awesome(buttons), BorderLayout.SOUTH);
+		paramsContent.add(presentation.awesome(buttons), BorderLayout.SOUTH);
 
 		params.pack();
-		params.setLocationRelativeTo(parent);
+		params.setLocationRelativeTo(presentation.getApplicationFrame());
 		LOGGER.debug("Showing SessionCreator dialog");
 		params.setVisible(true);
 
@@ -182,6 +183,6 @@ class SessionCreator implements BeanCreator<Session> {
 			return null;
 		}
 
-		return beans.createSession(piece);
+		return context.getBeans().createSession(piece);
 	}
 }

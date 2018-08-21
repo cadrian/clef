@@ -21,20 +21,22 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
+import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.ui.form.DateComponentFactory;
 import net.cadrian.clef.ui.form.FieldComponentFactory;
 import net.cadrian.clef.ui.form.PropertiesComponentFactory;
 import net.cadrian.clef.ui.form.TextAreaComponentFactory;
 
-class SessionFormModel extends BeanFormModel<Session, Void> {
+class SessionFormModel extends BeanFormModel<Session, NoBean> {
 
-	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, Void>> COMPONENT_FACTORIES = new LinkedHashMap<>();
+	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, NoBean>> COMPONENT_FACTORIES = new LinkedHashMap<>();
 	static {
-		final DateComponentFactory<Void> startFactory = new DateComponentFactory<>(true);
-		final DateComponentFactory<Void> stopFactory = new DateComponentFactory<>(true);
-		final TextAreaComponentFactory<Void> notesFactory = new TextAreaComponentFactory<>(true);
-		final PropertiesComponentFactory<Void> propertiesFactory = new PropertiesComponentFactory<>(true);
+		final DateComponentFactory<NoBean> startFactory = new DateComponentFactory<>(true);
+		final DateComponentFactory<NoBean> stopFactory = new DateComponentFactory<>(true);
+		final TextAreaComponentFactory<NoBean> notesFactory = new TextAreaComponentFactory<>(true);
+		final PropertiesComponentFactory<NoBean> propertiesFactory = new PropertiesComponentFactory<>(Entity.session,
+				true);
 		COMPONENT_FACTORIES.put("Start", startFactory);
 		COMPONENT_FACTORIES.put("Stop", stopFactory);
 		COMPONENT_FACTORIES.put("Notes", notesFactory);

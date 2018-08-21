@@ -26,6 +26,7 @@ import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -48,29 +49,28 @@ class WorkCreator implements BeanCreator<Work> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkCreator.class);
 
-	private final Application parent;
-	private final Beans beans;
-	private final Resources rc;
+	private final ApplicationContext context;
 
-	public WorkCreator(final Resources rc, final Application parent, final Beans beans) {
-		this.parent = parent;
-		this.beans = beans;
-		this.rc = rc;
+	public WorkCreator(final ApplicationContext context) {
+		this.context = context;
 	}
 
 	@Override
 	public Work createBean() {
+		Beans beans = context.getBeans();
+		Presentation presentation = context.getPresentation();
+		JFrame parent = presentation.getApplicationFrame();
 		final Collection<? extends Author> allAuthors = beans.getAuthors();
 		if (allAuthors.isEmpty()) {
-			JOptionPane.showMessageDialog(parent, rc.getMessage("WorkCreatorNoAuthorsMessage"),
-					rc.getMessage("WorkCreatorNoAuthorsTitle"), JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(parent, presentation.getMessage("WorkCreatorNoAuthorsMessage"),
+					presentation.getMessage("WorkCreatorNoAuthorsTitle"), JOptionPane.WARNING_MESSAGE);
 			return null;
 		}
 
 		final Collection<? extends Pricing> allPricings = beans.getPricings();
 		if (allPricings.isEmpty()) {
-			JOptionPane.showMessageDialog(parent, rc.getMessage("WorkCreatorNoPricingsMessage"),
-					rc.getMessage("WorkCreatorNoPricingsTitle"), JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(parent, presentation.getMessage("WorkCreatorNoPricingsMessage"),
+					presentation.getMessage("WorkCreatorNoPricingsTitle"), JOptionPane.WARNING_MESSAGE);
 			return null;
 		}
 
@@ -84,20 +84,22 @@ class WorkCreator implements BeanCreator<Work> {
 			pricingsModel.addElement(pricing);
 		}
 
-		final JDialog params = new JDialog(parent, rc.getMessage("WorkCreatorTitle"), true);
+		final JDialog params = new JDialog(parent, presentation.getMessage("WorkCreatorTitle"), true);
 
 		final JPanel paramsContent = new JPanel(new BorderLayout());
 		params.getContentPane().add(paramsContent);
-		paramsContent.add(new JLabel(rc.getMessage("WorkCreatorMessage")), BorderLayout.NORTH);
+		paramsContent.add(new JLabel(presentation.getMessage("WorkCreatorMessage")), BorderLayout.NORTH);
 
 		final JList<Author> authors = new JList<>(authorsModel);
 		final JPanel authorsPanel = new JPanel(new BorderLayout());
-		authorsPanel.add(rc.bolden(new JLabel(rc.getMessage("WorkCreatorAuthorsTitle"))), BorderLayout.NORTH);
+		authorsPanel.add(presentation.bold(new JLabel(presentation.getMessage("WorkCreatorAuthorsTitle"))),
+				BorderLayout.NORTH);
 		authorsPanel.add(new JScrollPane(authors), BorderLayout.CENTER);
 
 		final JList<Pricing> pricings = new JList<>(pricingsModel);
 		final JPanel pricingsPanel = new JPanel(new BorderLayout());
-		pricingsPanel.add(rc.bolden(new JLabel(rc.getMessage("WorkCreatorPricingsTitle"))), BorderLayout.NORTH);
+		pricingsPanel.add(presentation.bold(new JLabel(presentation.getMessage("WorkCreatorPricingsTitle"))),
+				BorderLayout.NORTH);
 		pricingsPanel.add(new JScrollPane(pricings), BorderLayout.CENTER);
 
 		final JPanel lists = new JPanel();
@@ -149,7 +151,7 @@ class WorkCreator implements BeanCreator<Work> {
 		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 		buttons.setFloatable(false);
 		buttons.add(saveAction);
-		paramsContent.add(rc.awesome(buttons), BorderLayout.SOUTH);
+		paramsContent.add(presentation.awesome(buttons), BorderLayout.SOUTH);
 
 		params.pack();
 		params.setLocationRelativeTo(parent);

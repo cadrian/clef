@@ -18,16 +18,13 @@ package net.cadrian.clef.ui.form;
 
 import java.util.Collection;
 
-import javax.swing.JFrame;
-
-import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Work;
+import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.BeanCreator;
 import net.cadrian.clef.ui.BeanFormModel;
 import net.cadrian.clef.ui.BeanGetter;
 import net.cadrian.clef.ui.DataPane;
-import net.cadrian.clef.ui.Resources;
 
 public class PiecesComponentFactory
 		extends AbstractFieldComponentFactory<Collection<Piece>, DataPane<Piece, Work>, Work> {
@@ -36,9 +33,9 @@ public class PiecesComponentFactory
 
 		private final DataPane<Piece, Work> component;
 
-		public PiecesComponent(final Resources rc, JFrame parent, final BeanGetter<Piece> beanGetter,
+		public PiecesComponent(final ApplicationContext context, final BeanGetter<Piece> beanGetter,
 				final BeanCreator<Piece> beanCreator, final BeanFormModel<Piece, Work> beanFormModel) {
-			component = new DataPane<>(rc, parent, beanGetter, beanCreator, beanFormModel);
+			component = new DataPane<>(context, false, beanGetter, beanCreator, beanFormModel);
 		}
 
 		@Override
@@ -48,6 +45,7 @@ public class PiecesComponentFactory
 
 		@Override
 		public Collection<Piece> getData() {
+			component.saveData();
 			return component.getList();
 		}
 
@@ -63,27 +61,25 @@ public class PiecesComponentFactory
 
 	}
 
-	private final Beans beans;
 	private final BeanFormModel<Piece, Work> beanFormModel;
 
-	public PiecesComponentFactory(final Beans beans, final BeanFormModel<Piece, Work> beanFormModel, final String tab) {
+	public PiecesComponentFactory(final BeanFormModel<Piece, Work> beanFormModel, final String tab) {
 		super(false, tab);
-		this.beans = beans;
 		this.beanFormModel = beanFormModel;
 	}
 
 	@Override
-	public FieldComponent<Collection<Piece>, DataPane<Piece, Work>> createComponent(final Resources rc,
-			final Work context, JFrame parent) {
-		final BeanGetter<Piece> beanGetter = () -> context.getPieces();
+	public FieldComponent<Collection<Piece>, DataPane<Piece, Work>> createComponent(final ApplicationContext context,
+			final Work contextBean) {
+		final BeanGetter<Piece> beanGetter = () -> contextBean.getPieces();
 		final BeanCreator<Piece> beanCreator = new BeanCreator<Piece>() {
 
 			@Override
 			public Piece createBean() {
-				return beans.createPiece(context);
+				return context.getBeans().createPiece(contextBean);
 			}
 		};
-		return new PiecesComponent(rc, parent, beanGetter, beanCreator, beanFormModel);
+		return new PiecesComponent(context, beanGetter, beanCreator, beanFormModel);
 	}
 
 	@Override
