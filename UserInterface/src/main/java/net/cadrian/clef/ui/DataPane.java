@@ -20,11 +20,11 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -50,8 +50,8 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 
 	private static final long serialVersionUID = -6198568152980667836L;
 
-	private final DefaultListModel<T> model = new DefaultListModel<>();
-	private final JList<T> list = new JList<>(model);
+	private final SortableListModel<T> model;
+	private final JList<T> list;
 	private final JPanel current = new JPanel(new BorderLayout());
 
 	private final Action addAction;
@@ -65,16 +65,21 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 	private BeanForm<T, C> currentForm;
 
 	public DataPane(final ApplicationContext context, final boolean showSave, final BeanGetter<T> beanGetter,
-			final BeanCreator<T> beanCreator, final BeanFormModel<T, C> beanFormModel) {
-		this(context, showSave, beanGetter, beanCreator, beanFormModel, null);
+			final BeanCreator<T> beanCreator, final Comparator<T> beanComparator,
+			final BeanFormModel<T, C> beanFormModel) {
+		this(context, showSave, beanGetter, beanCreator, beanComparator, beanFormModel, null);
 	}
 
 	public DataPane(final ApplicationContext context, final boolean showSave, final BeanGetter<T> beanGetter,
-			final BeanCreator<T> beanCreator, final BeanFormModel<T, C> beanFormModel, final List<String> tabs) {
+			final BeanCreator<T> beanCreator, final Comparator<T> beanComparator,
+			final BeanFormModel<T, C> beanFormModel, final List<String> tabs) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
 		this.beanGetter = beanGetter;
 		this.beanCreator = beanCreator;
 		this.context = context;
+
+		model = new SortableListModel<>(beanComparator);
+		list = new JList<>(model);
 
 		final JPanel left = new JPanel(new BorderLayout());
 
@@ -169,8 +174,8 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 	}
 
 	public Collection<T> getList() {
-		List<T> result = new ArrayList<>();
-		int n = model.getSize();
+		final List<T> result = new ArrayList<>();
+		final int n = model.getSize();
 		for (int i = 0; i < n; i++) {
 			result.add(model.getElementAt(i));
 		}
@@ -183,6 +188,8 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 
 	void addData() {
 		final SwingWorker<Void, T> worker = new SwingWorker<Void, T>() {
+
+			private int index = -1;
 
 			@Override
 			protected Void doInBackground() throws Exception {
@@ -206,14 +213,14 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 			protected void process(final java.util.List<T> chunks) {
 				for (final T bean : chunks) {
 					LOGGER.debug("Adding element: {}", bean);
-					model.addElement(bean);
+					index = model.add(bean);
 				}
 			};
 
 			@Override
 			protected void done() {
 				LOGGER.debug("Selecting last element");
-				list.setSelectedIndex(model.getSize() - 1);
+				list.setSelectedIndex(index);
 			}
 		};
 
@@ -238,6 +245,7 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 	}
 
 	public void saveData() {
+		final T selected = list.getSelectedValue();
 		try {
 			currentForm.save();
 		} catch (final ModelException e) {
@@ -245,7 +253,7 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 			JOptionPane.showMessageDialog(DataPane.this, context.getPresentation().getMessage("SaveFailedMessage"),
 					context.getPresentation().getMessage("SaveFailedTitle"), JOptionPane.WARNING_MESSAGE);
 		} finally {
-			refreshList(list.getSelectedValue());
+			refreshList(selected);
 		}
 	}
 
@@ -272,10 +280,10 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 			protected void process(final java.util.List<T> chunks) {
 				for (final T bean : chunks) {
 					LOGGER.debug("Adding element: {} (selected is {})", bean, selected);
+					final int index = model.add(bean);
 					if (bean.equals(selected)) {
-						selectedIndex = model.getSize();
+						selectedIndex = index;
 					}
-					model.addElement(bean);
 				}
 			};
 
@@ -287,7 +295,7 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 		};
 
 		LOGGER.debug("Removing all elements");
-		model.removeAllElements();
+		model.removeAll();
 		worker.execute();
 	}
 

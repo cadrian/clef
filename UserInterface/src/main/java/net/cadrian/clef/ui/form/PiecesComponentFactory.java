@@ -35,7 +35,14 @@ public class PiecesComponentFactory
 
 		public PiecesComponent(final ApplicationContext context, final BeanGetter<Piece> beanGetter,
 				final BeanCreator<Piece> beanCreator, final BeanFormModel<Piece, Work> beanFormModel) {
-			component = new DataPane<>(context, false, beanGetter, beanCreator, beanFormModel);
+			component = new DataPane<>(context, false, beanGetter, beanCreator, (p1, p2) -> comparePieces(p1, p2),
+					beanFormModel);
+		}
+
+		private static int comparePieces(final Piece p1, final Piece p2) {
+			final String name1 = p1.getName();
+			final String name2 = p2.getName();
+			return (name1 == null ? "" : name1).compareTo(name2 == null ? "" : name2);
 		}
 
 		@Override
