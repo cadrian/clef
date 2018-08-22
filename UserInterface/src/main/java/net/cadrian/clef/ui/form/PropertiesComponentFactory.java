@@ -22,7 +22,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -58,6 +57,7 @@ import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.Presentation;
+import net.cadrian.clef.ui.SortedListModel;
 
 public class PropertiesComponentFactory<C extends Bean>
 		extends AbstractFieldComponentFactory<Collection<? extends Property>, JSplitPane, C> {
@@ -116,7 +116,7 @@ public class PropertiesComponentFactory<C extends Bean>
 			}
 		}
 
-		private static class EditableProperty {
+		private static class EditableProperty implements Comparable<EditableProperty> {
 			private final PropertyDescriptor propertyDescriptor;
 			private Property property;
 			private String value;
@@ -166,6 +166,11 @@ public class PropertiesComponentFactory<C extends Bean>
 			}
 
 			@Override
+			public int compareTo(final EditableProperty o) {
+				return propertyDescriptor.getName().compareTo(o.propertyDescriptor.getName());
+			}
+
+			@Override
 			public String toString() {
 				return propertyDescriptor.getName();
 			}
@@ -175,7 +180,7 @@ public class PropertiesComponentFactory<C extends Bean>
 		private final Entity entity;
 		private final JSplitPane component;
 		private final Map<PropertyDescriptor, Property> deleted = new HashMap<>();
-		private final DefaultListModel<EditableProperty> model = new DefaultListModel<>();
+		private final SortedListModel<EditableProperty> model = new SortedListModel<>();
 		private final JList<EditableProperty> list;
 		private final boolean writable;
 
@@ -205,7 +210,10 @@ public class PropertiesComponentFactory<C extends Bean>
 
 					@Override
 					public void actionPerformed(final ActionEvent e) {
-						addData(list.getSelectedIndex());
+						final int index = addData();
+						if (index >= 0) {
+							list.setSelectedIndex(index);
+						}
 						setEnabled(!getAddableDescriptors().isEmpty());
 					}
 				};
@@ -228,7 +236,7 @@ public class PropertiesComponentFactory<C extends Bean>
 				list.addListSelectionListener(new ListSelectionListener() {
 
 					@Override
-					public void valueChanged(ListSelectionEvent e) {
+					public void valueChanged(final ListSelectionEvent e) {
 						delAction.setEnabled(!list.isSelectionEmpty());
 					}
 				});
@@ -289,9 +297,7 @@ public class PropertiesComponentFactory<C extends Bean>
 				property.delete(); // TODO no!!!
 			}
 			deleted.clear();
-			final Enumeration<EditableProperty> elements = model.elements();
-			while (elements.hasMoreElements()) {
-				final EditableProperty property = elements.nextElement();
+			for (final EditableProperty property : model.getElements()) {
 				if (property.getProperty() == null) {
 					final Property bean = beans.createProperty(property.getPropertyDescriptor());// TODO no!!!
 					property.setProperty(bean);
@@ -307,10 +313,11 @@ public class PropertiesComponentFactory<C extends Bean>
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					model.removeAllElements();
+					final List<EditableProperty> properties = new ArrayList<>();
 					for (final Property property : data) {
-						model.addElement(new EditableProperty(property));
+						properties.add(new EditableProperty(property));
 					}
+					model.replaceAll(properties);
 				}
 			});
 		}
@@ -326,10 +333,8 @@ public class PropertiesComponentFactory<C extends Bean>
 
 			LOGGER.debug("descriptors for {}: {}", entity, descriptors);
 
-			final Enumeration<EditableProperty> elements = model.elements();
-			while (elements.hasMoreElements()) {
-				final EditableProperty property = elements.nextElement();
-				PropertyDescriptor propertyDescriptor = property.getPropertyDescriptor();
+			for (final EditableProperty property : model.getElements()) {
+				final PropertyDescriptor propertyDescriptor = property.getPropertyDescriptor();
 				LOGGER.debug("property: {} (descriptor: {}) => removed", property, propertyDescriptor);
 				descriptors.remove(propertyDescriptor);
 			}
@@ -339,7 +344,9 @@ public class PropertiesComponentFactory<C extends Bean>
 			return descriptors;
 		}
 
-		void addData(final int index) {
+		int addData() {
+			final int result;
+
 			final List<PropertyDescriptor> addableDescriptors = new ArrayList<>(getAddableDescriptors());
 			addableDescriptors.sort((d1, d2) -> d1.getName().compareTo(d2.getName()));
 
@@ -356,13 +363,12 @@ public class PropertiesComponentFactory<C extends Bean>
 					addProperty = new EditableProperty(propertyDescriptor);
 				}
 				addProperty.setValue("");
-
-				if (index == -1) {
-					model.addElement(addProperty);
-				} else {
-					model.add(index, addProperty);
-				}
+				result = model.add(addProperty);
+			} else {
+				result = -1;
 			}
+
+			return result;
 		}
 
 		void delData(final int index) {
@@ -371,7 +377,7 @@ public class PropertiesComponentFactory<C extends Bean>
 			if (bean != null) {
 				deleted.put(bean.getPropertyDescriptor(), bean);
 			}
-			model.removeElementAt(index);
+			model.remove(index);
 		}
 
 	}
