@@ -17,7 +17,6 @@
 package net.cadrian.clef.ui;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -102,55 +101,23 @@ public class Application extends JFrame {
 
 		mainPane.addTab(context.getPresentation().getMessage("Sessions"),
 				new DataPane<>(context, true, beans::getSessions, new SessionCreator(context),
-						(s1, s2) -> compareSessions(s1, s2), new SessionFormModel(Session.class)));
+						(s1, s2) -> BeanComparators.compareSessions(s1, s2), new SessionFormModel(Session.class)));
 
 		mgtPane.addTab(context.getPresentation().getMessage("Works"),
 				new DataPane<>(context, true, beans::getWorks, new WorkCreator(context),
-						(w1, w2) -> compareWorks(w1, w2), new WorkFormModel(Work.class),
+						(w1, w2) -> BeanComparators.compareWorks(w1, w2), new WorkFormModel(Work.class),
 						Arrays.asList("Description", "Pieces")));
-		mgtPane.addTab(context.getPresentation().getMessage("Authors"), new DataPane<>(context, true, beans::getAuthors,
-				beans::createAuthor, (a1, a2) -> compareAuthors(a1, a2), new AuthorFormModel(Author.class)));
+		mgtPane.addTab(context.getPresentation().getMessage("Authors"),
+				new DataPane<>(context, true, beans::getAuthors, beans::createAuthor,
+						(a1, a2) -> BeanComparators.compareAuthors(a1, a2), new AuthorFormModel(Author.class)));
 		mgtPane.addTab(context.getPresentation().getMessage("Pricings"),
 				new DataPane<>(context, true, beans::getPricings, beans::createPricing,
-						(p1, p2) -> comparePricings(p1, p2), new PricingFormModel(Pricing.class)));
+						(p1, p2) -> BeanComparators.comparePricings(p1, p2), new PricingFormModel(Pricing.class)));
 		mainPane.addTab(context.getPresentation().getMessage("Management"), mgtPane);
 
 		mainPane.addTab(context.getPresentation().getMessage("Statistics"), new StatisticsPanel(context));
 
 		mainPane.addTab(context.getPresentation().getMessage("Configuration"), new ConfigurationPanel(context));
-	}
-
-	private static int compareSessions(final Session s1, final Session s2) {
-		final Date start1 = s1.getStart();
-		final Date start2 = s2.getStart();
-		if (start1 == null) {
-			if (start2 == null) {
-				return 0;
-			}
-			return 1;
-		}
-		if (start2 == null) {
-			return -1;
-		}
-		return start1.compareTo(start2);
-	}
-
-	private static int compareWorks(final Work w1, final Work w2) {
-		final String name1 = w1.getName();
-		final String name2 = w2.getName();
-		return (name1 == null ? "" : name1).compareTo(name2 == null ? "" : name2);
-	}
-
-	private static int compareAuthors(final Author a1, final Author a2) {
-		final String name1 = a1.getName();
-		final String name2 = a2.getName();
-		return (name1 == null ? "" : name1).compareTo(name2 == null ? "" : name2);
-	}
-
-	private static int comparePricings(final Pricing p1, final Pricing p2) {
-		final String name1 = p1.getName();
-		final String name2 = p2.getName();
-		return (name1 == null ? "" : name1).compareTo(name2 == null ? "" : name2);
 	}
 
 }

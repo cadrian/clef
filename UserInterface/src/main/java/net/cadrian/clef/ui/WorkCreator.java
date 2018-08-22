@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -74,15 +73,11 @@ class WorkCreator implements BeanCreator<Work> {
 			return null;
 		}
 
-		final DefaultListModel<Author> authorsModel = new DefaultListModel<>();
-		for (final Author author : allAuthors) {
-			authorsModel.addElement(author);
-		}
+		final SortableListModel<Author> authorsModel = new SortableListModel<>(
+				(a1, a2) -> BeanComparators.compareAuthors(a1, a2), allAuthors);
 
-		final DefaultListModel<Pricing> pricingsModel = new DefaultListModel<>();
-		for (final Pricing pricing : allPricings) {
-			pricingsModel.addElement(pricing);
-		}
+		final SortableListModel<Pricing> pricingsModel = new SortableListModel<>(
+				(p1, p2) -> BeanComparators.comparePricings(p1, p2), allPricings);
 
 		final JDialog params = new JDialog(parent, presentation.getMessage("WorkCreatorTitle"), true);
 

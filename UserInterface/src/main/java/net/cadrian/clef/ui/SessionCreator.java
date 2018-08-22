@@ -78,10 +78,8 @@ class SessionCreator implements BeanCreator<Session> {
 			return null;
 		}
 
-		final DefaultListModel<Work> worksModel = new DefaultListModel<>();
-		for (final Work work : allWorks) {
-			worksModel.addElement(work);
-		}
+		final SortableListModel<Work> worksModel = new SortableListModel<>(
+				(w1, w2) -> BeanComparators.compareWorks(w1, w2), allWorks);
 
 		final DefaultListModel<Piece> piecesModel = new DefaultListModel<>();
 
