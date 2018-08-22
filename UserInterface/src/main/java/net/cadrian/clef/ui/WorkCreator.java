@@ -110,7 +110,7 @@ class WorkCreator implements BeanCreator<Work> {
 		paramsContent.add(lists, BorderLayout.CENTER);
 
 		final AtomicBoolean saved = new AtomicBoolean(false);
-		final Action saveAction = new AbstractAction("Save") {
+		final Action addAction = new AbstractAction("Add") {
 			private static final long serialVersionUID = -8659808353683696964L;
 
 			@Override
@@ -123,7 +123,7 @@ class WorkCreator implements BeanCreator<Work> {
 				}
 			}
 		};
-		saveAction.setEnabled(false);
+		addAction.setEnabled(false);
 
 		final AtomicBoolean authorsSelected = new AtomicBoolean(false);
 		final AtomicBoolean pricingsSelected = new AtomicBoolean(false);
@@ -132,7 +132,7 @@ class WorkCreator implements BeanCreator<Work> {
 			public void valueChanged(final ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					authorsSelected.set(true);
-					saveAction.setEnabled(pricingsSelected.get());
+					addAction.setEnabled(pricingsSelected.get());
 					saved.set(false);
 				}
 			}
@@ -142,7 +142,7 @@ class WorkCreator implements BeanCreator<Work> {
 			public void valueChanged(final ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					pricingsSelected.set(true);
-					saveAction.setEnabled(authorsSelected.get());
+					addAction.setEnabled(authorsSelected.get());
 					saved.set(false);
 				}
 			}
@@ -150,7 +150,7 @@ class WorkCreator implements BeanCreator<Work> {
 
 		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 		buttons.setFloatable(false);
-		buttons.add(saveAction);
+		buttons.add(addAction);
 		paramsContent.add(presentation.awesome(buttons), BorderLayout.SOUTH);
 
 		params.pack();
