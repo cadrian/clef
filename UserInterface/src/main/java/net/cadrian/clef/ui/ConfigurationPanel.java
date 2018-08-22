@@ -92,6 +92,7 @@ class ConfigurationPanel extends JTabbedPane {
 
 		final JTable table = new JTable(model);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.setAutoCreateRowSorter(true);
 		result.add(new JScrollPane(table), BorderLayout.CENTER);
 
 		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
