@@ -14,6 +14,6 @@ Clef also includes tons of "notes" that may help you track your ideas as you wor
 Note: although I use it for musical composition, Clef can be used for any kind of artwork: books, cinema, ...
 
 # TODO
-- add sorting on properties and property descriptors screens
-- add properties to "pricing"
 - add a new kind of property: files, BLOB -- useful to register external data such as PDF files, etc. (and put them in the database?)
+- add some warnings if not all is saved
+- enhance "please confirm delete" message
