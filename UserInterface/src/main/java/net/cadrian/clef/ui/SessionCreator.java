@@ -124,7 +124,7 @@ class SessionCreator implements BeanCreator<Session> {
 		paramsContent.add(lists, BorderLayout.CENTER);
 
 		final AtomicBoolean saved = new AtomicBoolean(false);
-		final Action saveAction = new AbstractAction("Save") {
+		final Action addAction = new AbstractAction("Add") {
 			private static final long serialVersionUID = -8659808353683696964L;
 
 			@Override
@@ -137,7 +137,7 @@ class SessionCreator implements BeanCreator<Session> {
 				}
 			}
 		};
-		saveAction.setEnabled(false);
+		addAction.setEnabled(false);
 
 		final AtomicBoolean worksSelected = new AtomicBoolean(false);
 		final AtomicBoolean piecesSelected = new AtomicBoolean(false);
@@ -146,7 +146,7 @@ class SessionCreator implements BeanCreator<Session> {
 			public void valueChanged(final ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					worksSelected.set(true);
-					saveAction.setEnabled(piecesSelected.get());
+					addAction.setEnabled(piecesSelected.get());
 					saved.set(false);
 				}
 			}
@@ -156,7 +156,7 @@ class SessionCreator implements BeanCreator<Session> {
 			public void valueChanged(final ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					piecesSelected.set(true);
-					saveAction.setEnabled(worksSelected.get());
+					addAction.setEnabled(worksSelected.get());
 					saved.set(false);
 				}
 			}
@@ -164,7 +164,7 @@ class SessionCreator implements BeanCreator<Session> {
 
 		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 		buttons.setFloatable(false);
-		buttons.add(saveAction);
+		buttons.add(addAction);
 		paramsContent.add(presentation.awesome(buttons), BorderLayout.SOUTH);
 
 		params.pack();
