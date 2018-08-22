@@ -22,18 +22,23 @@ import java.util.Map;
 import javax.swing.JComponent;
 
 import net.cadrian.clef.model.bean.Pricing;
+import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.ui.form.FieldComponentFactory;
+import net.cadrian.clef.ui.form.PropertiesComponentFactory;
 import net.cadrian.clef.ui.form.TextAreaComponentFactory;
 import net.cadrian.clef.ui.form.TextFieldComponentFactory;
 
-class PricingFormModel extends BeanFormModel<Pricing, Pricing> {
+class PricingFormModel extends BeanFormModel<Pricing, NoBean> {
 
-	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, Pricing>> COMPONENT_FACTORIES = new LinkedHashMap<>();
+	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, NoBean>> COMPONENT_FACTORIES = new LinkedHashMap<>();
 	static {
-		final TextFieldComponentFactory<Pricing> nameFactory = new TextFieldComponentFactory<>(true);
-		final TextAreaComponentFactory<Pricing> notesFactory = new TextAreaComponentFactory<>(true);
+		final TextFieldComponentFactory<NoBean> nameFactory = new TextFieldComponentFactory<>(true);
+		final TextAreaComponentFactory<NoBean> notesFactory = new TextAreaComponentFactory<>(true);
+		final PropertiesComponentFactory<NoBean> propertiesFactory = new PropertiesComponentFactory<>(Entity.pricing,
+				true);
 		COMPONENT_FACTORIES.put("Name", nameFactory);
 		COMPONENT_FACTORIES.put("Notes", notesFactory);
+		COMPONENT_FACTORIES.put("Properties", propertiesFactory);
 	}
 
 	PricingFormModel(final Class<Pricing> beanType) {

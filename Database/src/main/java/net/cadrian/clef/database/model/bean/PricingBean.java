@@ -20,12 +20,12 @@ import net.cadrian.clef.database.DatabaseException;
 import net.cadrian.clef.database.bean.Pricing;
 import net.cadrian.clef.model.ModelException;
 
-public class PricingBean extends AbstractBean implements net.cadrian.clef.model.bean.Pricing {
+public class PricingBean extends AbstractPropertyBean implements net.cadrian.clef.model.bean.Pricing {
 
 	private final Pricing bean;
 
 	public PricingBean(final Pricing bean, final DatabaseBeansHolder db) {
-		super(db);
+		super(bean, db);
 		this.bean = bean;
 	}
 
@@ -56,6 +56,7 @@ public class PricingBean extends AbstractBean implements net.cadrian.clef.model.
 		update();
 	}
 
+	@Override
 	void update() {
 		try {
 			db.getPricings().update(bean);

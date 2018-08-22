@@ -23,7 +23,7 @@ import net.cadrian.clef.database.io.Condition;
 import net.cadrian.clef.database.io.Field;
 import net.cadrian.clef.database.io.StringField;
 
-public class Pricing extends AbstractBean<Pricing> {
+public class Pricing extends AbstractPropertyBean<Pricing> {
 
 	private static final String TABLE_NAME = "pricing";
 	private static final List<Field<Pricing>> FIELDS = Arrays.asList(

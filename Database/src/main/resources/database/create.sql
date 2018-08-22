@@ -118,6 +118,14 @@ CREATE TABLE IF NOT EXISTS pricing (
 	PRIMARY KEY(id)
 );
 
+CREATE TABLE IF NOT EXISTS pricing_property (
+	property_id BIGINT NOT NULL,
+	pricing_id BIGINT NOT NULL,
+	PRIMARY KEY(property_id, pricing_id),
+	FOREIGN KEY(property_id) REFERENCES property(id),
+	FOREIGN KEY(pricing_id) REFERENCES pricing(id)
+);
+
 -- META
 
 CREATE TABLE IF NOT EXISTS meta_property (

@@ -22,7 +22,7 @@ public interface PropertyDescriptor extends Bean {
 
 	public static enum Entity {
 		// keep meta out (low-level management only)
-		author, work, piece, session;
+		pricing, author, work, piece, session;
 	}
 
 	Entity getEntity();

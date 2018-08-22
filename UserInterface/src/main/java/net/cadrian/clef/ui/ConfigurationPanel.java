@@ -53,6 +53,7 @@ import org.slf4j.LoggerFactory;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.Piece;
+import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.PropertyBean;
 import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
@@ -77,6 +78,7 @@ class ConfigurationPanel extends JTabbedPane {
 	}
 
 	private static final List<ConfigurableBeanDescription> CONFIGURABLE_BEANS = Arrays.asList(
+			new ConfigurableBeanDescription(Entity.pricing, Pricing.class),
 			new ConfigurableBeanDescription(Entity.author, Author.class),
 			new ConfigurableBeanDescription(Entity.work, Work.class),
 			new ConfigurableBeanDescription(Entity.piece, Piece.class),

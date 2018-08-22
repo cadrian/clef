@@ -16,9 +16,14 @@
  */
 package net.cadrian.clef.model.bean;
 
-import net.cadrian.clef.model.Bean;
+import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 
-public interface Pricing extends Bean {
+public interface Pricing extends PropertyBean {
+
+	@Override
+	default PropertyDescriptor.Entity getEntity() {
+		return Entity.pricing;
+	}
 
 	String getName();
 
