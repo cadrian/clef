@@ -36,6 +36,7 @@ import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.model.bean.Work;
+import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
 
 public class Application extends JFrame {
 
@@ -43,33 +44,12 @@ public class Application extends JFrame {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
-	private static class ApplicationContextImpl implements ApplicationContext {
-
-		private final Beans beans;
-		private final Presentation presentation;
-
-		ApplicationContextImpl(final Beans beans, final Presentation presentation) {
-			this.beans = beans;
-			this.presentation = presentation;
-		}
-
-		@Override
-		public Beans getBeans() {
-			return beans;
-		}
-
-		@Override
-		public Presentation getPresentation() {
-			return presentation;
-		}
-
-	}
-
 	private final ApplicationContextImpl context;
 
 	public Application(final Beans beans) {
 		final Presentation presentation = getPresentation();
 		context = new ApplicationContextImpl(beans, presentation);
+		context.setValue(AdvancedConfigurationEntry.allowStartWrite, false);
 		initUI();
 	}
 

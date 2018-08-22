@@ -43,6 +43,8 @@ import com.github.lgooddatepicker.components.TimePickerSettings;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
+import net.cadrian.clef.ui.ApplicationContext.ApplicationContextListener;
 
 public class DateComponentFactory<C extends Bean> extends AbstractFieldComponentFactory<Date, JPanel, C> {
 
@@ -152,8 +154,9 @@ public class DateComponentFactory<C extends Bean> extends AbstractFieldComponent
 
 			};
 
-			refresh.setEnabled(writable);
-			setDate.setEnabled(writable);
+			final boolean w = context.getValue(AdvancedConfigurationEntry.allowStartWrite);
+			refresh.setEnabled(writable || w);
+			setDate.setEnabled(writable || w);
 
 			final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 			buttons.setFloatable(false);
@@ -162,6 +165,17 @@ public class DateComponentFactory<C extends Bean> extends AbstractFieldComponent
 
 			component.add(display);
 			component.add(context.getPresentation().awesome(buttons));
+
+			context.addApplicationContextListener(AdvancedConfigurationEntry.allowStartWrite,
+					new ApplicationContextListener<Boolean>() {
+
+						@Override
+						public void onAdvancedConfigurationChange(final AdvancedConfigurationEntry entry,
+								final Boolean value) {
+							refresh.setEnabled(writable || value);
+							setDate.setEnabled(writable || value);
+						}
+					});
 		}
 
 		@Override

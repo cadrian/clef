@@ -22,6 +22,7 @@ import java.awt.GraphicsEnvironment;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -66,7 +67,7 @@ public class Presentation {
 		}
 	}
 
-	public JButton awesome(final JButton button) {
+	public <B extends AbstractButton> B awesome(final B button) {
 		button.setText(getMessage("Awesome." + button.getText()));
 		button.setFont(awesomeFont);
 		return button;

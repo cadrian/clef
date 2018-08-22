@@ -17,6 +17,7 @@
 package net.cadrian.clef.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,15 +29,20 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -52,6 +58,7 @@ import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.model.bean.Work;
+import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
 
 class ConfigurationPanel extends JTabbedPane {
 
@@ -82,6 +89,8 @@ class ConfigurationPanel extends JTabbedPane {
 		for (final ConfigurableBeanDescription configurableBean : CONFIGURABLE_BEANS) {
 			addTab(presentation.getMessage(configurableBean.name), configurationPanel(context, configurableBean));
 		}
+
+		addTab(presentation.getMessage("AdvancedConfiguration"), advancedConfigurationPanel(context));
 	}
 
 	private JPanel configurationPanel(final ApplicationContext context,
@@ -135,10 +144,35 @@ class ConfigurationPanel extends JTabbedPane {
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
 			@Override
-			public void valueChanged(ListSelectionEvent e) {
+			public void valueChanged(final ListSelectionEvent e) {
 				delAction.setEnabled(model.canDelRow(table.getSelectedRow()));
 			}
 		});
+
+		return result;
+	}
+
+	private JPanel advancedConfigurationPanel(final ApplicationContext context) {
+		final JPanel result = new JPanel(new BorderLayout());
+
+		final JToggleButton allowStartWriteButton = context.getPresentation().awesome(new JToggleButton("Attention"));
+		allowStartWriteButton.setForeground(Color.RED);
+		final JLabel allowStartWriteLabel = new JLabel(context.getPresentation().getMessage("AllowStartWriteLabel"));
+
+		final JPanel content = new JPanel();
+		content.setLayout(new BoxLayout(content, BoxLayout.X_AXIS));
+		content.add(allowStartWriteButton);
+		content.add(allowStartWriteLabel);
+
+		allowStartWriteButton.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				context.setValue(AdvancedConfigurationEntry.allowStartWrite, allowStartWriteButton.isSelected());
+			}
+		});
+
+		result.add(content, BorderLayout.CENTER);
 
 		return result;
 	}
