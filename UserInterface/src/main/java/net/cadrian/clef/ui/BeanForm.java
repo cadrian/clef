@@ -70,10 +70,12 @@ class BeanForm<T extends Bean, C extends Bean> extends JPanel {
 
 		void save(final T bean) {
 			try {
+				LOGGER.debug("saving {}.{}", bean, model.name);
+				final D data = component.getData();
 				if (model.setter == null) {
 					LOGGER.info("no setter for {}", model.name);
 				} else {
-					model.setter.invoke(bean, component.getData());
+					model.setter.invoke(bean, data);
 				}
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				LOGGER.error("BUG: could not save value", e);
