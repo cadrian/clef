@@ -47,8 +47,8 @@ public class Property extends AbstractBean<Property> {
 		return propertyDescriptorId;
 	}
 
-	public void setPropertyDescriptorId(Long dictionaryId) {
-		this.propertyDescriptorId = dictionaryId;
+	public void setPropertyDescriptorId(final Long dictionaryId) {
+		propertyDescriptorId = dictionaryId;
 	}
 
 	public String getValue() {

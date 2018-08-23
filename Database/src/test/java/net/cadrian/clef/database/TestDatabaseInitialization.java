@@ -40,7 +40,7 @@ public class TestDatabaseInitialization extends AbstractDatabaseTestHarness {
 	public void testInitialization() throws Exception {
 		final DatabaseManager mgr = getManager();
 
-		Long versionPD = readPropertyDescriptor(mgr, "meta", "VERSION");
+		final Long versionPD = readPropertyDescriptor(mgr, "meta", "VERSION");
 		assertNotNull(versionPD);
 
 		readProperties(mgr, versionPD, "1.0.0");
@@ -87,7 +87,7 @@ public class TestDatabaseInitialization extends AbstractDatabaseTestHarness {
 		}
 	}
 
-	private String readClob(String fieldName, ResultSet rs) throws SQLException, IOException {
+	private String readClob(final String fieldName, final ResultSet rs) throws SQLException, IOException {
 		final String result;
 		try (StringWriter w = new StringWriter()) {
 			final Clob v = rs.getClob(fieldName);

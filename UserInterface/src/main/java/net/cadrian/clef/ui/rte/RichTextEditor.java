@@ -1,3 +1,19 @@
+/*
+ * This file is part of Clef.
+ *
+ * Clef is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Clef is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 package net.cadrian.clef.ui.rte;
 
 import java.awt.BorderLayout;
@@ -189,7 +205,7 @@ public class RichTextEditor extends JPanel {
 		add(presentation.awesome(tools), BorderLayout.NORTH);
 	}
 
-	public void replaceSelection(String content) {
+	public void replaceSelection(final String content) {
 		editor.replaceSelection(content);
 		undoManager.discardAllEdits();
 	}

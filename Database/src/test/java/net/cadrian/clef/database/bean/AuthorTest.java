@@ -41,7 +41,7 @@ public class AuthorTest extends AbstractDatabaseTestHarness {
 		final PropertyDescriptor template = new PropertyDescriptor();
 		template.setEntity("author");
 		template.setName("FOO");
-		PropertyDescriptor inserted = propertyDescriptors.insert(template);
+		final PropertyDescriptor inserted = propertyDescriptors.insert(template);
 		fooPropertyDescriptorId = inserted.getId();
 	}
 

@@ -34,7 +34,7 @@ public class BlobField<T extends DatabaseBean> extends AbstractField<T, BlobStre
 	public interface BlobStream extends Closeable {
 		void save(InputStream stream) throws DatabaseException;
 
-		default void read(OutputStream stream) throws DatabaseException {
+		default void read(final OutputStream stream) throws DatabaseException {
 		}
 	}
 

@@ -128,12 +128,12 @@ public class Application extends JFrame {
 
 		addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e) {
+			public void windowClosing(final WindowEvent e) {
 				if (sessionsPanel.isDirty() || worksPanel.isDirty() || authorsPanel.isDirty()
 						|| pricingsPanel.isDirty() | configurationPanel.isDirty()) {
 					LOGGER.info("unsaved work on exit: asking confirmation");
 
-					int response = JOptionPane.showConfirmDialog(Application.this,
+					final int response = JOptionPane.showConfirmDialog(Application.this,
 							context.getPresentation().getMessage("ConfirmExitMessage"),
 							context.getPresentation().getMessage("ConfirmExitTitle"), JOptionPane.YES_NO_OPTION,
 							JOptionPane.QUESTION_MESSAGE);

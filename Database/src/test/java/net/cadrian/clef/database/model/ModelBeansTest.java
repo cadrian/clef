@@ -72,7 +72,7 @@ public class ModelBeansTest extends AbstractDatabaseTestHarness {
 		Assert.assertTrue(pieces.contains(lullaby));
 		Assert.assertTrue(pieces.contains(waltz));
 
-		Property copyright = beans.createProperty(copyrightPropertyDescriptor);
+		final Property copyright = beans.createProperty(copyrightPropertyDescriptor);
 		copyright.setValue("This is a test, it has no rights");
 
 		final Set<Property> propertiesToSet = new HashSet<>();

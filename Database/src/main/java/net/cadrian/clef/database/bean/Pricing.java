@@ -45,7 +45,7 @@ public class Pricing extends AbstractPropertyBean<Pricing> {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -53,7 +53,7 @@ public class Pricing extends AbstractPropertyBean<Pricing> {
 		return notes;
 	}
 
-	public void setNotes(String notes) {
+	public void setNotes(final String notes) {
 		this.notes = notes;
 	}
 

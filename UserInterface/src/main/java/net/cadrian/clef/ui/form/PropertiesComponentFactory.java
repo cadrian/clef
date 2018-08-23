@@ -233,7 +233,7 @@ public class PropertiesComponentFactory<C extends Bean>
 				};
 
 				buttons.add(addAction);
-				buttons.add(new JSeparator(JSeparator.VERTICAL));
+				buttons.add(new JSeparator(SwingConstants.VERTICAL));
 				buttons.add(delAction);
 				left.add(context.getPresentation().awesome(buttons), BorderLayout.SOUTH);
 

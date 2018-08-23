@@ -24,9 +24,6 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.After;
 import org.junit.Before;
 
-import net.cadrian.clef.database.DatabaseException;
-import net.cadrian.clef.database.DatabaseManager;
-
 public abstract class AbstractDatabaseTestHarness {
 
 	private BasicDataSource dataSource;
@@ -43,7 +40,7 @@ public abstract class AbstractDatabaseTestHarness {
 		if (dataSource != null) {
 			try {
 				dataSource.close();
-			} catch (SQLException e) {
+			} catch (final SQLException e) {
 				throw new DatabaseException(e);
 			} finally {
 				dataSource = null;

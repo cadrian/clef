@@ -98,7 +98,7 @@ class SessionCreator implements BeanCreator<Session> {
 		works.addListSelectionListener(new ListSelectionListener() {
 
 			@Override
-			public void valueChanged(ListSelectionEvent e) {
+			public void valueChanged(final ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					// TODO swing niceties using an async worker
 					for (final Piece piece : works.getSelectedValue().getPieces()) {

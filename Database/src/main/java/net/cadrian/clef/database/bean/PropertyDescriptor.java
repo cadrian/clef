@@ -48,7 +48,7 @@ public class PropertyDescriptor extends AbstractBean<PropertyDescriptor> {
 		return entity;
 	}
 
-	public void setEntity(String entity) {
+	public void setEntity(final String entity) {
 		this.entity = entity;
 	}
 
@@ -65,7 +65,7 @@ public class PropertyDescriptor extends AbstractBean<PropertyDescriptor> {
 	}
 
 	public void setDescription(final String value) {
-		this.description = value;
+		description = value;
 	}
 
 	@Override

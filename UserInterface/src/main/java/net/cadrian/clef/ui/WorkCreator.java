@@ -56,9 +56,9 @@ class WorkCreator implements BeanCreator<Work> {
 
 	@Override
 	public Work createBean() {
-		Beans beans = context.getBeans();
-		Presentation presentation = context.getPresentation();
-		JFrame parent = presentation.getApplicationFrame();
+		final Beans beans = context.getBeans();
+		final Presentation presentation = context.getPresentation();
+		final JFrame parent = presentation.getApplicationFrame();
 		final Collection<? extends Author> allAuthors = beans.getAuthors();
 		if (allAuthors.isEmpty()) {
 			JOptionPane.showMessageDialog(parent, presentation.getMessage("WorkCreatorNoAuthorsMessage"),
