@@ -26,4 +26,6 @@ public interface FieldComponent<D, J extends JComponent> {
 	void setData(D data);
 
 	double getWeight();
+
+	boolean isDirty();
 }

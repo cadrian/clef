@@ -84,6 +84,8 @@ class ConfigurationPanel extends JTabbedPane {
 			new ConfigurableBeanDescription(Entity.piece, Piece.class),
 			new ConfigurableBeanDescription(Entity.session, Session.class));
 
+	private final List<PropertyDescriptorTableModel> models = new ArrayList<>();
+
 	ConfigurationPanel(final ApplicationContext context) {
 		super();
 
@@ -100,6 +102,7 @@ class ConfigurationPanel extends JTabbedPane {
 		final JPanel result = new JPanel(new BorderLayout());
 
 		final PropertyDescriptorTableModel model = new PropertyDescriptorTableModel(context, configurableBean);
+		models.add(model);
 
 		final JTable table = new JTable(model);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -138,7 +141,7 @@ class ConfigurationPanel extends JTabbedPane {
 
 		buttons.add(addAction);
 		buttons.add(saveAction);
-		buttons.add(new JSeparator(JSeparator.VERTICAL));
+		buttons.add(new JSeparator(SwingConstants.VERTICAL));
 		buttons.add(delAction);
 		result.add(context.getPresentation().awesome(buttons), BorderLayout.SOUTH);
 
@@ -236,6 +239,10 @@ class ConfigurationPanel extends JTabbedPane {
 					bean.setDescription(description);
 					dirty = false;
 				}
+			}
+
+			public boolean isDirty() {
+				return dirty;
 			}
 		}
 
@@ -402,6 +409,27 @@ class ConfigurationPanel extends JTabbedPane {
 			}
 		}
 
+		public boolean isDirty() {
+			if (!deletedBeans.isEmpty()) {
+				return true;
+			}
+			for (final EditableBean editableBean : editableBeans) {
+				if (editableBean.isDirty()) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+	}
+
+	public boolean isDirty() {
+		for (final PropertyDescriptorTableModel model : models) {
+			if (model.isDirty()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

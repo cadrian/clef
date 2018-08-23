@@ -81,6 +81,10 @@ class BeanForm<T extends Bean, C extends Bean> extends JPanel {
 				LOGGER.error("BUG: could not save value", e);
 			}
 		}
+
+		public boolean isDirty() {
+			return component.isDirty();
+		}
 	}
 
 	private final T bean;
@@ -165,6 +169,15 @@ class BeanForm<T extends Bean, C extends Bean> extends JPanel {
 
 	public T getBean() {
 		return bean;
+	}
+
+	public boolean isDirty() {
+		for (final FieldView<T, ?, ?, C> field : fields.values()) {
+			if (field.isDirty()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

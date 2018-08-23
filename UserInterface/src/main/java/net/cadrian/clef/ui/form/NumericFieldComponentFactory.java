@@ -29,6 +29,7 @@ public class NumericFieldComponentFactory<C extends Bean>
 	private static class NumericFieldComponent implements FieldComponent<Long, JFormattedTextField> {
 
 		private final JFormattedTextField component;
+		private String savedData = "";
 
 		NumericFieldComponent(final boolean writable) {
 			component = new JFormattedTextField(NumberFormat.getIntegerInstance());
@@ -42,21 +43,31 @@ public class NumericFieldComponentFactory<C extends Bean>
 
 		@Override
 		public Long getData() {
+			final String text = component.getText();
 			try {
-				return Long.parseLong(component.getText());
+				return Long.parseLong(text);
 			} catch (final NumberFormatException e) {
 				return null;
+			} finally {
+				savedData = text;
 			}
 		}
 
 		@Override
 		public void setData(final Long data) {
-			component.setText(data == null ? "" : data.toString());
+			final String string = data == null ? "" : data.toString();
+			component.setText(string);
+			savedData = string;
 		}
 
 		@Override
 		public double getWeight() {
 			return 0;
+		}
+
+		@Override
+		public boolean isDirty() {
+			return !savedData.equals(component.getText());
 		}
 
 	}

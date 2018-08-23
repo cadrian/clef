@@ -191,6 +191,7 @@ public class RichTextEditor extends JPanel {
 
 	public void replaceSelection(String content) {
 		editor.replaceSelection(content);
+		undoManager.discardAllEdits();
 	}
 
 	public void setEditable(final boolean writable) {

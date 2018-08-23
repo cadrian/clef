@@ -165,6 +165,10 @@ public class PropertiesComponentFactory<C extends Bean>
 				}
 			}
 
+			public boolean isDirty() {
+				return dirty;
+			}
+
 			@Override
 			public int compareTo(final EditableProperty o) {
 				return propertyDescriptor.getName().compareTo(o.propertyDescriptor.getName());
@@ -248,6 +252,7 @@ public class PropertiesComponentFactory<C extends Bean>
 			component.setLeftComponent(left);
 			component.setRightComponent(new JPanel());
 			list.addListSelectionListener(new ListSelectionListener() {
+
 				@Override
 				public void valueChanged(final ListSelectionEvent e) {
 					if (!e.getValueIsAdjusting()) {
@@ -256,6 +261,7 @@ public class PropertiesComponentFactory<C extends Bean>
 					}
 				}
 			});
+
 		}
 
 		void saveProperty() {
@@ -292,6 +298,7 @@ public class PropertiesComponentFactory<C extends Bean>
 
 		@Override
 		public Collection<? extends Property> getData() {
+			saveProperty();
 			final List<Property> result = new ArrayList<>();
 			final Beans beans = context.getBeans();
 			// property deletes are handled when saving the bean holding the properties
@@ -324,6 +331,19 @@ public class PropertiesComponentFactory<C extends Bean>
 		@Override
 		public double getWeight() {
 			return 1;
+		}
+
+		@Override
+		public boolean isDirty() {
+			if (!deleted.isEmpty()) {
+				return true;
+			}
+			for (final EditableProperty property : model.getElements()) {
+				if (property.isDirty()) {
+					return true;
+				}
+			}
+			return false; // TODO wrong -- the RTE may have been modified too
 		}
 
 		Collection<PropertyDescriptor> getAddableDescriptors() {

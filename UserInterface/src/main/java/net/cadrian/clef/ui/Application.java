@@ -16,11 +16,14 @@
  */
 package net.cadrian.clef.ui;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -56,7 +59,7 @@ public class Application extends JFrame {
 		setLookAndFeel(false);
 		setTitle(context.getPresentation().getMessage("ClefTitle"));
 		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		initComponents();
 		pack();
 	}
@@ -99,25 +102,55 @@ public class Application extends JFrame {
 		final JTabbedPane mgtPane = new JTabbedPane(SwingConstants.TOP);
 		final Beans beans = context.getBeans();
 
-		mainPane.addTab(context.getPresentation().getMessage("Sessions"),
-				new DataPane<>(context, true, beans::getSessions, new SessionCreator(context),
-						(s1, s2) -> BeanComparators.compareSessions(s1, s2), new SessionFormModel(Session.class)));
+		final DataPane<Session, NoBean> sessionsPanel = new DataPane<>(context, true, beans::getSessions,
+				new SessionCreator(context), (s1, s2) -> BeanComparators.compareSessions(s1, s2),
+				new SessionFormModel(Session.class));
+		final DataPane<Work, Work> worksPanel = new DataPane<>(context, true, beans::getWorks, new WorkCreator(context),
+				(w1, w2) -> BeanComparators.compareWorks(w1, w2), new WorkFormModel(Work.class),
+				Arrays.asList("Description", "Pieces"));
+		final DataPane<Author, NoBean> authorsPanel = new DataPane<>(context, true, beans::getAuthors,
+				beans::createAuthor, (a1, a2) -> BeanComparators.compareAuthors(a1, a2),
+				new AuthorFormModel(Author.class));
+		final DataPane<Pricing, NoBean> pricingsPanel = new DataPane<>(context, true, beans::getPricings,
+				beans::createPricing, (p1, p2) -> BeanComparators.comparePricings(p1, p2),
+				new PricingFormModel(Pricing.class));
+		final ConfigurationPanel configurationPanel = new ConfigurationPanel(context);
 
-		mgtPane.addTab(context.getPresentation().getMessage("Works"),
-				new DataPane<>(context, true, beans::getWorks, new WorkCreator(context),
-						(w1, w2) -> BeanComparators.compareWorks(w1, w2), new WorkFormModel(Work.class),
-						Arrays.asList("Description", "Pieces")));
-		mgtPane.addTab(context.getPresentation().getMessage("Authors"),
-				new DataPane<>(context, true, beans::getAuthors, beans::createAuthor,
-						(a1, a2) -> BeanComparators.compareAuthors(a1, a2), new AuthorFormModel(Author.class)));
-		mgtPane.addTab(context.getPresentation().getMessage("Pricings"),
-				new DataPane<>(context, true, beans::getPricings, beans::createPricing,
-						(p1, p2) -> BeanComparators.comparePricings(p1, p2), new PricingFormModel(Pricing.class)));
+		mainPane.addTab(context.getPresentation().getMessage("Sessions"), sessionsPanel);
+
+		mgtPane.addTab(context.getPresentation().getMessage("Works"), worksPanel);
+		mgtPane.addTab(context.getPresentation().getMessage("Authors"), authorsPanel);
+		mgtPane.addTab(context.getPresentation().getMessage("Pricings"), pricingsPanel);
+
 		mainPane.addTab(context.getPresentation().getMessage("Management"), mgtPane);
-
 		mainPane.addTab(context.getPresentation().getMessage("Statistics"), new StatisticsPanel(context));
+		mainPane.addTab(context.getPresentation().getMessage("Configuration"), configurationPanel);
 
-		mainPane.addTab(context.getPresentation().getMessage("Configuration"), new ConfigurationPanel(context));
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				if (sessionsPanel.isDirty() || worksPanel.isDirty() || authorsPanel.isDirty()
+						|| pricingsPanel.isDirty() | configurationPanel.isDirty()) {
+					LOGGER.info("unsaved work on exit: asking confirmation");
+
+					int response = JOptionPane.showConfirmDialog(Application.this,
+							context.getPresentation().getMessage("ConfirmExitMessage"),
+							context.getPresentation().getMessage("ConfirmExitTitle"), JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE);
+					switch (response) {
+					case JOptionPane.YES_OPTION:
+						LOGGER.info("USER CONFIRMED DIRTY EXIT.");
+						// confirmed.
+						break;
+					case JOptionPane.NO_OPTION:
+					case JOptionPane.CLOSED_OPTION:
+						LOGGER.info("User did not confirm, aborting exit");
+						return;
+					}
+				}
+				dispose();
+			}
+		});
 	}
 
 }

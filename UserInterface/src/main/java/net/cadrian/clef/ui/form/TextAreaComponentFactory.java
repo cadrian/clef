@@ -25,6 +25,7 @@ public class TextAreaComponentFactory<C extends Bean> extends AbstractFieldCompo
 	private static class TextAreaComponent implements FieldComponent<String, RichTextEditor> {
 
 		private final RichTextEditor component;
+		private String savedData = "";
 
 		TextAreaComponent(final ApplicationContext context, final boolean writable) {
 			component = new RichTextEditor(context);
@@ -38,17 +39,24 @@ public class TextAreaComponentFactory<C extends Bean> extends AbstractFieldCompo
 
 		@Override
 		public String getData() {
-			return component.getText();
+			savedData = component.getText();
+			return savedData;
 		}
 
 		@Override
 		public void setData(final String data) {
-			component.setText(data);
+			savedData = data == null ? "" : data;
+			component.setText(savedData);
 		}
 
 		@Override
 		public double getWeight() {
 			return 2;
+		}
+
+		@Override
+		public boolean isDirty() {
+			return !savedData.equals(component.getText());
 		}
 
 	}

@@ -61,6 +61,11 @@ public class PiecesComponentFactory
 			return 1;
 		}
 
+		@Override
+		public boolean isDirty() {
+			return component.isDirty();
+		}
+
 	}
 
 	private final BeanFormModel<Piece, Work> beanFormModel;

@@ -53,6 +53,11 @@ public class BeanComponentFactory<T extends Bean, C extends Bean>
 			return 0;
 		}
 
+		@Override
+		public boolean isDirty() {
+			return false;
+		}
+
 	}
 
 	private final Class<T> beanType;

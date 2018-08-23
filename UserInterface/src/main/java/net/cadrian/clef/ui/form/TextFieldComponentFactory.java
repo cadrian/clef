@@ -26,6 +26,7 @@ public class TextFieldComponentFactory<C extends Bean> extends AbstractFieldComp
 	private static class TextFieldComponent implements FieldComponent<String, JTextField> {
 
 		private final JTextField component;
+		private String savedData = "";
 
 		TextFieldComponent(final boolean writable) {
 			component = new JTextField();
@@ -39,17 +40,24 @@ public class TextFieldComponentFactory<C extends Bean> extends AbstractFieldComp
 
 		@Override
 		public String getData() {
-			return component.getText();
+			savedData = component.getText();
+			return savedData;
 		}
 
 		@Override
 		public void setData(final String data) {
-			component.setText(data);
+			savedData = data == null ? "" : data;
+			component.setText(savedData);
 		}
 
 		@Override
 		public double getWeight() {
 			return 0;
+		}
+
+		@Override
+		public boolean isDirty() {
+			return !savedData.equals(component.getText());
 		}
 
 	}
@@ -63,8 +71,7 @@ public class TextFieldComponentFactory<C extends Bean> extends AbstractFieldComp
 	}
 
 	@Override
-	public FieldComponent<String, JTextField> createComponent(final ApplicationContext context,
-			final C contextBean) {
+	public FieldComponent<String, JTextField> createComponent(final ApplicationContext context, final C contextBean) {
 		return new TextFieldComponent(writable);
 	}
 

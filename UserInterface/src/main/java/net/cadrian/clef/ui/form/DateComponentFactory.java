@@ -122,6 +122,7 @@ public class DateComponentFactory<C extends Bean> extends AbstractFieldComponent
 		private final Action setDate;
 		private Date date;
 		private final DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		private boolean dirty;
 
 		DateComponent(final ApplicationContext context, final boolean writable) {
 			component = new JPanel();
@@ -137,6 +138,7 @@ public class DateComponentFactory<C extends Bean> extends AbstractFieldComponent
 				public void actionPerformed(final ActionEvent e) {
 					date = new Date();
 					display.setText(df.format(date));
+					dirty = true;
 				}
 
 			};
@@ -150,6 +152,7 @@ public class DateComponentFactory<C extends Bean> extends AbstractFieldComponent
 					picker.setVisible(true);
 					date = picker.getDate();
 					display.setText(df.format(date));
+					dirty = true;
 				}
 
 			};
@@ -185,6 +188,7 @@ public class DateComponentFactory<C extends Bean> extends AbstractFieldComponent
 
 		@Override
 		public Date getData() {
+			dirty = false;
 			return date;
 		}
 
@@ -196,6 +200,7 @@ public class DateComponentFactory<C extends Bean> extends AbstractFieldComponent
 				public void run() {
 					date = data;
 					display.setText(df.format(date));
+					dirty = false;
 				}
 			});
 		}
@@ -203,6 +208,11 @@ public class DateComponentFactory<C extends Bean> extends AbstractFieldComponent
 		@Override
 		public double getWeight() {
 			return 0;
+		}
+
+		@Override
+		public boolean isDirty() {
+			return dirty;
 		}
 
 	}
