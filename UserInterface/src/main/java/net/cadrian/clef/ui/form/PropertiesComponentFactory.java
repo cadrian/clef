@@ -294,16 +294,14 @@ public class PropertiesComponentFactory<C extends Bean>
 		public Collection<? extends Property> getData() {
 			final List<Property> result = new ArrayList<>();
 			final Beans beans = context.getBeans();
-			for (final Property property : deleted.values()) {
-				property.delete(); // TODO no!!!
-			}
+			// property deletes are handled when saving the bean holding the properties
 			deleted.clear();
 			for (final EditableProperty property : model.getElements()) {
 				if (property.getProperty() == null) {
-					final Property bean = beans.createProperty(property.getPropertyDescriptor());// TODO no!!!
+					final Property bean = beans.createProperty(property.getPropertyDescriptor());
 					property.setProperty(bean);
 				}
-				property.save();
+				property.save(); // TODO risk here: if error, this property will stay dangling
 				result.add(property.getProperty());
 			}
 			return result;
