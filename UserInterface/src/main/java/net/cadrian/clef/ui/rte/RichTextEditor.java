@@ -22,6 +22,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
+import java.util.Base64.Decoder;
+import java.util.Base64.Encoder;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -38,11 +44,15 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.StyledEditorKit;
+import javax.swing.text.rtf.RTFEditorKit;
 import javax.swing.undo.UndoManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.Presentation;
@@ -52,10 +62,17 @@ public class RichTextEditor extends JPanel {
 	// - http://www.javaquizplayer.com/examples/text-editor-using-java-example.html
 	// - https://www.artima.com/forums/flat.jsp?forum=1&thread=1276
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(RichTextEditor.class);
+
 	private static final long serialVersionUID = 7187888775973838539L;
 
-	final StyledDocument document;
-	final JTextPane editor;
+	private static final Encoder BASE64_ENCODER = Base64.getEncoder();
+	private static final Decoder BASE64_DECODER = Base64.getDecoder();
+
+	private final RTFEditorKit kit = new RTFEditorKit();
+
+	private final StyledDocument document;
+	private final JTextPane editor;
 
 	private final UndoManager undoManager;
 
@@ -64,7 +81,7 @@ public class RichTextEditor extends JPanel {
 		final Presentation presentation = context.getPresentation();
 
 		setBorder(BorderFactory.createEtchedBorder());
-		document = new DefaultStyledDocument();
+		document = (StyledDocument) kit.createDefaultDocument();
 		editor = new JTextPane();
 		undoManager = new UndoManager();
 
@@ -215,11 +232,33 @@ public class RichTextEditor extends JPanel {
 	}
 
 	public String getText() {
-		return editor.getText();
+		String text;
+		final int len = document.getLength();
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream(len)) {
+			try {
+				kit.write(out, document, 0, len);
+			} catch (IOException | BadLocationException e) {
+				LOGGER.error("Error while writing text", e);
+			}
+			text = BASE64_ENCODER.encodeToString(out.toByteArray());
+		} catch (final IOException e) {
+			LOGGER.error("Could not get RTF, text is lost", e);
+			text = "";
+		}
+		return text;
 	}
 
 	public void setText(final String text) {
-		editor.setText(text);
+		try (ByteArrayInputStream in = new ByteArrayInputStream(BASE64_DECODER.decode(text))) {
+			try {
+				document.remove(0, document.getLength());
+				kit.read(in, document, 0);
+			} catch (IOException | BadLocationException e) {
+				LOGGER.error("Error while reading text", e);
+			}
+		} catch (final IOException e) {
+			LOGGER.error("Error while reading text", e);
+		}
 	}
 
 }
