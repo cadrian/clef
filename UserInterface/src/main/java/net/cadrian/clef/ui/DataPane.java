@@ -248,7 +248,9 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 	public void saveData() {
 		final T selected = list.getSelectedValue();
 		try {
-			currentForm.save();
+			if (currentForm != null) {
+				currentForm.save();
+			}
 		} catch (final ModelException e) {
 			LOGGER.error("Error while saving data", e);
 			JOptionPane.showMessageDialog(DataPane.this, context.getPresentation().getMessage("SaveFailedMessage"),
