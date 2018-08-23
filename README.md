@@ -14,6 +14,18 @@ Clef also includes tons of "notes" that may help you track your ideas as you wor
 Note: although I use it for musical composition, Clef can be used for any kind of artwork: books, cinema, ...
 
 # TODO
-- add a new kind of property: files, BLOB -- useful to register external data such as PDF files, etc. (and put them in the database?)
+- rich text for notes (find a convenient editor pane in swing -- must be available in Maven AND Debian; or hack one)
+  - https://stackoverflow.com/questions/196980/can-anyone-recommend-a-java-rich-text-editor
+  - http://www.javaquizplayer.com/examples/text-editor-using-java-example.html
+  - https://www.artima.com/forums/flat.jsp?forum=1&thread=1276
+  - https://github.com/hdijkema/JRichTextEditor
+  - http://www.hexidec.com/ekit.php
+  - http://shef.sourceforge.net/
+- properties should be typed: use BLOB instead of CLOB; it could contain serialized data. Provide several editors:
+  - text / rich text
+  - numeric
+  - dates
+  - links to external files / resources (useful to register external data such as PDF files, etc.)
+- property descriptors should set the property type
 - add some warnings if not all is saved
 - enhance "please confirm delete" message
