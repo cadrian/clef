@@ -163,7 +163,7 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 		if (saveAction != null) {
 			buttons.add(saveAction);
 		}
-		buttons.add(new JSeparator(JSeparator.VERTICAL));
+		buttons.add(new JSeparator(SwingConstants.VERTICAL));
 		buttons.add(delAction);
 		left.add(context.getPresentation().awesome(buttons), BorderLayout.PAGE_END);
 
@@ -228,11 +228,12 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 	}
 
 	void delData() {
+		final T bean = list.getSelectedValue();
 		if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
-				context.getPresentation().getMessage("ConfirmDeleteMessage"),
+				context.getPresentation().getMessage("ConfirmDeleteMessage", bean),
 				context.getPresentation().getMessage("ConfirmDeleteTitle"), JOptionPane.YES_NO_OPTION)) {
 			try {
-				list.getSelectedValue().delete();
+				bean.delete();
 			} catch (final ModelException e) {
 				LOGGER.error("Error while deleting data", e);
 				JOptionPane.showMessageDialog(DataPane.this,

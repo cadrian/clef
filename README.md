@@ -21,4 +21,3 @@ Note: although I use it for musical composition, Clef can be used for any kind o
   - links to external files / resources (useful to register external data such as PDF files, etc.)
 - property descriptors should set the property type
 - add some warnings if not all is saved
-- enhance "please confirm delete" message
