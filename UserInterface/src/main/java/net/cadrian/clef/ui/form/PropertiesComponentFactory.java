@@ -39,7 +39,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -58,6 +57,7 @@ import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.Presentation;
 import net.cadrian.clef.ui.SortedListModel;
+import net.cadrian.clef.ui.rte.RichTextEditor;
 
 public class PropertiesComponentFactory<C extends Bean>
 		extends AbstractFieldComponentFactory<Collection<? extends Property>, JSplitPane, C> {
@@ -185,7 +185,7 @@ public class PropertiesComponentFactory<C extends Bean>
 		private final boolean writable;
 
 		private EditableProperty current;
-		private JTextArea content;
+		private RichTextEditor content;
 
 		PropertiesComponent(final ApplicationContext context, final Entity entity, final boolean writable) {
 			this.context = context;
@@ -229,7 +229,7 @@ public class PropertiesComponentFactory<C extends Bean>
 				};
 
 				buttons.add(addAction);
-				buttons.add(new JSeparator());
+				buttons.add(new JSeparator(JSeparator.VERTICAL));
 				buttons.add(delAction);
 				left.add(context.getPresentation().awesome(buttons), BorderLayout.SOUTH);
 
@@ -269,7 +269,8 @@ public class PropertiesComponentFactory<C extends Bean>
 			if (selected == null) {
 				component.setRightComponent(new JPanel());
 			} else {
-				content = new JTextArea(selected.getValue());
+				content = new RichTextEditor(context);
+				content.replaceSelection(selected.getValue());
 				if (writable) {
 					content.addFocusListener(new FocusAdapter() {
 						@Override

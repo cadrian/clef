@@ -163,7 +163,7 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 		if (saveAction != null) {
 			buttons.add(saveAction);
 		}
-		buttons.add(new JSeparator());
+		buttons.add(new JSeparator(JSeparator.VERTICAL));
 		buttons.add(delAction);
 		left.add(context.getPresentation().awesome(buttons), BorderLayout.PAGE_END);
 

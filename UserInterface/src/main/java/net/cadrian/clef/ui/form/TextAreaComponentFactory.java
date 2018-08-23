@@ -16,24 +16,23 @@
  */
 package net.cadrian.clef.ui.form;
 
-import javax.swing.JTextArea;
-
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.rte.RichTextEditor;
 
-public class TextAreaComponentFactory<C extends Bean> extends AbstractFieldComponentFactory<String, JTextArea, C> {
+public class TextAreaComponentFactory<C extends Bean> extends AbstractFieldComponentFactory<String, RichTextEditor, C> {
 
-	private static class TextAreaComponent implements FieldComponent<String, JTextArea> {
+	private static class TextAreaComponent implements FieldComponent<String, RichTextEditor> {
 
-		private final JTextArea component;
+		private final RichTextEditor component;
 
-		TextAreaComponent(final boolean writable) {
-			component = new JTextArea();
+		TextAreaComponent(final ApplicationContext context, final boolean writable) {
+			component = new RichTextEditor(context);
 			component.setEditable(writable);
 		}
 
 		@Override
-		public JTextArea getComponent() {
+		public RichTextEditor getComponent() {
 			return component;
 		}
 
@@ -63,8 +62,9 @@ public class TextAreaComponentFactory<C extends Bean> extends AbstractFieldCompo
 	}
 
 	@Override
-	public FieldComponent<String, JTextArea> createComponent(final ApplicationContext context, final C contextBean) {
-		return new TextAreaComponent(writable);
+	public FieldComponent<String, RichTextEditor> createComponent(final ApplicationContext context,
+			final C contextBean) {
+		return new TextAreaComponent(context, writable);
 	}
 
 	@Override

@@ -23,7 +23,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.swing.AbstractButton;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
@@ -54,7 +53,7 @@ public class Presentation {
 		if (ft == null) {
 			throw new RuntimeException("Missing some Awesome.");
 		}
-		awesomeFont = new Font(ft.getName(), ft.getStyle(), 20);
+		awesomeFont = new Font(ft.getName(), ft.getStyle(), 16);
 		LOGGER.debug("Font Awesome: {}", awesomeFont);
 	}
 
@@ -76,8 +75,8 @@ public class Presentation {
 	public JToolBar awesome(final JToolBar toolbar) {
 		toolbar.setFont(awesomeFont);
 		for (final Component component : toolbar.getComponents()) {
-			if (component instanceof JButton) {
-				awesome((JButton) component);
+			if (component instanceof AbstractButton) {
+				awesome((AbstractButton) component);
 			}
 		}
 		return toolbar;

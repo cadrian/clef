@@ -138,7 +138,7 @@ class ConfigurationPanel extends JTabbedPane {
 
 		buttons.add(addAction);
 		buttons.add(saveAction);
-		buttons.add(new JSeparator());
+		buttons.add(new JSeparator(JSeparator.VERTICAL));
 		buttons.add(delAction);
 		result.add(context.getPresentation().awesome(buttons), BorderLayout.SOUTH);
 
