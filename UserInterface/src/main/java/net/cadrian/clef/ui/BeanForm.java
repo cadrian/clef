@@ -83,7 +83,11 @@ class BeanForm<T extends Bean, C extends Bean> extends JPanel {
 		}
 
 		public boolean isDirty() {
-			return component.isDirty();
+			boolean result = component.isDirty();
+			if (result) {
+				LOGGER.debug("dirty: {}", model.name);
+			}
+			return result;
 		}
 	}
 
@@ -174,10 +178,16 @@ class BeanForm<T extends Bean, C extends Bean> extends JPanel {
 	public boolean isDirty() {
 		for (final FieldView<T, ?, ?, C> field : fields.values()) {
 			if (field.isDirty()) {
+				LOGGER.debug("dirty: {}", bean);
 				return true;
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "form:" + bean;
 	}
 
 }

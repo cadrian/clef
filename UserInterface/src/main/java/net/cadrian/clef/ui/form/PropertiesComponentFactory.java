@@ -126,6 +126,9 @@ public class PropertiesComponentFactory<C extends Bean>
 		}
 
 		public boolean isDirty() {
+			if (dirty) {
+				LOGGER.debug("dirty: {}", property);
+			}
 			return dirty;
 		}
 
@@ -342,6 +345,7 @@ public class PropertiesComponentFactory<C extends Bean>
 		@Override
 		public boolean isDirty() {
 			if (!deleted.isEmpty()) {
+				LOGGER.debug("dirty: there are deleted properties");
 				return true;
 			}
 			for (final EditableProperty property : model.getElements()) {
@@ -349,7 +353,11 @@ public class PropertiesComponentFactory<C extends Bean>
 					return true;
 				}
 			}
-			return propertyEditor == null ? false : propertyEditor.isDirty();
+			if (propertyEditor == null) {
+				return false;
+			}
+
+			return propertyEditor.isDirty();
 		}
 
 		Collection<PropertyDescriptor> getAddableDescriptors() {
@@ -435,7 +443,11 @@ public class PropertiesComponentFactory<C extends Bean>
 
 		@Override
 		public boolean isDirty() {
-			return content.isDirty();
+			boolean result = content.isDirty();
+			if (result) {
+				LOGGER.debug("dirty: {}", property);
+			}
+			return result;
 		}
 
 		@Override
@@ -471,7 +483,11 @@ public class PropertiesComponentFactory<C extends Bean>
 
 		@Override
 		public boolean isDirty() {
-			return content.isDirty();
+			boolean result = content.isDirty();
+			if (result) {
+				LOGGER.debug("dirty: {}", property);
+			}
+			return result;
 		}
 
 		@Override
@@ -509,7 +525,11 @@ public class PropertiesComponentFactory<C extends Bean>
 
 		@Override
 		public boolean isDirty() {
-			return content.isDirty();
+			boolean result = content.isDirty();
+			if (result) {
+				LOGGER.debug("dirty: {}", property);
+			}
+			return result;
 		}
 	}
 

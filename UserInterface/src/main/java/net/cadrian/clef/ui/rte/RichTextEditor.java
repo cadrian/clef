@@ -272,7 +272,11 @@ public class RichTextEditor extends JPanel {
 	}
 
 	public boolean isDirty() {
-		return dirty != 0;
+		boolean result = dirty != 0;
+		if (result) {
+			LOGGER.debug("dirty: RTE");
+		}
+		return result;
 	}
 
 }

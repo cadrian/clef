@@ -16,16 +16,20 @@
  */
 package net.cadrian.clef.ui.form;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.rte.RichTextEditor;
 
 public class TextAreaComponentFactory<C extends Bean> extends AbstractFieldComponentFactory<String, RichTextEditor, C> {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(TextAreaComponentFactory.class);
+
 	private static class TextAreaComponent implements FieldComponent<String, RichTextEditor> {
 
 		private final RichTextEditor component;
-		private String savedData = "";
 
 		TextAreaComponent(final ApplicationContext context, final boolean writable) {
 			component = new RichTextEditor(context);
@@ -39,14 +43,13 @@ public class TextAreaComponentFactory<C extends Bean> extends AbstractFieldCompo
 
 		@Override
 		public String getData() {
-			savedData = component.getText();
-			return savedData;
+			return component.getText();
 		}
 
 		@Override
 		public void setData(final String data) {
-			savedData = data == null ? "" : data;
-			component.setText(savedData);
+			component.setText(data == null ? "" : data);
+			component.markSave();
 		}
 
 		@Override
@@ -56,7 +59,11 @@ public class TextAreaComponentFactory<C extends Bean> extends AbstractFieldCompo
 
 		@Override
 		public boolean isDirty() {
-			return !savedData.equals(component.getText());
+			boolean result = component.isDirty();
+			if (result) {
+				LOGGER.debug("dirty");
+			}
+			return result;
 		}
 
 	}

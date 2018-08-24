@@ -300,7 +300,18 @@ class ConfigurationPanel extends JTabbedPane {
 			}
 
 			public boolean isDirty() {
+				if (dirty) {
+					LOGGER.debug("dirty: {}", bean);
+				}
 				return dirty;
+			}
+
+			@Override
+			public String toString() {
+				if (bean != null) {
+					return bean.toString();
+				}
+				return "";
 			}
 		}
 
@@ -480,10 +491,12 @@ class ConfigurationPanel extends JTabbedPane {
 
 		public boolean isDirty() {
 			if (!deletedBeans.isEmpty()) {
+				LOGGER.debug("dirty: there are deleted beans");
 				return true;
 			}
 			for (final EditableBean editableBean : editableBeans) {
 				if (editableBean.isDirty()) {
+					LOGGER.debug("dirty: {}", editableBean);
 					return true;
 				}
 			}

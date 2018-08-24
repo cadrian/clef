@@ -192,6 +192,9 @@ public class DateSelector extends JPanel {
 	}
 
 	public boolean isDirty() {
+		if (dirty) {
+			LOGGER.debug("dirty");
+		}
 		return dirty;
 	}
 

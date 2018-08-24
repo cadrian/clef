@@ -306,10 +306,16 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 	}
 
 	public boolean isDirty() {
+		final boolean result;
 		if (currentForm == null) {
-			return false;
+			result = false;
+		} else {
+			result = currentForm.isDirty();
+			if (result) {
+				LOGGER.debug("dirty: {}", currentForm);
+			}
 		}
-		return currentForm.isDirty();
+		return result;
 	}
 
 }

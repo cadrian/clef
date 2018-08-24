@@ -12,11 +12,16 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.cadrian.clef.ui.ApplicationContext;
 
 public class FileSelector extends JPanel {
 
 	private static final long serialVersionUID = -606371277654849846L;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(FileSelector.class);
 
 	// app-wide
 	private static File lastDirectory;
@@ -83,6 +88,9 @@ public class FileSelector extends JPanel {
 	}
 
 	public boolean isDirty() {
+		if (dirty) {
+			LOGGER.debug("dirty");
+		}
 		return dirty;
 	}
 
