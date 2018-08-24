@@ -1,36 +1,45 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-        <modelVersion>4.0.0</modelVersion>
-        <groupId>net.cadrian.clef</groupId>
-        <artifactId>Root</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-        <packaging>pom</packaging>
-        <name>ClefRoot</name>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>net.cadrian.clef</groupId>
+	<artifactId>Root</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>ClefRoot</name>
 
-        <properties>
-                <debian.hasPackageVersion/>
-                <debian.originalVersion>0.0.1-SNAPSHOT</debian.originalVersion>
-                <debian.package>libclef-root-java</debian.package>
-        </properties>
+	<properties>
+		<debian.hasPackageVersion />
+		<debian.originalVersion>0.0.1-SNAPSHOT</debian.originalVersion>
+		<debian.package>libclef-root-java</debian.package>
+	</properties>
 
-        <dependencies>
-                <dependency>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                        <version>1.7.25</version>
-                </dependency>
-                <dependency>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                        <version>1.2.3</version>
-                        <scope>test</scope>
-                </dependency>
-                <dependency>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
-                        <version>4.12</version>
-                        <scope>test</scope>
-                </dependency>
-        </dependencies>
+<!-- 
+	<modules>
+		<module>../Model</module>
+		<module>../Database</module>
+		<module>../UserInterface</module>
+		<module>../Application</module>
+	</modules>
+-->
+
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>
