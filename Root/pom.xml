@@ -12,16 +12,10 @@
 		<debian.hasPackageVersion />
 		<debian.originalVersion>0.0.1-SNAPSHOT</debian.originalVersion>
 		<debian.package>libclef-root-java</debian.package>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
-
-<!-- 
-	<modules>
-		<module>../Model</module>
-		<module>../Database</module>
-		<module>../UserInterface</module>
-		<module>../Application</module>
-	</modules>
--->
 
 	<dependencies>
 		<dependency>
