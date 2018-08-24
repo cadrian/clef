@@ -25,9 +25,6 @@ import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Base64.Decoder;
-import java.util.Base64.Encoder;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -48,7 +45,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.StyledEditorKit;
-import javax.swing.text.rtf.RTFEditorKit;
+import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.undo.UndoManager;
 
 import org.slf4j.Logger;
@@ -66,10 +63,7 @@ public class RichTextEditor extends JPanel {
 
 	private static final long serialVersionUID = 7187888775973838539L;
 
-	private static final Encoder BASE64_ENCODER = Base64.getEncoder();
-	private static final Decoder BASE64_DECODER = Base64.getDecoder();
-
-	private final RTFEditorKit kit = new RTFEditorKit();
+	private final HTMLEditorKit kit = new HTMLEditorKit();
 
 	private final StyledDocument document;
 	private final JTextPane editor;
@@ -85,6 +79,7 @@ public class RichTextEditor extends JPanel {
 		setBorder(BorderFactory.createEtchedBorder());
 		document = (StyledDocument) kit.createDefaultDocument();
 		editor = new JTextPane();
+		editor.setEditorKit(kit);
 		undoManager = new UndoManager();
 		undoManager.setLimit(0);
 
@@ -246,7 +241,7 @@ public class RichTextEditor extends JPanel {
 			} catch (IOException | BadLocationException e) {
 				LOGGER.error("Error while writing text", e);
 			}
-			text = BASE64_ENCODER.encodeToString(out.toByteArray());
+			text = new String(out.toByteArray());
 		} catch (final IOException e) {
 			LOGGER.error("Could not get RTF, text is lost", e);
 			text = "";
@@ -255,7 +250,7 @@ public class RichTextEditor extends JPanel {
 	}
 
 	public void setText(final String text) {
-		try (ByteArrayInputStream in = new ByteArrayInputStream(BASE64_DECODER.decode(text))) {
+		try (ByteArrayInputStream in = new ByteArrayInputStream(text.getBytes())) {
 			try {
 				document.remove(0, document.getLength());
 				kit.read(in, document, 0);
@@ -274,7 +269,7 @@ public class RichTextEditor extends JPanel {
 	public boolean isDirty() {
 		boolean result = dirty != 0;
 		if (result) {
-			LOGGER.debug("dirty: RTE");
+			LOGGER.debug("dirty: RTE {}", dirty);
 		}
 		return result;
 	}
