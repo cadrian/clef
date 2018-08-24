@@ -27,6 +27,7 @@ class ApplicationContextImpl implements ApplicationContext {
 
 	private final Beans beans;
 	private final Presentation presentation;
+	private boolean closing;
 
 	private static class AdvancedConfiguration<T> {
 		private final AdvancedConfigurationEntry entry;
@@ -109,6 +110,15 @@ class ApplicationContextImpl implements ApplicationContext {
 		@SuppressWarnings("unchecked")
 		final AdvancedConfiguration<T> advancedConfiguration = (AdvancedConfiguration<T>) listeners.get(entry);
 		advancedConfiguration.setValue(value);
+	}
+
+	public void setClosing(boolean closing) {
+		this.closing = closing;
+	}
+
+	@Override
+	public boolean applicationIsClosing() {
+		return closing;
 	}
 
 }

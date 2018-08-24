@@ -50,4 +50,6 @@ public interface ApplicationContext {
 
 	<T> void setValue(AdvancedConfigurationEntry entry, T value);
 
+	boolean applicationIsClosing();
+
 }

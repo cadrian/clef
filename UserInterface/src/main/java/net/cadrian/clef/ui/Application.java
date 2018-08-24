@@ -129,20 +129,28 @@ public class Application extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(final WindowEvent e) {
+				context.setClosing(true);
 				if (sessionsPanel.isDirty() || worksPanel.isDirty() || authorsPanel.isDirty()
 						|| pricingsPanel.isDirty() | configurationPanel.isDirty()) {
 					LOGGER.info("unsaved work on exit: asking confirmation");
 
 					final int response = JOptionPane.showConfirmDialog(Application.this,
 							context.getPresentation().getMessage("ConfirmExitMessage"),
-							context.getPresentation().getMessage("ConfirmExitTitle"), JOptionPane.YES_NO_OPTION,
+							context.getPresentation().getMessage("ConfirmExitTitle"), JOptionPane.YES_NO_CANCEL_OPTION,
 							JOptionPane.QUESTION_MESSAGE);
 					switch (response) {
 					case JOptionPane.YES_OPTION:
-						LOGGER.info("USER CONFIRMED DIRTY EXIT.");
-						// confirmed.
+						LOGGER.info("User asked to save before exit.");
+						sessionsPanel.saveData();
+						worksPanel.saveData();
+						authorsPanel.saveData();
+						pricingsPanel.saveData();
+						configurationPanel.saveData();
 						break;
 					case JOptionPane.NO_OPTION:
+						LOGGER.info("USER CONFIRMED DIRTY EXIT.");
+						break;
+					case JOptionPane.CANCEL_OPTION:
 					case JOptionPane.CLOSED_OPTION:
 						LOGGER.info("User did not confirm, aborting exit");
 						return;

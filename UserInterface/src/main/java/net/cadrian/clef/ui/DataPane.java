@@ -261,6 +261,9 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 	}
 
 	void refreshList(final T selected) {
+		if (context.applicationIsClosing()) {
+			return;
+		}
 		final SwingWorker<Void, T> worker = new SwingWorker<Void, T>() {
 			private int selectedIndex = -1;
 

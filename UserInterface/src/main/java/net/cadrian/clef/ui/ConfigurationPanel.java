@@ -501,4 +501,10 @@ class ConfigurationPanel extends JTabbedPane {
 		return false;
 	}
 
+	public void saveData() {
+		for (final PropertyDescriptorTableModel model : models) {
+			model.save();
+		}
+	}
+
 }
