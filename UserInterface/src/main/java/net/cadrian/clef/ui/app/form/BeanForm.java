@@ -20,7 +20,6 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,54 +42,6 @@ public class BeanForm<T extends Bean, C extends Bean> extends JPanel {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BeanForm.class);
 
 	private static final long serialVersionUID = -2371381405618937355L;
-
-	private static class FieldView<T extends Bean, D, J extends JComponent, C extends Bean> {
-		final FieldModel<T, D, J, C> model;
-		final FieldComponent<D, J> component;
-
-		FieldView(final FieldModel<T, D, J, C> model, final FieldComponent<D, J> component) {
-			if (model == null) {
-				throw new NullPointerException("null model");
-			}
-			this.model = model;
-			if (component == null) {
-				throw new NullPointerException("null component");
-			}
-			this.component = component;
-		}
-
-		void load(final T bean) {
-			try {
-				@SuppressWarnings("unchecked")
-				final D data = (D) model.getter.invoke(bean);
-				component.setData(data);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				LOGGER.error("BUG: could not load value", e);
-			}
-		}
-
-		void save(final T bean) {
-			try {
-				LOGGER.debug("saving {}.{}", bean, model.name);
-				final D data = component.getData();
-				if (model.setter == null) {
-					LOGGER.info("no setter for {}", model.name);
-				} else {
-					model.setter.invoke(bean, data);
-				}
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				LOGGER.error("BUG: could not save value", e);
-			}
-		}
-
-		public boolean isDirty() {
-			final boolean result = component.isDirty();
-			if (result) {
-				LOGGER.debug("dirty: {}", model.name);
-			}
-			return result;
-		}
-	}
 
 	private final T bean;
 	private final Map<String, FieldView<T, ?, ?, C>> fields = new LinkedHashMap<>();

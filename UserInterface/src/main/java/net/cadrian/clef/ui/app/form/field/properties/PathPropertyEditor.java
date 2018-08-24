@@ -14,31 +14,20 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.ui.app.form.field;
+package net.cadrian.clef.ui.app.form.field.properties;
 
-import javax.swing.JComponent;
+import net.cadrian.clef.ui.ApplicationContext;
 
-import net.cadrian.clef.model.Bean;
+class PathPropertyEditor extends AbstractFilePropertyEditor {
 
-public abstract class AbstractFieldComponentFactory<D, J extends JComponent, C extends Bean>
-		implements FieldComponentFactory<D, J, C> {
-
-	protected final boolean writable;
-	private final String tab;
-
-	protected AbstractFieldComponentFactory(final boolean writable, final String tab) {
-		this.writable = writable;
-		this.tab = tab;
+	PathPropertyEditor(final ApplicationContext context, final boolean writable, final EditableProperty property) {
+		super(context, writable, property);
+		content.setFile(property.getValue());
 	}
 
 	@Override
-	public boolean isWritable() {
-		return writable;
+	public void save() {
+		property.setValue(content.getFile().getAbsolutePath());
+		content.markSave();
 	}
-
-	@Override
-	public String getTab() {
-		return tab;
-	}
-
 }

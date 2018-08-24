@@ -31,7 +31,7 @@ public class FieldModel<T extends Bean, D, J extends JComponent, C extends Bean>
 	final FieldComponentFactory<D, J, C> componentFactory;
 
 	@SuppressWarnings("unchecked")
-	public FieldModel(final String name, final Method getter, final Method setter,
+	FieldModel(final String name, final Method getter, final Method setter,
 			final FieldComponentFactory<D, J, C> componentFactory) {
 		this.name = name;
 		this.type = (Class<D>) getter.getReturnType();

@@ -26,9 +26,9 @@ import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
-import net.cadrian.clef.ui.app.form.field.PropertiesComponentFactory;
-import net.cadrian.clef.ui.app.form.field.TextAreaComponentFactory;
-import net.cadrian.clef.ui.app.form.field.TextFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.properties.PropertiesComponentFactory;
+import net.cadrian.clef.ui.app.form.field.text.TextAreaComponentFactory;
+import net.cadrian.clef.ui.app.form.field.text.TextFieldComponentFactory;
 
 public class PricingFormModel extends BeanFormModel<Pricing, NoBean> {
 

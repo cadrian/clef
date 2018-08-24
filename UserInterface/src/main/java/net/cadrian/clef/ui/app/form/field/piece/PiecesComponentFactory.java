@@ -14,59 +14,22 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.ui.app.form.field;
+package net.cadrian.clef.ui.app.form.field.piece;
 
 import java.util.Collection;
 
-import net.cadrian.clef.model.bean.BeanComparators;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.BeanCreator;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.BeanGetter;
+import net.cadrian.clef.ui.app.form.field.AbstractFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.tab.DataPane;
 
 public class PiecesComponentFactory
 		extends AbstractFieldComponentFactory<Collection<Piece>, DataPane<Piece, Work>, Work> {
-
-	private static class PiecesComponent implements FieldComponent<Collection<Piece>, DataPane<Piece, Work>> {
-
-		private final DataPane<Piece, Work> component;
-
-		public PiecesComponent(final ApplicationContext context, final BeanGetter<Piece> beanGetter,
-				final BeanCreator<Piece> beanCreator, final BeanFormModel<Piece, Work> beanFormModel) {
-			component = new DataPane<>(context, false, beanGetter, beanCreator,
-					(p1, p2) -> BeanComparators.comparePieces(p1, p2), beanFormModel);
-		}
-
-		@Override
-		public DataPane<Piece, Work> getComponent() {
-			return component;
-		}
-
-		@Override
-		public Collection<Piece> getData() {
-			component.saveData();
-			return component.getList();
-		}
-
-		@Override
-		public void setData(final Collection<Piece> data) {
-			// ignored
-		}
-
-		@Override
-		public double getWeight() {
-			return 1;
-		}
-
-		@Override
-		public boolean isDirty() {
-			return component.isDirty();
-		}
-
-	}
 
 	private final BeanFormModel<Piece, Work> beanFormModel;
 

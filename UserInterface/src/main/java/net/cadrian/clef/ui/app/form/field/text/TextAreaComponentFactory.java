@@ -14,59 +14,15 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.ui.app.form.field;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package net.cadrian.clef.ui.app.form.field.text;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.app.form.field.AbstractFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.widget.rte.RichTextEditor;
 
 public class TextAreaComponentFactory<C extends Bean> extends AbstractFieldComponentFactory<String, RichTextEditor, C> {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(TextAreaComponentFactory.class);
-
-	private static class TextAreaComponent implements FieldComponent<String, RichTextEditor> {
-
-		private final RichTextEditor component;
-
-		TextAreaComponent(final ApplicationContext context, final boolean writable) {
-			component = new RichTextEditor(context);
-			component.setEditable(writable);
-		}
-
-		@Override
-		public RichTextEditor getComponent() {
-			return component;
-		}
-
-		@Override
-		public String getData() {
-			return component.getText();
-		}
-
-		@Override
-		public void setData(final String data) {
-			component.setText(data == null ? "" : data);
-			component.markSave();
-		}
-
-		@Override
-		public double getWeight() {
-			return 2;
-		}
-
-		@Override
-		public boolean isDirty() {
-			final boolean result = component.isDirty();
-			if (result) {
-				LOGGER.debug("dirty");
-			}
-			return result;
-		}
-
-	}
 
 	public TextAreaComponentFactory(final boolean writable) {
 		this(writable, null);

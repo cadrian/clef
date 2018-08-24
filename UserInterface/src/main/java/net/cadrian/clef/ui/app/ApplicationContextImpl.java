@@ -16,9 +16,7 @@
  */
 package net.cadrian.clef.ui.app;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.cadrian.clef.model.Beans;
@@ -30,39 +28,6 @@ class ApplicationContextImpl implements ApplicationContext {
 	private final Beans beans;
 	private final PresentationImpl presentation;
 	private boolean closing;
-
-	private static class AdvancedConfiguration<T> {
-		private final AdvancedConfigurationEntry entry;
-		private T value;
-		private final List<ApplicationContextListener<T>> listeners = new ArrayList<>();
-
-		private AdvancedConfiguration(final AdvancedConfigurationEntry entry) {
-			this.entry = entry;
-		}
-
-		void addApplicationContextListener(final ApplicationContextListener<T> listener) {
-			listeners.add(listener);
-		}
-
-		void removeApplicationContextListener(final ApplicationContextListener<T> listener) {
-			listeners.remove(listener);
-		}
-
-		public T getValue() {
-			return value;
-		}
-
-		public void setValue(final T value) {
-			this.value = value;
-			fireAdvancedConfigurationChanged();
-		}
-
-		private void fireAdvancedConfigurationChanged() {
-			for (final ApplicationContextListener<T> listener : listeners) {
-				listener.onAdvancedConfigurationChange(entry, value);
-			}
-		}
-	}
 
 	private final Map<AdvancedConfigurationEntry, AdvancedConfiguration<?>> listeners = new HashMap<>();
 

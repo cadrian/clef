@@ -14,63 +14,17 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.ui.app.form.field;
-
-import java.text.NumberFormat;
+package net.cadrian.clef.ui.app.form.field.numeric;
 
 import javax.swing.JFormattedTextField;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.app.form.field.AbstractFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldComponent;
 
 public class NumericFieldComponentFactory<C extends Bean>
 		extends AbstractFieldComponentFactory<Long, JFormattedTextField, C> {
-
-	private static class NumericFieldComponent implements FieldComponent<Long, JFormattedTextField> {
-
-		private final JFormattedTextField component;
-		private String savedData = "";
-
-		NumericFieldComponent(final boolean writable) {
-			component = new JFormattedTextField(NumberFormat.getIntegerInstance());
-			component.setEditable(writable);
-		}
-
-		@Override
-		public JFormattedTextField getComponent() {
-			return component;
-		}
-
-		@Override
-		public Long getData() {
-			final String text = component.getText();
-			try {
-				return Long.parseLong(text);
-			} catch (final NumberFormatException e) {
-				return null;
-			} finally {
-				savedData = text;
-			}
-		}
-
-		@Override
-		public void setData(final Long data) {
-			final String string = data == null ? "" : data.toString();
-			component.setText(string);
-			savedData = string;
-		}
-
-		@Override
-		public double getWeight() {
-			return 0;
-		}
-
-		@Override
-		public boolean isDirty() {
-			return !savedData.equals(component.getText());
-		}
-
-	}
 
 	public NumericFieldComponentFactory(final boolean writable) {
 		this(writable, null);

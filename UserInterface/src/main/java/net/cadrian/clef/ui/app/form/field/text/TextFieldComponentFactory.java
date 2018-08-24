@@ -14,53 +14,16 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.ui.app.form.field;
+package net.cadrian.clef.ui.app.form.field.text;
 
 import javax.swing.JTextField;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.app.form.field.AbstractFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldComponent;
 
 public class TextFieldComponentFactory<C extends Bean> extends AbstractFieldComponentFactory<String, JTextField, C> {
-
-	private static class TextFieldComponent implements FieldComponent<String, JTextField> {
-
-		private final JTextField component;
-		private String savedData = "";
-
-		TextFieldComponent(final boolean writable) {
-			component = new JTextField();
-			component.setEditable(writable);
-		}
-
-		@Override
-		public JTextField getComponent() {
-			return component;
-		}
-
-		@Override
-		public String getData() {
-			savedData = component.getText();
-			return savedData;
-		}
-
-		@Override
-		public void setData(final String data) {
-			savedData = data == null ? "" : data;
-			component.setText(savedData);
-		}
-
-		@Override
-		public double getWeight() {
-			return 0;
-		}
-
-		@Override
-		public boolean isDirty() {
-			return !savedData.equals(component.getText());
-		}
-
-	}
 
 	public TextFieldComponentFactory(final boolean writable) {
 		this(writable, null);
