@@ -45,8 +45,8 @@ class DateComponentPicker extends JDialog {
 	private Date date;
 
 	DateComponentPicker(final ApplicationContext context, final Date date) {
-		super(context.getPresentation().getApplicationFrame(),
-				context.getPresentation().getMessage("DatePickerTitle"), true);
+		super(context.getPresentation().getApplicationFrame(), context.getPresentation().getMessage("DatePickerTitle"),
+				true);
 		this.date = date;
 
 		final JPanel pickerPanel = new JPanel(new BorderLayout());

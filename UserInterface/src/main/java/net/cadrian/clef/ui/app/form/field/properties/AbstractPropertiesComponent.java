@@ -242,8 +242,7 @@ abstract class AbstractPropertiesComponent implements FieldComponent<Collection<
 		final List<PropertyDescriptor> addableDescriptors = new ArrayList<>(getAddableDescriptors());
 		addableDescriptors.sort((d1, d2) -> d1.getName().compareTo(d2.getName()));
 
-		final AddPropertyChooser chooser = new AddPropertyChooser(context, entity,
-				addableDescriptors);
+		final AddPropertyChooser chooser = new AddPropertyChooser(context, entity, addableDescriptors);
 		chooser.setVisible(true);
 
 		final PropertyDescriptor propertyDescriptor = chooser.getSelected();

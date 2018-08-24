@@ -45,8 +45,8 @@ class AddPropertyChooser extends JDialog {
 
 	AddPropertyChooser(final ApplicationContext context, final Entity entity,
 			final List<PropertyDescriptor> addableDescriptors) {
-		super(context.getPresentation().getApplicationFrame(),
-				context.getPresentation().getMessage("AddPropertyTitle"), true);
+		super(context.getPresentation().getApplicationFrame(), context.getPresentation().getMessage("AddPropertyTitle"),
+				true);
 
 		final JPanel panel = new JPanel(new BorderLayout());
 		getContentPane().add(panel);

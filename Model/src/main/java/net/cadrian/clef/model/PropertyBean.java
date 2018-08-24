@@ -20,7 +20,6 @@ import java.util.Collection;
 
 import net.cadrian.clef.model.bean.Property;
 import net.cadrian.clef.model.bean.PropertyDescriptor;
-import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 
 public interface PropertyBean extends Bean {
 

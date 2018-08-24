@@ -23,12 +23,12 @@ import javax.swing.JComponent;
 
 import net.cadrian.clef.model.NoBean;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
+import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
 import net.cadrian.clef.ui.app.form.field.date.DateComponentFactory;
 import net.cadrian.clef.ui.app.form.field.properties.PropertiesComponentFactory;
 import net.cadrian.clef.ui.app.form.field.text.TextAreaComponentFactory;
-import net.cadrian.clef.model.bean.Session;
 
 public class SessionFormModel extends BeanFormModel<Session, NoBean> {
 
