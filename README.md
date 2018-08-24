@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/cadrian/clef.png?branch=master)](https://travis-ci.org/cadrian/clef)
+
 # Presentation
 Clef allows one to manage musical productions (pieces, works,  authors, pricing).
 
