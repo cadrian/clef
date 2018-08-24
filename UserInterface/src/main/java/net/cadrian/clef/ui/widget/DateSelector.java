@@ -182,7 +182,7 @@ public class DateSelector extends JPanel {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(final Date date) {
 		this.date = date;
 		dirty = false;
 		SwingUtilities.invokeLater(new Runnable() {
@@ -198,10 +198,10 @@ public class DateSelector extends JPanel {
 		return df.format(getDate());
 	}
 
-	public void setDateString(String date) {
+	public void setDateString(final String date) {
 		try {
 			setDate(df.parse(date));
-		} catch (ParseException e) {
+		} catch (final ParseException e) {
 			LOGGER.error("Error while setting date", e);
 			setDate(new Date());
 		}

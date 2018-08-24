@@ -14,24 +14,31 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.model.bean;
+package net.cadrian.clef.ui.app.form.field;
 
-import net.cadrian.clef.model.PropertyBean;
-import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
+import javax.swing.JComponent;
 
-public interface Author extends PropertyBean {
+import net.cadrian.clef.model.Bean;
 
-	@Override
-	default PropertyDescriptor.Entity getEntity() {
-		return Entity.author;
+abstract class AbstractFieldComponentFactory<D, J extends JComponent, C extends Bean>
+		implements FieldComponentFactory<D, J, C> {
+
+	protected final boolean writable;
+	private final String tab;
+
+	public AbstractFieldComponentFactory(final boolean writable, final String tab) {
+		this.writable = writable;
+		this.tab = tab;
 	}
 
-	String getName();
+	@Override
+	public boolean isWritable() {
+		return writable;
+	}
 
-	void setName(String name);
-
-	String getNotes();
-
-	void setNotes(String notes);
+	@Override
+	public String getTab() {
+		return tab;
+	}
 
 }

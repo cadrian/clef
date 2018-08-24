@@ -14,24 +14,11 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.model.bean;
+package net.cadrian.clef.ui.app.form;
 
-import net.cadrian.clef.model.PropertyBean;
-import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
+import net.cadrian.clef.model.Bean;
 
-public interface Author extends PropertyBean {
-
-	@Override
-	default PropertyDescriptor.Entity getEntity() {
-		return Entity.author;
-	}
-
-	String getName();
-
-	void setName(String name);
-
-	String getNotes();
-
-	void setNotes(String notes);
-
+@FunctionalInterface
+public interface BeanCreator<T extends Bean> {
+	T createBean();
 }

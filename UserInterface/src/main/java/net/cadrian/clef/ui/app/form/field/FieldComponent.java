@@ -14,24 +14,18 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.model.bean;
+package net.cadrian.clef.ui.app.form.field;
 
-import net.cadrian.clef.model.PropertyBean;
-import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
+import javax.swing.JComponent;
 
-public interface Author extends PropertyBean {
+public interface FieldComponent<D, J extends JComponent> {
+	J getComponent();
 
-	@Override
-	default PropertyDescriptor.Entity getEntity() {
-		return Entity.author;
-	}
+	D getData();
 
-	String getName();
+	void setData(D data);
 
-	void setName(String name);
+	double getWeight();
 
-	String getNotes();
-
-	void setNotes(String notes);
-
+	boolean isDirty();
 }

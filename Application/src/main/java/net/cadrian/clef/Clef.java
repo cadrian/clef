@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import net.cadrian.clef.database.DatabaseException;
 import net.cadrian.clef.database.DatabaseManager;
 import net.cadrian.clef.database.model.ModelBeans;
-import net.cadrian.clef.ui.Application;
+import net.cadrian.clef.ui.app.Application;
 
 public class Clef {
 

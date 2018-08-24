@@ -91,14 +91,14 @@ public class FileSelector extends JPanel {
 		return file;
 	}
 
-	public void setFile(File file) {
+	public void setFile(final File file) {
 		this.file = file;
 		display.setText(file.getAbsolutePath());
 	}
 
-	public void setFile(String path) {
+	public void setFile(final String path) {
 		if (path != null) {
-			this.file = new File(path);
+			file = new File(path);
 			display.setText(path);
 		}
 	}

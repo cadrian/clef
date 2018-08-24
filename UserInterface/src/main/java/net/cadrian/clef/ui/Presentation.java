@@ -16,80 +16,21 @@
  */
 package net.cadrian.clef.ui;
 
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
 import javax.swing.AbstractButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public interface Presentation {
 
-public class Presentation {
+	String getMessage(String key, Object... args);
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Presentation.class);
+	<B extends AbstractButton> B awesome(B button);
 
-	private final ResourceBundle messages;
-	private final JFrame frame;
-	private final Font awesomeFont;
+	JToolBar awesome(JToolBar toolbar);
 
-	public Presentation(final ResourceBundle messages, final JFrame frame) {
-		this.messages = messages;
-		this.frame = frame;
+	JLabel bold(JLabel label);
 
-		Font ft = null;
-		for (final String f : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
-			if (f.equals("FontAwesome")) {
-				LOGGER.debug("Awesome!");
-				ft = Font.decode(f);
-				break;
-			}
-		}
-		if (ft == null) {
-			throw new RuntimeException("Missing some Awesome.");
-		}
-		awesomeFont = new Font(ft.getName(), ft.getStyle(), 16);
-		LOGGER.debug("Font Awesome: {}", awesomeFont);
-	}
-
-	public String getMessage(final String key, final Object... args) {
-		try {
-			return String.format(messages.getString(key), args);
-		} catch (final MissingResourceException e) {
-			LOGGER.warn("Missing resource: {}", key);
-			return key;
-		}
-	}
-
-	public <B extends AbstractButton> B awesome(final B button) {
-		button.setText(getMessage("Awesome." + button.getText()));
-		button.setFont(awesomeFont);
-		return button;
-	}
-
-	public JToolBar awesome(final JToolBar toolbar) {
-		toolbar.setFont(awesomeFont);
-		for (final Component component : toolbar.getComponents()) {
-			if (component instanceof AbstractButton) {
-				awesome((AbstractButton) component);
-			}
-		}
-		return toolbar;
-	}
-
-	public JLabel bold(final JLabel label) {
-		final Font font = label.getFont();
-		label.setFont(new Font(font.getFontName(), Font.BOLD, font.getSize()));
-		return label;
-	}
-
-	public JFrame getApplicationFrame() {
-		return frame;
-	}
+	JFrame getApplicationFrame();
 
 }

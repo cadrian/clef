@@ -14,24 +14,21 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.model.bean;
+package net.cadrian.clef.ui.tools;
 
-import net.cadrian.clef.model.PropertyBean;
-import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
+import java.util.Collection;
+import java.util.Comparator;
 
-public interface Author extends PropertyBean {
+public class SortableListModel<E> extends AbstractSortedListModel<E> {
 
-	@Override
-	default PropertyDescriptor.Entity getEntity() {
-		return Entity.author;
+	private static final long serialVersionUID = 9181985135265163745L;
+
+	public SortableListModel(final Comparator<E> comparator) {
+		super(comparator);
 	}
 
-	String getName();
-
-	void setName(String name);
-
-	String getNotes();
-
-	void setNotes(String notes);
+	public SortableListModel(final Comparator<E> comparator, final Collection<? extends E> init) {
+		super(comparator, init);
+	}
 
 }

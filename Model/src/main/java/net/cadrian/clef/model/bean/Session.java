@@ -18,6 +18,7 @@ package net.cadrian.clef.model.bean;
 
 import java.util.Date;
 
+import net.cadrian.clef.model.PropertyBean;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 
 public interface Session extends PropertyBean {

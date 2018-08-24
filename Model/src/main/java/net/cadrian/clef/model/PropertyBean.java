@@ -14,24 +14,20 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.model.bean;
+package net.cadrian.clef.model;
 
-import net.cadrian.clef.model.PropertyBean;
+import java.util.Collection;
+
+import net.cadrian.clef.model.bean.Property;
+import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 
-public interface Author extends PropertyBean {
+public interface PropertyBean extends Bean {
 
-	@Override
-	default PropertyDescriptor.Entity getEntity() {
-		return Entity.author;
-	}
+	PropertyDescriptor.Entity getEntity();
 
-	String getName();
+	Collection<? extends Property> getProperties();
 
-	void setName(String name);
-
-	String getNotes();
-
-	void setNotes(String notes);
+	void setProperties(Collection<? extends Property> properties);
 
 }

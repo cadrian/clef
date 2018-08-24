@@ -24,7 +24,7 @@ import java.util.TreeSet;
 import net.cadrian.clef.database.DatabasePropertyBean;
 import net.cadrian.clef.model.bean.Property;
 
-abstract class AbstractPropertyBean extends AbstractBean implements net.cadrian.clef.model.bean.PropertyBean {
+abstract class AbstractPropertyBean extends AbstractBean implements net.cadrian.clef.model.PropertyBean {
 
 	private final DatabasePropertyBean bean;
 
