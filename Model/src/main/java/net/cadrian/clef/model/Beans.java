@@ -32,7 +32,7 @@ public interface Beans {
 
 	Property createProperty(PropertyDescriptor propertyDescriptor);
 
-	PropertyDescriptor createPropertyDescriptor(PropertyDescriptor.Entity entity);
+	PropertyDescriptor createPropertyDescriptor(PropertyDescriptor.Entity entity, PropertyDescriptor.Type type);
 
 	Piece createPiece(Work work);
 

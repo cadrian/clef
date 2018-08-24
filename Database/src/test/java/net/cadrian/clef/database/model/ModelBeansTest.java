@@ -32,6 +32,7 @@ import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.Property;
 import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
+import net.cadrian.clef.model.bean.PropertyDescriptor.Type;
 import net.cadrian.clef.model.bean.Work;
 
 public class ModelBeansTest extends AbstractDatabaseTestHarness {
@@ -44,7 +45,7 @@ public class ModelBeansTest extends AbstractDatabaseTestHarness {
 	public void setup() throws DatabaseException {
 		super.setup();
 		beans = new ModelBeans(getManager());
-		copyrightPropertyDescriptor = beans.createPropertyDescriptor(Entity.piece);
+		copyrightPropertyDescriptor = beans.createPropertyDescriptor(Entity.piece, Type.string);
 	}
 
 	@Test

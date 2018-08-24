@@ -25,7 +25,15 @@ public interface PropertyDescriptor extends Bean {
 		pricing, author, work, piece, session;
 	}
 
+	public static enum Type {
+		string, date, path, file;
+	}
+
 	Entity getEntity();
+
+	Type getType();
+
+	void setType(Type type);
 
 	String getName();
 

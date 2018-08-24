@@ -29,10 +29,12 @@ public class PropertyDescriptor extends AbstractBean<PropertyDescriptor> {
 	private static final String TABLE_NAME = "property_descriptor";
 	private static final List<Field<PropertyDescriptor>> FIELDS = Arrays.asList(
 			new StringField<>("entity", PropertyDescriptor::getEntity, PropertyDescriptor::setEntity, Condition.EQ),
+			new StringField<>("type", PropertyDescriptor::getType, PropertyDescriptor::setType, Condition.EQ),
 			new StringField<>("name", PropertyDescriptor::getName, PropertyDescriptor::setName, Condition.EQ),
 			new ClobField<>("description", PropertyDescriptor::getDescription, PropertyDescriptor::setDescription));
 
 	private String entity;
+	private String type;
 	private String name;
 	private String description;
 
@@ -50,6 +52,14 @@ public class PropertyDescriptor extends AbstractBean<PropertyDescriptor> {
 
 	public void setEntity(final String entity) {
 		this.entity = entity;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(final String type) {
+		this.type = type;
 	}
 
 	public String getName() {

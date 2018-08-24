@@ -41,6 +41,17 @@ public class PropertyDescriptorBean extends AbstractBean implements net.cadrian.
 	}
 
 	@Override
+	public Type getType() {
+		final String type = bean.getType();
+		return type == null ? null : Type.valueOf(type);
+	}
+
+	@Override
+	public void setType(final Type type) {
+		bean.setType(type.name());
+	}
+
+	@Override
 	public String getName() {
 		return bean.getName();
 	}

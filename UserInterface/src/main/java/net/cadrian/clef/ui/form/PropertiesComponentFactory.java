@@ -17,10 +17,18 @@
 package net.cadrian.clef.ui.form;
 
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Base64.Decoder;
+import java.util.Base64.Encoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +40,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -54,17 +63,85 @@ import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Property;
 import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
+import net.cadrian.clef.model.bean.PropertyDescriptor.Type;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.Presentation;
 import net.cadrian.clef.ui.SortedListModel;
 import net.cadrian.clef.ui.rte.RichTextEditor;
+import net.cadrian.clef.ui.widget.DateSelector;
+import net.cadrian.clef.ui.widget.FileSelector;
 
 public class PropertiesComponentFactory<C extends Bean>
 		extends AbstractFieldComponentFactory<Collection<? extends Property>, JSplitPane, C> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesComponentFactory.class);
 
-	private static class PropertiesComponent implements FieldComponent<Collection<? extends Property>, JSplitPane> {
+	static class EditableProperty implements Comparable<EditableProperty> {
+		private final PropertyDescriptor propertyDescriptor;
+		private Property property;
+		private String value;
+		private boolean dirty;
+
+		EditableProperty(final PropertyDescriptor propertyDescriptor) {
+			this.propertyDescriptor = propertyDescriptor;
+			property = null;
+			value = null;
+			dirty = false;
+		}
+
+		EditableProperty(final Property property) {
+			propertyDescriptor = property.getPropertyDescriptor();
+			this.property = property;
+			value = property.getValue();
+			dirty = false;
+		}
+
+		public PropertyDescriptor getPropertyDescriptor() {
+			return propertyDescriptor;
+		}
+
+		public Property getProperty() {
+			return property;
+		}
+
+		void setProperty(final Property property) {
+			this.property = property;
+			dirty = true;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(final String value) {
+			this.value = value;
+			dirty = true;
+		}
+
+		public void save() {
+			if (dirty) {
+				property.setValue(value);
+				dirty = false;
+			}
+		}
+
+		public boolean isDirty() {
+			return dirty;
+		}
+
+		@Override
+		public int compareTo(final EditableProperty o) {
+			return propertyDescriptor.getName().compareTo(o.propertyDescriptor.getName());
+		}
+
+		@Override
+		public String toString() {
+			return propertyDescriptor.getName();
+		}
+	}
+
+	private static abstract class AbstractPropertiesComponent
+			implements FieldComponent<Collection<? extends Property>, JSplitPane> {
 
 		private static class AddPropertyChooser extends JDialog {
 
@@ -116,82 +193,19 @@ public class PropertiesComponentFactory<C extends Bean>
 			}
 		}
 
-		private static class EditableProperty implements Comparable<EditableProperty> {
-			private final PropertyDescriptor propertyDescriptor;
-			private Property property;
-			private String value;
-			private boolean dirty;
+		protected final ApplicationContext context;
+		protected final Entity entity;
+		protected final boolean writable;
 
-			EditableProperty(final PropertyDescriptor propertyDescriptor) {
-				this.propertyDescriptor = propertyDescriptor;
-				property = null;
-				value = null;
-				dirty = false;
-			}
-
-			EditableProperty(final Property property) {
-				propertyDescriptor = property.getPropertyDescriptor();
-				this.property = property;
-				value = property.getValue();
-				dirty = false;
-			}
-
-			public PropertyDescriptor getPropertyDescriptor() {
-				return propertyDescriptor;
-			}
-
-			public Property getProperty() {
-				return property;
-			}
-
-			void setProperty(final Property property) {
-				this.property = property;
-				dirty = true;
-			}
-
-			public String getValue() {
-				return value;
-			}
-
-			public void setValue(final String value) {
-				this.value = value;
-				dirty = true;
-			}
-
-			public void save() {
-				if (dirty) {
-					property.setValue(value);
-					dirty = false;
-				}
-			}
-
-			public boolean isDirty() {
-				return dirty;
-			}
-
-			@Override
-			public int compareTo(final EditableProperty o) {
-				return propertyDescriptor.getName().compareTo(o.propertyDescriptor.getName());
-			}
-
-			@Override
-			public String toString() {
-				return propertyDescriptor.getName();
-			}
-		}
-
-		private final ApplicationContext context;
-		private final Entity entity;
 		private final JSplitPane component;
 		private final Map<PropertyDescriptor, Property> deleted = new HashMap<>();
 		private final SortedListModel<EditableProperty> model = new SortedListModel<>();
 		private final JList<EditableProperty> list;
-		private final boolean writable;
 
 		private EditableProperty current;
-		private RichTextEditor content;
+		private PropertyEditor propertyEditor;
 
-		PropertiesComponent(final ApplicationContext context, final Entity entity, final boolean writable) {
+		AbstractPropertiesComponent(final ApplicationContext context, final Entity entity, final boolean writable) {
 			this.context = context;
 			this.entity = entity;
 			this.writable = writable;
@@ -265,31 +279,23 @@ public class PropertiesComponentFactory<C extends Bean>
 		}
 
 		void saveProperty() {
-			if (writable && current != null && content != null) {
-				current.setValue(content.getText());
+			if (writable && propertyEditor != null) {
+				propertyEditor.save();
 			}
 		}
 
 		void loadProperty(final EditableProperty selected) {
 			current = selected;
 			if (selected == null) {
+				propertyEditor = null;
 				component.setRightComponent(new JPanel());
 			} else {
-				content = new RichTextEditor(context);
-				content.replaceSelection(selected.getValue());
-				if (writable) {
-					content.addFocusListener(new FocusAdapter() {
-						@Override
-						public void focusLost(final FocusEvent e) {
-							saveProperty();
-						}
-					});
-				} else {
-					content.setEditable(false);
-				}
-				component.setRightComponent(content);
+				propertyEditor = getEditor(current);
+				component.setRightComponent(propertyEditor.getEditor());
 			}
 		}
+
+		protected abstract PropertyEditor getEditor(EditableProperty selected);
 
 		@Override
 		public JSplitPane getComponent() {
@@ -343,7 +349,7 @@ public class PropertiesComponentFactory<C extends Bean>
 					return true;
 				}
 			}
-			return false; // TODO wrong -- the RTE may have been modified too
+			return propertyEditor == null ? false : propertyEditor.isDirty();
 		}
 
 		Collection<PropertyDescriptor> getAddableDescriptors() {
@@ -399,6 +405,207 @@ public class PropertiesComponentFactory<C extends Bean>
 			model.remove(index);
 		}
 
+	}
+
+	private interface PropertyEditor {
+		JComponent getEditor();
+
+		boolean isDirty();
+
+		void save();
+	}
+
+	private static class StringPropertyEditor implements PropertyEditor {
+		private final EditableProperty property;
+		private final RichTextEditor content;
+
+		StringPropertyEditor(final ApplicationContext context, final boolean writable,
+				final EditableProperty property) {
+			this.property = property;
+			content = new RichTextEditor(context);
+			content.replaceSelection(property.getValue());
+			content.markSave();
+			content.setEditable(writable);
+		}
+
+		@Override
+		public JComponent getEditor() {
+			return content;
+		}
+
+		@Override
+		public boolean isDirty() {
+			return content.isDirty();
+		}
+
+		@Override
+		public void save() {
+			property.setValue(content.getText());
+			content.markSave();
+		}
+	}
+
+	private static class DatePropertyEditor implements PropertyEditor {
+		private final EditableProperty property;
+		private final JPanel container;
+		private final DateSelector content;
+
+		DatePropertyEditor(final ApplicationContext context, final boolean writable, final EditableProperty property) {
+			this.property = property;
+
+			content = new DateSelector(context, writable);
+			content.setDateString(property.getValue());
+
+			container = new JPanel(new GridBagLayout());
+			final GridBagConstraints constraints = new GridBagConstraints();
+			constraints.anchor = GridBagConstraints.CENTER;
+			constraints.fill = GridBagConstraints.HORIZONTAL;
+			constraints.weightx = 1;
+			container.add(content, constraints);
+		}
+
+		@Override
+		public JComponent getEditor() {
+			return container;
+		}
+
+		@Override
+		public boolean isDirty() {
+			return content.isDirty();
+		}
+
+		@Override
+		public void save() {
+			property.setValue(content.getDateString());
+			content.markSave();
+		}
+	}
+
+	private static abstract class AbstractFilePropertyEditor implements PropertyEditor {
+		protected final EditableProperty property;
+		private final JPanel container;
+		protected final FileSelector content;
+
+		// TODO add a button to download the content of the file, either from the file
+		// system or from the database, depending on the type
+
+		AbstractFilePropertyEditor(final ApplicationContext context, final boolean writable,
+				final EditableProperty property) {
+			this.property = property;
+			content = new FileSelector(context, writable);
+
+			container = new JPanel(new GridBagLayout());
+			final GridBagConstraints constraints = new GridBagConstraints();
+			constraints.anchor = GridBagConstraints.CENTER;
+			constraints.fill = GridBagConstraints.HORIZONTAL;
+			constraints.weightx = 1;
+			container.add(content, constraints);
+		}
+
+		@Override
+		public JComponent getEditor() {
+			return container;
+		}
+
+		@Override
+		public boolean isDirty() {
+			return content.isDirty();
+		}
+	}
+
+	private static class PathPropertyEditor extends AbstractFilePropertyEditor {
+
+		PathPropertyEditor(final ApplicationContext context, final boolean writable, final EditableProperty property) {
+			super(context, writable, property);
+			content.setFile(property.getValue());
+		}
+
+		@Override
+		public void save() {
+			property.setValue(content.getFile().getAbsolutePath());
+			content.markSave();
+		}
+	}
+
+	private static class FilePropertyEditor extends AbstractFilePropertyEditor {
+
+		private static final Encoder BASE64_ENCODER = Base64.getEncoder();
+		private static final Decoder BASE64_DECODER = Base64.getDecoder();
+
+		private static int indexOfSep(final byte[] data) {
+			for (int i = 0; i < data.length; i++) {
+				if (data[i] == 0) {
+					return i;
+				}
+			}
+			return data.length;
+		}
+
+		FilePropertyEditor(final ApplicationContext context, final boolean writable, final EditableProperty property) {
+			super(context, writable, property);
+			final byte[] serializedData = BASE64_DECODER.decode(property.getValue());
+			final int sep = indexOfSep(serializedData);
+			final String path = new String(serializedData, 0, sep);
+			content.setFile(path);
+		}
+
+		@Override
+		public void save() {
+			final File file = content.getFile();
+			final String path = file.getAbsolutePath();
+			byte[] data = null;
+
+			// TODO support big files (1.5Gb max for now -- because of BASE64)
+
+			try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+					ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+				final byte[] buffer = new byte[4096];
+				int n;
+				while ((n = in.read(buffer)) >= 0) {
+					out.write(buffer, 0, n);
+				}
+				data = out.toByteArray();
+			} catch (final IOException e) {
+				LOGGER.error("error while reading file, not saving data", e);
+			}
+
+			try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+				out.write(path.getBytes());
+				if (data != null) {
+					out.write(0);
+					out.write(data);
+				}
+			} catch (final IOException e) {
+				LOGGER.error("error while serializing data", e);
+			}
+			property.setValue(BASE64_ENCODER.encodeToString(data));
+			content.markSave();
+		}
+
+	}
+
+	private static class PropertiesComponent extends AbstractPropertiesComponent {
+
+		PropertiesComponent(final ApplicationContext context, final Entity entity, final boolean writable) {
+			super(context, entity, writable);
+		}
+
+		@Override
+		protected PropertyEditor getEditor(final EditableProperty selected) {
+			final Type type = selected.getPropertyDescriptor().getType();
+			switch (type) {
+			case string:
+				return new StringPropertyEditor(context, writable, selected);
+			case date:
+				return new DatePropertyEditor(context, writable, selected);
+			case file:
+				return new FilePropertyEditor(context, writable, selected);
+			case path:
+				return new PathPropertyEditor(context, writable, selected);
+			default:
+				return null;
+			}
+		}
 	}
 
 	private final Entity entity;

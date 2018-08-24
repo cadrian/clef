@@ -3,6 +3,7 @@
 CREATE TABLE IF NOT EXISTS property_descriptor (
 	id BIGINT AUTO_INCREMENT NOT NULL,
 	entity VARCHAR(256) NOT NULL,
+	type VARCHAR(256) NOT NULL,
 	name VARCHAR(4096),
 	description CLOB,
 	PRIMARY KEY(id)
@@ -11,12 +12,16 @@ CREATE TABLE IF NOT EXISTS property_descriptor (
 CREATE INDEX IF NOT EXISTS property_descriptor_idx
 	ON property_descriptor (entity);
 
-ALTER TABLE property_descriptor
-	ADD CONSTRAINT IF NOT EXISTS property_descriptor_entity_ck
-	CHECK (entity in ('meta', 'author', 'work', 'piece', 'session'));
-
 CREATE UNIQUE INDEX IF NOT EXISTS property_descriptor_idx2
 	ON property_descriptor (entity, name);
+
+ALTER TABLE property_descriptor
+	ADD CONSTRAINT IF NOT EXISTS property_descriptor_entity_ck
+	CHECK (entity in ('meta', 'pricing', 'author', 'work', 'piece', 'session'));
+
+ALTER TABLE property_descriptor
+	ADD CONSTRAINT IF NOT EXISTS property_descriptor_type_ck
+	CHECK (type in ('string', 'date', 'path', 'file'));
 
 -- PROPERTY
 
@@ -136,12 +141,12 @@ CREATE TABLE IF NOT EXISTS meta_property (
 
 -- Set initial version if not already set
 
-INSERT INTO property_descriptor (entity, name, description)
-	SELECT entity, name, description FROM (
-		SELECT 'meta' AS entity, 'VERSION' AS name, 'Database schema version' AS description
+INSERT INTO property_descriptor (entity, type, name, description)
+	SELECT entity, type, name, description FROM (
+		SELECT 'meta' AS entity, 'string' AS type, 'VERSION' AS name, 'Database schema version' AS description
 	) sub
 	WHERE NOT EXISTS (
-		SELECT entity, name, description
+		SELECT entity, type, name, description
 		FROM property_descriptor p
 		WHERE sub.entity = p.entity
 		AND sub.name = p.name

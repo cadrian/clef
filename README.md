@@ -14,9 +14,5 @@ Clef also includes tons of "notes" that may help you track your ideas as you wor
 Note: although I use it for musical composition, Clef can be used for any kind of artwork: books, cinema, ...
 
 # TODO
-- properties should be typed: use BLOB instead of CLOB; it could contain serialized data. Provide several editors:
-  - text / rich text
-  - numeric
-  - dates
-  - links to external files / resources (useful to register external data such as PDF files, etc.)
-- property descriptors should set the property type
+- import, export of data
+- some actual code cleanup

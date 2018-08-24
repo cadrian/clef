@@ -302,11 +302,13 @@ public class ModelBeans implements Beans {
 	}
 
 	@Override
-	public PropertyDescriptor createPropertyDescriptor(final Entity entity) {
+	public PropertyDescriptor createPropertyDescriptor(final PropertyDescriptor.Entity entity,
+			final PropertyDescriptor.Type type) {
 		final PropertyDescriptorBean result;
 		try {
 			final net.cadrian.clef.database.bean.PropertyDescriptor template = new net.cadrian.clef.database.bean.PropertyDescriptor();
 			template.setEntity(entity.name());
+			template.setType(type.name());
 			final net.cadrian.clef.database.bean.PropertyDescriptor bean = db.getPropertyDescriptors().insert(template);
 			result = new PropertyDescriptorBean(bean, db);
 			propertyDescriptorsCache.put(bean.getId(), result);

@@ -76,6 +76,8 @@ public class RichTextEditor extends JPanel {
 
 	private final UndoManager undoManager;
 
+	private int dirty;
+
 	public RichTextEditor(final ApplicationContext context) {
 		super(new BorderLayout());
 		final Presentation presentation = context.getPresentation();
@@ -84,6 +86,7 @@ public class RichTextEditor extends JPanel {
 		document = (StyledDocument) kit.createDefaultDocument();
 		editor = new JTextPane();
 		undoManager = new UndoManager();
+		undoManager.setLimit(0);
 
 		editor.setDocument(document);
 		add(new JScrollPane(editor), BorderLayout.CENTER);
@@ -94,6 +97,7 @@ public class RichTextEditor extends JPanel {
 			@Override
 			public void undoableEditHappened(final UndoableEditEvent e) {
 				undoManager.addEdit(e.getEdit());
+				dirty++;
 			}
 		});
 
@@ -111,6 +115,7 @@ public class RichTextEditor extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				if (undoManager.canUndo()) {
 					undoManager.undo();
+					dirty++;
 				} else {
 					editor.requestFocusInWindow();
 				}
@@ -124,6 +129,7 @@ public class RichTextEditor extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				if (undoManager.canRedo()) {
 					undoManager.redo();
+					dirty--;
 				} else {
 					editor.requestFocusInWindow();
 				}
@@ -259,6 +265,14 @@ public class RichTextEditor extends JPanel {
 		} catch (final IOException e) {
 			LOGGER.error("Error while reading text", e);
 		}
+	}
+
+	public void markSave() {
+		dirty = 0;
+	}
+
+	public boolean isDirty() {
+		return dirty != 0;
 	}
 
 }

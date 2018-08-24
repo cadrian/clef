@@ -30,6 +30,8 @@ import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -57,6 +59,7 @@ import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.PropertyBean;
 import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
+import net.cadrian.clef.model.bean.PropertyDescriptor.Type;
 import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
@@ -67,6 +70,12 @@ class ConfigurationPanel extends JTabbedPane {
 
 	private static final long serialVersionUID = -2023860576290261246L;
 
+	private static final int COLUMN_NAME = 0;
+	private static final int COLUMN_TYPE = 1;
+	private static final int COLUMN_DESCRIPTION = 2;
+
+	private static final Class<?>[] COLUMN_TYPES = { String.class, LocalizedType.class, String.class };
+
 	private static class ConfigurableBeanDescription {
 		final Entity entity;
 		final String name;
@@ -74,6 +83,41 @@ class ConfigurationPanel extends JTabbedPane {
 		ConfigurableBeanDescription(final Entity entity, final Class<? extends PropertyBean> type) {
 			this.entity = entity;
 			name = type.getSimpleName();
+		}
+	}
+
+	private static class LocalizedType {
+		final PropertyDescriptor.Type type;
+		private final String string;
+
+		private LocalizedType(final PropertyDescriptor.Type type, final Presentation presentation) {
+			this.type = type;
+			string = presentation.getMessage("PropertyType." + type);
+		}
+
+		@Override
+		public String toString() {
+			return string;
+		}
+
+		public static LocalizedType[] values(final Presentation presentation) {
+			final Type[] types = PropertyDescriptor.Type.values();
+			final List<LocalizedType> result = new ArrayList<>(types.length);
+			for (final Type type : types) {
+				result.add(new LocalizedType(type, presentation));
+			}
+			Collections.sort(result, (t1, t2) -> t1.string.compareTo(t2.string));
+			return result.toArray(new LocalizedType[types.length]);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			return ((LocalizedType) obj).type == type;
+		}
+
+		@Override
+		public int hashCode() {
+			return type.hashCode();
 		}
 	}
 
@@ -105,6 +149,9 @@ class ConfigurationPanel extends JTabbedPane {
 		models.add(model);
 
 		final JTable table = new JTable(model);
+
+		final JComboBox<LocalizedType> typeCombo = new JComboBox<>(LocalizedType.values(context.getPresentation()));
+		table.getColumnModel().getColumn(COLUMN_TYPE).setCellEditor(new DefaultCellEditor(typeCombo));
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setAutoCreateRowSorter(true);
 		result.add(new JScrollPane(table), BorderLayout.CENTER);
@@ -189,12 +236,14 @@ class ConfigurationPanel extends JTabbedPane {
 		private static class EditableBean implements Comparable<EditableBean> {
 			private PropertyDescriptor bean;
 			private String name;
+			private LocalizedType type;
 			private String description;
 			private boolean dirty;
 
-			EditableBean(final PropertyDescriptor bean) {
+			EditableBean(final Presentation presentation, final PropertyDescriptor bean) {
 				this.bean = bean;
 				name = bean == null ? "" : bean.getName();
+				type = new LocalizedType(bean == null ? Type.string : bean.getType(), presentation);
 				description = bean == null ? "" : bean.getDescription();
 				dirty = false;
 			}
@@ -224,6 +273,14 @@ class ConfigurationPanel extends JTabbedPane {
 				dirty = true;
 			}
 
+			public LocalizedType getType() {
+				return type;
+			}
+
+			public void setType(final LocalizedType type) {
+				this.type = type;
+			}
+
 			public String getDescription() {
 				return description;
 			}
@@ -236,6 +293,7 @@ class ConfigurationPanel extends JTabbedPane {
 			public void save() {
 				if (dirty) {
 					bean.setName(name);
+					bean.setType(type.type);
 					bean.setDescription(description);
 					dirty = false;
 				}
@@ -259,16 +317,17 @@ class ConfigurationPanel extends JTabbedPane {
 			this.context = context;
 			this.configurableBean = configurableBean;
 			columnNames = new String[] { context.getPresentation().getMessage("Name"),
-					context.getPresentation().getMessage("Description") };
+					context.getPresentation().getMessage("Type"), context.getPresentation().getMessage("Description") };
 			refresh();
 		}
 
 		private void refresh() {
 			final Collection<? extends PropertyDescriptor> propertyDescriptors = context.getBeans()
 					.getPropertyDescriptors(configurableBean.entity);
+			Presentation presentation = context.getPresentation();
 
 			for (final PropertyDescriptor bean : propertyDescriptors) {
-				final EditableBean editableBean = new EditableBean(bean);
+				final EditableBean editableBean = new EditableBean(presentation, bean);
 				editableBeans.add(editableBean);
 			}
 			Collections.sort(editableBeans);
@@ -278,7 +337,7 @@ class ConfigurationPanel extends JTabbedPane {
 			if (row == -1) {
 				row = editableBeans.size();
 			}
-			editableBeans.add(new EditableBean(null));
+			editableBeans.add(new EditableBean(context.getPresentation(), null));
 			fireTableRowsInserted(row, row);
 		}
 
@@ -331,7 +390,7 @@ class ConfigurationPanel extends JTabbedPane {
 					for (final EditableBean editableBean : editableBeans) {
 						if (editableBean.getBean() == null) {
 							final PropertyDescriptor bean = context.getBeans()
-									.createPropertyDescriptor(configurableBean.entity);
+									.createPropertyDescriptor(configurableBean.entity, editableBean.getType().type);
 							editableBean.setBean(bean);
 						}
 						editableBean.save();
@@ -373,15 +432,17 @@ class ConfigurationPanel extends JTabbedPane {
 
 		@Override
 		public int getColumnCount() {
-			return 2;
+			return columnNames.length;
 		}
 
 		@Override
 		public Object getValueAt(final int rowIndex, final int columnIndex) {
 			switch (columnIndex) {
-			case 0:
+			case COLUMN_NAME:
 				return editableBeans.get(rowIndex).getName();
-			case 1:
+			case COLUMN_TYPE:
+				return editableBeans.get(rowIndex).getType();
+			case COLUMN_DESCRIPTION:
 				return editableBeans.get(rowIndex).getDescription();
 			}
 			return null;
@@ -393,6 +454,11 @@ class ConfigurationPanel extends JTabbedPane {
 		}
 
 		@Override
+		public Class<?> getColumnClass(final int column) {
+			return COLUMN_TYPES[column];
+		}
+
+		@Override
 		public boolean isCellEditable(final int rowIndex, final int columnIndex) {
 			return true;
 		}
@@ -400,10 +466,13 @@ class ConfigurationPanel extends JTabbedPane {
 		@Override
 		public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex) {
 			switch (columnIndex) {
-			case 0:
+			case COLUMN_NAME:
 				editableBeans.get(rowIndex).setName((String) aValue);
 				break;
-			case 1:
+			case COLUMN_TYPE:
+				editableBeans.get(rowIndex).setType((LocalizedType) aValue);
+				break;
+			case COLUMN_DESCRIPTION:
 				editableBeans.get(rowIndex).setDescription((String) aValue);
 				break;
 			}

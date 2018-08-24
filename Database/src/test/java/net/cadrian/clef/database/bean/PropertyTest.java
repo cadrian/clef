@@ -51,6 +51,7 @@ public class PropertyTest extends AbstractDatabaseTestHarness {
 
 		final PropertyDescriptor templateTest = new PropertyDescriptor();
 		templateTest.setEntity("meta");
+		templateTest.setType("string");
 		templateTest.setName("TEST");
 		testPropertyDescriptor = propertyDescriptors.insert(templateTest);
 		LOGGER.info("testPropertyDescriptor.getId()={}", testPropertyDescriptor.getId());
