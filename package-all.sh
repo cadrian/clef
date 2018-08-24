@@ -1,8 +1,18 @@
 #/usr/bin/env bash
 
 rm -rf pkg
-mkdir pkg
+mkdir -p pkg/build
 cd pkg
+
+function prepareModule() {
+    local module=$1
+
+    (
+        echo
+        echo Preparing $module
+        cp -al ../$module build/$module
+    )
+}
 
 function buildModule() {
     local module=$1
@@ -10,9 +20,8 @@ function buildModule() {
     (
         echo
         echo Building $module
-        mkdir -p build/$module
-        cp -al ../$module build/$module/src
-        cd build/$module/src
+
+        cd build/$module
 
         case $module in
             Application)
@@ -29,7 +38,7 @@ function buildModule() {
                 ;;
         esac
 
-        debuild -b -us -uc > ../build.log || exit 1
+        debuild -b -us -uc > build.log || exit 1
         cd ..
         sudo dpkg -i *.deb || exit 1
     ) || exit 1
@@ -37,16 +46,19 @@ function buildModule() {
 
 if [ $# -gt 0 ]; then
     for module in "$@"; do
+        prepareModule $module
+    done
+    for module in "$@"; do
         buildModule $module
     done
 else
+    for module in Root Model Database UserInterface Application; do
+        prepareModule $module
+    done
     for module in Root Model Database UserInterface Application; do
         buildModule $module
     done
 fi
 
 echo
-
-ln build/*/*.deb .
-
 echo Done.
