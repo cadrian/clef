@@ -22,34 +22,29 @@ import java.util.Collection;
 import javax.swing.JSplitPane;
 
 import net.cadrian.clef.model.Bean;
+import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.model.bean.Property;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
-import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
-import net.cadrian.clef.ui.app.form.field.FieldModel;
+import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.app.form.field.FieldComponent;
+import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.SimpleFieldModel;
 
-public class PropertiesComponentFactory<T extends Bean>
-		extends AbstractSimpleFieldComponentFactory<T, Collection<? extends Property>, JSplitPane> {
+class PropertiesFieldModel<T extends Bean> extends SimpleFieldModel<T, Collection<? extends Property>, JSplitPane> {
 
 	private final Entity entity;
 
-	public PropertiesComponentFactory(final Entity entity, final boolean writable) {
-		this(entity, writable, null);
-	}
-
-	public PropertiesComponentFactory(final Entity entity, final boolean writable, final String tab) {
-		super(writable, tab);
+	PropertiesFieldModel(final String name, final String tab, final Method getter, final Method setter,
+			final FieldComponentFactory<T, Collection<? extends Property>, JSplitPane> componentFactory,
+			final Entity entity) {
+		super(name, tab, getter, setter, componentFactory);
 		this.entity = entity;
 	}
 
 	@Override
-	protected FieldModel<T, Collection<? extends Property>, JSplitPane> createModel(final String fieldName,
-			final Method getter, final Method setter) {
-		return new PropertiesFieldModel<>(fieldName, tab, getter, setter, this, entity);
-	}
-
-	@Override
-	public Class<?> getDataType() {
-		return Collection.class;
+	public FieldComponent<Collection<? extends Property>, JSplitPane> createComponent(final T contextBean,
+			final ApplicationContext context) throws ModelException {
+		return new PropertiesComponent(context, entity, componentFactory.isWritable());
 	}
 
 }

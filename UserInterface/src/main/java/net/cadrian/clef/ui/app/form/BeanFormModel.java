@@ -16,7 +16,6 @@
  */
 package net.cadrian.clef.ui.app.form;
 
-import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -27,49 +26,33 @@ import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldModel;
 
-public abstract class BeanFormModel<T extends Bean, C extends Bean> {
+public abstract class BeanFormModel<T extends Bean> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BeanFormModel.class);
 
 	private final Class<T> beanType;
-	private final Map<String, FieldModel<T, ?, ?, C>> fields = new LinkedHashMap<>();
+	private final Map<String, FieldModel<T, ?, ?>> fields = new LinkedHashMap<>();
 
 	protected BeanFormModel(final Class<T> beanType,
-			final Map<String, FieldComponentFactory<?, ? extends JComponent, C>> componentFactories) {
+			final Map<String, FieldComponentFactory<T, ?, ? extends JComponent>> componentFactories) {
 		this.beanType = beanType;
 		initFields(componentFactories);
 	}
 
-	private void initFields(final Map<String, FieldComponentFactory<?, ? extends JComponent, C>> componentFactories) {
-		for (final Map.Entry<String, FieldComponentFactory<?, ? extends JComponent, C>> entry : componentFactories
+	private void initFields(final Map<String, FieldComponentFactory<T, ?, ? extends JComponent>> componentFactories) {
+		for (final Map.Entry<String, FieldComponentFactory<T, ?, ? extends JComponent>> entry : componentFactories
 				.entrySet()) {
 			final String fieldName = entry.getKey();
-			try {
-				final FieldComponentFactory<?, ? extends JComponent, C> componentFactory = entry.getValue();
-				final Class<?> dataType = componentFactory.getDataType();
-				final Method getter = beanType.getMethod("get" + fieldName);
-				if (!getter.getReturnType().equals(dataType)) {
-					LOGGER.error("BUG: invalid field model for {} -- {} vs {}", fieldName,
-							getter.getReturnType().getName(), dataType.getName());
-				} else {
-					final Method setter;
-					if (componentFactory.isWritable()) {
-						setter = beanType.getMethod("set" + fieldName, dataType);
-					} else {
-						setter = null;
-					}
-					LOGGER.info("Adding field model for {}", fieldName);
-					final FieldModel<T, ?, ?, C> model = new FieldModel<>(fieldName, getter, setter, componentFactory);
-					fields.put(fieldName, model);
-				}
-			} catch (NoSuchMethodException | SecurityException e) {
-				LOGGER.error("BUG: invalid field model for {}", fieldName, e);
-			}
+			final FieldComponentFactory<T, ?, ? extends JComponent> componentFactory = entry.getValue();
+			LOGGER.info("Adding field model for {}", fieldName);
+			final FieldModel<T, ?, ?> model = componentFactory.createModel(beanType, fieldName);
+			fields.put(fieldName, model);
 		}
 	}
 
-	Map<String, FieldModel<T, ?, ?, C>> getFields() {
+	Map<String, FieldModel<T, ?, ?>> getFields() {
 		return fields;
 	}
 

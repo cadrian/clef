@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.model.Beans;
-import net.cadrian.clef.model.NoBean;
 import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.BeanComparators;
 import net.cadrian.clef.model.bean.Pricing;
@@ -113,16 +112,16 @@ public class Application extends JFrame {
 		final JTabbedPane mgtPane = new JTabbedPane(SwingConstants.TOP);
 		final Beans beans = context.getBeans();
 
-		final DataPane<Session, NoBean> sessionsPanel = new DataPane<>(context, true, beans::getSessions,
+		final DataPane<Session> sessionsPanel = new DataPane<>(context, true, Session.class, beans::getSessions,
 				new SessionCreator(context), (s1, s2) -> BeanComparators.compareSessions(s1, s2),
 				new SessionFormModel(Session.class));
-		final DataPane<Work, Work> worksPanel = new DataPane<>(context, true, beans::getWorks, new WorkCreator(context),
-				(w1, w2) -> BeanComparators.compareWorks(w1, w2), new WorkFormModel(Work.class),
-				Arrays.asList("Description", "Pieces"));
-		final DataPane<Author, NoBean> authorsPanel = new DataPane<>(context, true, beans::getAuthors,
+		final DataPane<Work> worksPanel = new DataPane<>(context, true, Work.class, beans::getWorks,
+				new WorkCreator(context), (w1, w2) -> BeanComparators.compareWorks(w1, w2),
+				new WorkFormModel(Work.class), Arrays.asList("Description", "Pieces"));
+		final DataPane<Author> authorsPanel = new DataPane<>(context, true, Author.class, beans::getAuthors,
 				beans::createAuthor, (a1, a2) -> BeanComparators.compareAuthors(a1, a2),
 				new AuthorFormModel(Author.class));
-		final DataPane<Pricing, NoBean> pricingsPanel = new DataPane<>(context, true, beans::getPricings,
+		final DataPane<Pricing> pricingsPanel = new DataPane<>(context, true, Pricing.class, beans::getPricings,
 				beans::createPricing, (p1, p2) -> BeanComparators.comparePricings(p1, p2),
 				new PricingFormModel(Pricing.class));
 		final ConfigurationPanel configurationPanel = new ConfigurationPanel(context);

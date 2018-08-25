@@ -23,6 +23,7 @@ import java.awt.Insets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -36,27 +37,25 @@ import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.Presentation;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
+import net.cadrian.clef.ui.app.form.field.FieldModel;
 
-public class BeanForm<T extends Bean, C extends Bean> extends JPanel {
+public class BeanForm<T extends Bean> extends JPanel {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BeanForm.class);
 
 	private static final long serialVersionUID = -2371381405618937355L;
 
 	private final T bean;
-	private final Map<String, FieldView<T, ?, ?, C>> fields = new LinkedHashMap<>();
+	private final Map<String, FieldView<T, ?, ?>> fields = new LinkedHashMap<>();
 
-	public BeanForm(final ApplicationContext context, final C contextBean, final T bean,
-			final BeanFormModel<T, C> model, final List<String> tabs) {
+	public BeanForm(final ApplicationContext context, final T bean, final BeanFormModel<T> model,
+			final List<String> tabs) {
 		super(new BorderLayout());
-		if (bean == null) {
-			throw new NullPointerException("null bean");
-		}
-		this.bean = bean;
+		this.bean = Objects.requireNonNull(bean);
 
-		for (final FieldModel<T, ?, ?, C> fieldModel : model.getFields().values()) {
-			final FieldView<T, ?, ?, C> fieldView = getFieldView(context, contextBean, fieldModel);
-			fields.put(fieldView.model.name, fieldView);
+		for (final FieldModel<T, ?, ?> fieldModel : model.getFields().values()) {
+			final FieldView<T, ?, ?> fieldView = getFieldView(context, fieldModel, bean);
+			fields.put(fieldView.model.getName(), fieldView);
 		}
 
 		final Presentation presentation = context.getPresentation();
@@ -79,14 +78,15 @@ public class BeanForm<T extends Bean, C extends Bean> extends JPanel {
 
 	private void addFields(final Presentation presentation, final JPanel panel, final String tab) {
 		int gridy = 0;
-		for (final FieldView<T, ?, ?, C> fieldView : fields.values()) {
-			if (tab == null || tab.equals(fieldView.model.componentFactory.getTab())) {
+		for (final FieldView<T, ?, ?> fieldView : fields.values()) {
+			if (tab == null || tab.equals(fieldView.model.getTab())) {
 				final GridBagConstraints labelConstraints = new GridBagConstraints();
 				labelConstraints.gridy = gridy;
 				labelConstraints.anchor = GridBagConstraints.NORTHWEST;
 				labelConstraints.insets = new Insets(8, 2, 2, 2);
-				final String label = presentation.getMessage("Field." + fieldView.model.name);
-				LOGGER.debug("Label for {} is {}", fieldView.model.name, label);
+				final String name = fieldView.model.getName();
+				final String label = presentation.getMessage("Field." + name);
+				LOGGER.debug("Label for {} is {}", name, label);
 				panel.add(presentation.bold(new JLabel(label)), labelConstraints);
 
 				final GridBagConstraints fieldConstraints = new GridBagConstraints();
@@ -100,25 +100,25 @@ public class BeanForm<T extends Bean, C extends Bean> extends JPanel {
 
 				gridy++;
 			} else if (tab != null) {
-				LOGGER.debug("tab mismatch: {} vs {}", tab, fieldView.model.componentFactory.getTab());
+				LOGGER.debug("tab mismatch: {} vs {}", tab, fieldView.model.getTab());
 			}
 		}
 	}
 
-	private <D, J extends JComponent> FieldView<T, D, J, C> getFieldView(final ApplicationContext context,
-			final C contextBean, final FieldModel<T, D, J, C> model) {
-		final FieldComponent<D, J> component = model.componentFactory.createComponent(context, contextBean);
+	private <D, J extends JComponent> FieldView<T, D, J> getFieldView(final ApplicationContext context,
+			final FieldModel<T, D, J> model, final T bean) {
+		final FieldComponent<D, J> component = model.createComponent(bean, context);
 		return new FieldView<>(model, component);
 	}
 
 	public void load() {
-		for (final FieldView<T, ?, ?, C> field : fields.values()) {
+		for (final FieldView<T, ?, ?> field : fields.values()) {
 			field.load(bean);
 		}
 	}
 
 	public void save() {
-		for (final FieldView<T, ?, ?, C> field : fields.values()) {
+		for (final FieldView<T, ?, ?> field : fields.values()) {
 			field.save(bean);
 		}
 	}
@@ -128,7 +128,7 @@ public class BeanForm<T extends Bean, C extends Bean> extends JPanel {
 	}
 
 	public boolean isDirty() {
-		for (final FieldView<T, ?, ?, C> field : fields.values()) {
+		for (final FieldView<T, ?, ?> field : fields.values()) {
 			if (field.isDirty()) {
 				LOGGER.debug("dirty: {}", bean);
 				return true;

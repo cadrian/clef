@@ -19,14 +19,14 @@ package net.cadrian.clef.ui.app.form.field;
 import javax.swing.JComponent;
 
 import net.cadrian.clef.model.Bean;
-import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.model.ModelException;
 
-public interface FieldComponentFactory<D, J extends JComponent, C extends Bean> {
-	FieldComponent<D, J> createComponent(final ApplicationContext context, C contextBean);
+public interface FieldComponentFactory<T extends Bean, D, J extends JComponent> {
+
+	FieldModel<T, D, J> createModel(Class<T> beanType, String fieldName) throws ModelException;
 
 	Class<?> getDataType();
 
 	boolean isWritable();
 
-	String getTab();
 }

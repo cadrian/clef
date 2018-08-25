@@ -23,7 +23,6 @@ import javax.swing.JComponent;
 
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
-import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
 import net.cadrian.clef.ui.app.form.field.numeric.NumericFieldComponentFactory;
@@ -31,15 +30,16 @@ import net.cadrian.clef.ui.app.form.field.properties.PropertiesComponentFactory;
 import net.cadrian.clef.ui.app.form.field.text.TextAreaComponentFactory;
 import net.cadrian.clef.ui.app.form.field.text.TextFieldComponentFactory;
 
-public class PieceFormModel extends BeanFormModel<Piece, Work> {
+public class PieceFormModel extends BeanFormModel<Piece> {
 
-	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, Work>> COMPONENT_FACTORIES = new LinkedHashMap<>();
+	private static final Map<String, FieldComponentFactory<Piece, ?, ? extends JComponent>> COMPONENT_FACTORIES = new LinkedHashMap<>();
 	static {
-		final TextFieldComponentFactory<Work> nameFactory = new TextFieldComponentFactory<>(true);
-		final NumericFieldComponentFactory<Work> versionFactory = new NumericFieldComponentFactory<>(false);
-		final NumericFieldComponentFactory<Work> durationFactory = new NumericFieldComponentFactory<>(true);
-		final PropertiesComponentFactory<Work> propertiesFactory = new PropertiesComponentFactory<>(Entity.piece, true);
-		final TextAreaComponentFactory<Work> notesFactory = new TextAreaComponentFactory<>(true);
+		final TextFieldComponentFactory<Piece> nameFactory = new TextFieldComponentFactory<>(true);
+		final NumericFieldComponentFactory<Piece> versionFactory = new NumericFieldComponentFactory<>(false);
+		final NumericFieldComponentFactory<Piece> durationFactory = new NumericFieldComponentFactory<>(true);
+		final PropertiesComponentFactory<Piece> propertiesFactory = new PropertiesComponentFactory<>(Entity.piece,
+				true);
+		final TextAreaComponentFactory<Piece> notesFactory = new TextAreaComponentFactory<>(true);
 		COMPONENT_FACTORIES.put("Name", nameFactory);
 		COMPONENT_FACTORIES.put("Version", versionFactory);
 		COMPONENT_FACTORIES.put("Duration", durationFactory);

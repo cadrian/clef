@@ -16,8 +16,6 @@
  */
 package net.cadrian.clef.ui.app.form;
 
-import java.lang.reflect.InvocationTargetException;
-
 import javax.swing.JComponent;
 
 import org.slf4j.Logger;
@@ -25,15 +23,16 @@ import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
+import net.cadrian.clef.ui.app.form.field.FieldModel;
 
-class FieldView<T extends Bean, D, J extends JComponent, C extends Bean> {
+class FieldView<T extends Bean, D, J extends JComponent> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FieldView.class);
 
-	final FieldModel<T, D, J, C> model;
+	final FieldModel<T, D, J> model;
 	final FieldComponent<D, J> component;
 
-	FieldView(final FieldModel<T, D, J, C> model, final FieldComponent<D, J> component) {
+	FieldView(final FieldModel<T, D, J> model, final FieldComponent<D, J> component) {
 		if (model == null) {
 			throw new NullPointerException("null model");
 		}
@@ -45,33 +44,18 @@ class FieldView<T extends Bean, D, J extends JComponent, C extends Bean> {
 	}
 
 	void load(final T bean) {
-		try {
-			@SuppressWarnings("unchecked")
-			final D data = (D) model.getter.invoke(bean);
-			component.setData(data);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			LOGGER.error("BUG: could not load value", e);
-		}
+		component.setData(model.load(bean));
 	}
 
 	void save(final T bean) {
-		try {
-			LOGGER.debug("saving {}.{}", bean, model.name);
-			final D data = component.getData();
-			if (model.setter == null) {
-				LOGGER.info("no setter for {}", model.name);
-			} else {
-				model.setter.invoke(bean, data);
-			}
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			LOGGER.error("BUG: could not save value", e);
-		}
+		LOGGER.debug("saving {}.{}", bean, model.getName());
+		model.save(bean, component.getData());
 	}
 
 	public boolean isDirty() {
 		final boolean result = component.isDirty();
 		if (result) {
-			LOGGER.debug("dirty: {}", model.name);
+			LOGGER.debug("dirty: {}", model.getName());
 		}
 		return result;
 	}

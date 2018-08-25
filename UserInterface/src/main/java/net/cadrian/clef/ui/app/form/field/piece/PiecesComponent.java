@@ -20,7 +20,6 @@ import java.util.Collection;
 
 import net.cadrian.clef.model.bean.BeanComparators;
 import net.cadrian.clef.model.bean.Piece;
-import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.BeanCreator;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
@@ -28,18 +27,18 @@ import net.cadrian.clef.ui.app.form.BeanGetter;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.tab.DataPane;
 
-class PiecesComponent implements FieldComponent<Collection<Piece>, DataPane<Piece, Work>> {
+class PiecesComponent implements FieldComponent<Collection<Piece>, DataPane<Piece>> {
 
-	private final DataPane<Piece, Work> component;
+	private final DataPane<Piece> component;
 
 	public PiecesComponent(final ApplicationContext context, final BeanGetter<Piece> beanGetter,
-			final BeanCreator<Piece> beanCreator, final BeanFormModel<Piece, Work> beanFormModel) {
-		component = new DataPane<>(context, false, beanGetter, beanCreator,
+			final BeanCreator<Piece> beanCreator, final BeanFormModel<Piece> beanFormModel) {
+		component = new DataPane<>(context, false, Piece.class, beanGetter, beanCreator,
 				(p1, p2) -> BeanComparators.comparePieces(p1, p2), beanFormModel);
 	}
 
 	@Override
-	public DataPane<Piece, Work> getComponent() {
+	public DataPane<Piece> getComponent() {
 		return component;
 	}
 

@@ -19,26 +19,19 @@ package net.cadrian.clef.ui.app.form.field;
 import javax.swing.JComponent;
 
 import net.cadrian.clef.model.Bean;
+import net.cadrian.clef.model.ModelException;
+import net.cadrian.clef.ui.ApplicationContext;
 
-public abstract class AbstractFieldComponentFactory<D, J extends JComponent, C extends Bean>
-		implements FieldComponentFactory<D, J, C> {
+public interface FieldModel<T extends Bean, D, J extends JComponent> {
 
-	protected final boolean writable;
-	private final String tab;
+	FieldComponent<D, J> createComponent(T contextBean, ApplicationContext context) throws ModelException;
 
-	protected AbstractFieldComponentFactory(final boolean writable, final String tab) {
-		this.writable = writable;
-		this.tab = tab;
-	}
+	String getName();
 
-	@Override
-	public boolean isWritable() {
-		return writable;
-	}
+	String getTab();
 
-	@Override
-	public String getTab() {
-		return tab;
-	}
+	void save(T bean, D data);
+
+	D load(T bean);
 
 }

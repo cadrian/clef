@@ -16,40 +16,30 @@
  */
 package net.cadrian.clef.ui.app.form.field.piece;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Work;
-import net.cadrian.clef.ui.ApplicationContext;
-import net.cadrian.clef.ui.app.form.BeanCreator;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
-import net.cadrian.clef.ui.app.form.BeanGetter;
-import net.cadrian.clef.ui.app.form.field.AbstractFieldComponentFactory;
-import net.cadrian.clef.ui.app.form.field.FieldComponent;
+import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldModel;
 import net.cadrian.clef.ui.app.tab.DataPane;
 
 public class PiecesComponentFactory
-		extends AbstractFieldComponentFactory<Collection<Piece>, DataPane<Piece, Work>, Work> {
+		extends AbstractSimpleFieldComponentFactory<Work, Collection<Piece>, DataPane<Piece>> {
 
-	private final BeanFormModel<Piece, Work> beanFormModel;
+	private final BeanFormModel<Piece> beanFormModel;
 
-	public PiecesComponentFactory(final BeanFormModel<Piece, Work> beanFormModel, final String tab) {
+	public PiecesComponentFactory(final BeanFormModel<Piece> beanFormModel, final String tab) {
 		super(false, tab);
 		this.beanFormModel = beanFormModel;
 	}
 
 	@Override
-	public FieldComponent<Collection<Piece>, DataPane<Piece, Work>> createComponent(final ApplicationContext context,
-			final Work contextBean) {
-		final BeanGetter<Piece> beanGetter = () -> contextBean.getPieces();
-		final BeanCreator<Piece> beanCreator = new BeanCreator<Piece>() {
-
-			@Override
-			public Piece createBean() {
-				return context.getBeans().createPiece(contextBean);
-			}
-		};
-		return new PiecesComponent(context, beanGetter, beanCreator, beanFormModel);
+	protected FieldModel<Work, Collection<Piece>, DataPane<Piece>> createModel(final String fieldName,
+			final Method getter, final Method setter) {
+		return new PiecesFieldModel(fieldName, tab, getter, setter, this, beanFormModel);
 	}
 
 	@Override

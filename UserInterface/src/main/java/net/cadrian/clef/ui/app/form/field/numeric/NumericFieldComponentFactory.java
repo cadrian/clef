@@ -16,15 +16,16 @@
  */
 package net.cadrian.clef.ui.app.form.field.numeric;
 
+import java.lang.reflect.Method;
+
 import javax.swing.JFormattedTextField;
 
 import net.cadrian.clef.model.Bean;
-import net.cadrian.clef.ui.ApplicationContext;
-import net.cadrian.clef.ui.app.form.field.AbstractFieldComponentFactory;
-import net.cadrian.clef.ui.app.form.field.FieldComponent;
+import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldModel;
 
-public class NumericFieldComponentFactory<C extends Bean>
-		extends AbstractFieldComponentFactory<Long, JFormattedTextField, C> {
+public class NumericFieldComponentFactory<T extends Bean>
+		extends AbstractSimpleFieldComponentFactory<T, Long, JFormattedTextField> {
 
 	public NumericFieldComponentFactory(final boolean writable) {
 		this(writable, null);
@@ -35,9 +36,9 @@ public class NumericFieldComponentFactory<C extends Bean>
 	}
 
 	@Override
-	public FieldComponent<Long, JFormattedTextField> createComponent(final ApplicationContext context,
-			final C contextBean) {
-		return new NumericFieldComponent(writable);
+	protected FieldModel<T, Long, JFormattedTextField> createModel(final String fieldName, final Method getter,
+			final Method setter) {
+		return new NumericFieldModel<>(fieldName, tab, getter, setter, this);
 	}
 
 	@Override

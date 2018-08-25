@@ -33,17 +33,17 @@ import net.cadrian.clef.ui.app.form.field.properties.PropertiesComponentFactory;
 import net.cadrian.clef.ui.app.form.field.text.TextAreaComponentFactory;
 import net.cadrian.clef.ui.app.form.field.text.TextFieldComponentFactory;
 
-public class WorkFormModel extends BeanFormModel<Work, Work> {
+public class WorkFormModel extends BeanFormModel<Work> {
 
-	private static final Map<String, FieldComponentFactory<?, ? extends JComponent, Work>> COMPONENT_FACTORIES = new LinkedHashMap<>();
+	private static final Map<String, FieldComponentFactory<Work, ?, ? extends JComponent>> COMPONENT_FACTORIES = new LinkedHashMap<>();
 	static {
 		final TextFieldComponentFactory<Work> nameFactory = new TextFieldComponentFactory<>(true, "Description");
 		final TextAreaComponentFactory<Work> notesFactory = new TextAreaComponentFactory<>(true, "Description");
 		final PropertiesComponentFactory<Work> propertiesFactory = new PropertiesComponentFactory<>(Entity.work, true,
 				"Description");
-		final BeanComponentFactory<Author, Work> authorFactory = new BeanComponentFactory<>(Author.class,
+		final BeanComponentFactory<Work, Author> authorFactory = new BeanComponentFactory<>(Author.class,
 				"Description");
-		final BeanComponentFactory<Pricing, Work> pricingFactory = new BeanComponentFactory<>(Pricing.class,
+		final BeanComponentFactory<Work, Pricing> pricingFactory = new BeanComponentFactory<>(Pricing.class,
 				"Description");
 		final PiecesComponentFactory piecesFactory = new PiecesComponentFactory(new PieceFormModel(), "Pieces");
 		COMPONENT_FACTORIES.put("Author", authorFactory);

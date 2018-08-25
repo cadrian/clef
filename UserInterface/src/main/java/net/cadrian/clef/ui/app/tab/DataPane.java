@@ -51,7 +51,7 @@ import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.BeanGetter;
 import net.cadrian.clef.ui.tools.SortableListModel;
 
-public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
+public class DataPane<T extends Bean> extends JSplitPane {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DataPane.class);
 
@@ -69,17 +69,17 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 	private final BeanCreator<T> beanCreator;
 	private final ApplicationContext context;
 
-	private BeanForm<T, C> currentForm;
+	private BeanForm<T> currentForm;
 
-	public DataPane(final ApplicationContext context, final boolean showSave, final BeanGetter<T> beanGetter,
-			final BeanCreator<T> beanCreator, final Comparator<T> beanComparator,
-			final BeanFormModel<T, C> beanFormModel) {
-		this(context, showSave, beanGetter, beanCreator, beanComparator, beanFormModel, null);
+	public DataPane(final ApplicationContext context, final boolean showSave, final Class<T> beanType,
+			final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final Comparator<T> beanComparator,
+			final BeanFormModel<T> beanFormModel) {
+		this(context, showSave, beanType, beanGetter, beanCreator, beanComparator, beanFormModel, null);
 	}
 
-	public DataPane(final ApplicationContext context, final boolean showSave, final BeanGetter<T> beanGetter,
-			final BeanCreator<T> beanCreator, final Comparator<T> beanComparator,
-			final BeanFormModel<T, C> beanFormModel, final List<String> tabs) {
+	public DataPane(final ApplicationContext context, final boolean showSave, final Class<T> beanType,
+			final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final Comparator<T> beanComparator,
+			final BeanFormModel<T> beanFormModel, final List<String> tabs) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
 		this.beanGetter = beanGetter;
 		this.beanCreator = beanCreator;
@@ -104,9 +104,7 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 					current.removeAll();
 					if (selected != null) {
 						LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
-						@SuppressWarnings("unchecked")
-						final C contextBean = (C) selected; // TODO plainly wrong
-						currentForm = new BeanForm<>(context, contextBean, selected, beanFormModel, tabs);
+						currentForm = new BeanForm<>(context, selected, beanFormModel, tabs);
 						current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
 						currentForm.load();
 						delAction.setEnabled(true);

@@ -20,29 +20,24 @@ import java.lang.reflect.Method;
 import java.util.Date;
 
 import net.cadrian.clef.model.Bean;
-import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
-import net.cadrian.clef.ui.app.form.field.FieldModel;
+import net.cadrian.clef.model.ModelException;
+import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.app.form.field.FieldComponent;
+import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.SimpleFieldModel;
 import net.cadrian.clef.ui.widget.DateSelector;
 
-public class DateComponentFactory<T extends Bean> extends AbstractSimpleFieldComponentFactory<T, Date, DateSelector> {
+class DateFieldModel<T extends Bean> extends SimpleFieldModel<T, Date, DateSelector> {
 
-	public DateComponentFactory(final boolean writable) {
-		this(writable, null);
-	}
-
-	public DateComponentFactory(final boolean writable, final String tab) {
-		super(writable, tab);
+	DateFieldModel(final String name, final String tab, final Method getter, final Method setter,
+			final FieldComponentFactory<T, Date, DateSelector> componentFactory) {
+		super(name, tab, getter, setter, componentFactory);
 	}
 
 	@Override
-	protected FieldModel<T, Date, DateSelector> createModel(final String fieldName, final Method getter,
-			final Method setter) {
-		return new DateFieldModel<>(fieldName, tab, getter, setter, this);
-	}
-
-	@Override
-	public Class<Date> getDataType() {
-		return Date.class;
+	public FieldComponent<Date, DateSelector> createComponent(final T contextBean, final ApplicationContext context)
+			throws ModelException {
+		return new DateComponent(context, componentFactory.isWritable());
 	}
 
 }
