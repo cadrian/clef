@@ -32,12 +32,14 @@ public class PropertiesComponentFactory<T extends Bean>
 
 	private final Entity entity;
 
-	public PropertiesComponentFactory(final Entity entity, final boolean writable) {
-		this(entity, writable, null);
+	public PropertiesComponentFactory(final Class<T> beanType, final String fieldName, final Entity entity,
+			final boolean writable) {
+		this(beanType, fieldName, entity, writable, null);
 	}
 
-	public PropertiesComponentFactory(final Entity entity, final boolean writable, final String tab) {
-		super(writable, tab);
+	public PropertiesComponentFactory(final Class<T> beanType, final String fieldName, final Entity entity,
+			final boolean writable, final String tab) {
+		super(beanType, fieldName, writable, tab);
 		this.entity = entity;
 	}
 

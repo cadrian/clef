@@ -17,6 +17,8 @@
 package net.cadrian.clef.ui.app.form.field;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JComponent;
 
@@ -31,10 +33,25 @@ public abstract class AbstractSimpleFieldComponentFactory<T extends Bean, D, J e
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSimpleFieldComponentFactory.class);
 
+	private static final Map<Class<?>, Map<String, FieldModel<?, ?, ?>>> CACHE = new HashMap<>();
+
+	protected static <T extends Bean, D, J extends JComponent> FieldModel<T, D, J> getCachedModel(
+			final Class<T> beanType, final String fieldName) throws ModelException {
+		final Map<String, FieldModel<?, ?, ?>> cache = CACHE.get(beanType);
+		@SuppressWarnings("unchecked")
+		final FieldModel<T, D, J> result = cache == null ? null : (FieldModel<T, D, J>) cache.get(fieldName);
+		return result;
+	}
+
+	protected final Class<T> beanType;
+	protected final String fieldName;
 	protected final boolean writable;
 	protected final String tab;
 
-	protected AbstractSimpleFieldComponentFactory(final boolean writable, final String tab) {
+	protected AbstractSimpleFieldComponentFactory(final Class<T> beanType, final String fieldName,
+			final boolean writable, final String tab) {
+		this.beanType = beanType;
+		this.fieldName = fieldName;
 		this.writable = writable;
 		this.tab = tab;
 	}
@@ -45,29 +62,56 @@ public abstract class AbstractSimpleFieldComponentFactory<T extends Bean, D, J e
 	}
 
 	@Override
-	public FieldModel<T, D, J> createModel(final Class<T> beanType, final String fieldName) throws ModelException {
-		try {
-			final Class<?> dataType = getDataType();
-			final Method getter = beanType.getMethod("get" + fieldName);
-			if (!getter.getReturnType().equals(dataType)) {
-				LOGGER.error("BUG: invalid field model for {} -- {} vs {}", fieldName, getter.getReturnType().getName(),
-						dataType.getName());
-			} else {
-				final Method setter;
-				if (isWritable()) {
-					setter = beanType.getMethod("set" + fieldName, dataType);
+	public String getFieldName() {
+		return fieldName;
+	}
+
+	@Override
+	public Class<T> getBeanType() {
+		return beanType;
+	}
+
+	@Override
+	public FieldModel<T, D, J> createModel() throws ModelException {
+		FieldModel<T, D, J> result = getCachedModel();
+		if (result == null) {
+			try {
+				final Class<?> dataType = getDataType();
+				final Method getter = beanType.getMethod("get" + fieldName);
+				if (!getter.getReturnType().equals(dataType)) {
+					LOGGER.error("BUG: invalid field model for {} -- {} vs {}", fieldName,
+							getter.getReturnType().getName(), dataType.getName());
 				} else {
-					setter = null;
+					final Method setter;
+					if (isWritable()) {
+						setter = beanType.getMethod("set" + fieldName, dataType);
+					} else {
+						setter = null;
+					}
+					result = createModel(fieldName, getter, setter);
+					setCachedModel(result);
 				}
-				return createModel(fieldName, getter, setter);
+			} catch (NoSuchMethodException | SecurityException e) {
+				throw new ModelException(e);
 			}
-		} catch (NoSuchMethodException | SecurityException e) {
-			throw new ModelException(e);
 		}
-		return null;
+		return result;
 	}
 
 	protected abstract FieldModel<T, D, J> createModel(final String fieldName, final Method getter,
 			final Method setter);
+
+	private FieldModel<T, D, J> getCachedModel() {
+		return getCachedModel(beanType, fieldName);
+	}
+
+	private void setCachedModel(final FieldModel<T, D, J> result) {
+		Map<String, FieldModel<?, ?, ?>> cache = CACHE.get(beanType);
+		if (cache == null) {
+			cache = new HashMap<>();
+			CACHE.put(beanType, cache);
+		}
+		cache.put(fieldName, result);
+	}
 
 }

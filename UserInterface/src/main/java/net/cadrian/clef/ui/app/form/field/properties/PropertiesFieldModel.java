@@ -26,11 +26,12 @@ import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.model.bean.Property;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
-import net.cadrian.clef.ui.app.form.field.SimpleFieldModel;
 
-class PropertiesFieldModel<T extends Bean> extends SimpleFieldModel<T, Collection<? extends Property>, JSplitPane> {
+class PropertiesFieldModel<T extends Bean>
+		extends AbstractSimpleFieldModel<T, Collection<? extends Property>, JSplitPane> {
 
 	private final Entity entity;
 
@@ -42,7 +43,7 @@ class PropertiesFieldModel<T extends Bean> extends SimpleFieldModel<T, Collectio
 	}
 
 	@Override
-	public FieldComponent<Collection<? extends Property>, JSplitPane> createComponent(final T contextBean,
+	protected FieldComponent<Collection<? extends Property>, JSplitPane> createNewComponent(final T contextBean,
 			final ApplicationContext context) throws ModelException {
 		return new PropertiesComponent(context, entity, componentFactory.isWritable());
 	}

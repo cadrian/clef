@@ -16,8 +16,8 @@
  */
 package net.cadrian.clef.ui.app.form.model;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.swing.JComponent;
 
@@ -32,23 +32,15 @@ import net.cadrian.clef.ui.app.form.field.text.TextFieldComponentFactory;
 
 public class PieceFormModel extends BeanFormModel<Piece> {
 
-	private static final Map<String, FieldComponentFactory<Piece, ?, ? extends JComponent>> COMPONENT_FACTORIES = new LinkedHashMap<>();
-	static {
-		final TextFieldComponentFactory<Piece> nameFactory = new TextFieldComponentFactory<>(true);
-		final NumericFieldComponentFactory<Piece> versionFactory = new NumericFieldComponentFactory<>(false);
-		final NumericFieldComponentFactory<Piece> durationFactory = new NumericFieldComponentFactory<>(true);
-		final PropertiesComponentFactory<Piece> propertiesFactory = new PropertiesComponentFactory<>(Entity.piece,
-				true);
-		final TextAreaComponentFactory<Piece> notesFactory = new TextAreaComponentFactory<>(true);
-		COMPONENT_FACTORIES.put("Name", nameFactory);
-		COMPONENT_FACTORIES.put("Version", versionFactory);
-		COMPONENT_FACTORIES.put("Duration", durationFactory);
-		COMPONENT_FACTORIES.put("Notes", notesFactory);
-		COMPONENT_FACTORIES.put("Properties", propertiesFactory);
-	}
+	private static final Collection<FieldComponentFactory<Piece, ?, ? extends JComponent>> COMPONENT_FACTORIES = Arrays
+			.asList(new TextFieldComponentFactory<>(Piece.class, "Name", true),
+					new NumericFieldComponentFactory<>(Piece.class, "Version", false),
+					new NumericFieldComponentFactory<>(Piece.class, "Duration", true),
+					new TextAreaComponentFactory<>(Piece.class, "Notes", true),
+					new PropertiesComponentFactory<>(Piece.class, "Properties", Entity.piece, true));
 
 	public PieceFormModel() {
-		super(Piece.class, COMPONENT_FACTORIES);
+		super(COMPONENT_FACTORIES);
 	}
 
 }

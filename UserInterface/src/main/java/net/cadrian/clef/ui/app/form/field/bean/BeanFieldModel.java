@@ -23,11 +23,11 @@ import javax.swing.JTextField;
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
-import net.cadrian.clef.ui.app.form.field.SimpleFieldModel;
 
-class BeanFieldModel<T extends Bean, D extends Bean> extends SimpleFieldModel<T, D, JTextField> {
+class BeanFieldModel<T extends Bean, D extends Bean> extends AbstractSimpleFieldModel<T, D, JTextField> {
 
 	BeanFieldModel(final String name, final String tab, final Method getter, final Method setter,
 			final FieldComponentFactory<T, D, JTextField> componentFactory) {
@@ -35,7 +35,7 @@ class BeanFieldModel<T extends Bean, D extends Bean> extends SimpleFieldModel<T,
 	}
 
 	@Override
-	public FieldComponent<D, JTextField> createComponent(final T contextBean, final ApplicationContext context)
+	protected FieldComponent<D, JTextField> createNewComponent(final T contextBean, final ApplicationContext context)
 			throws ModelException {
 		return new BeanComponent<>(componentFactory.isWritable());
 	}

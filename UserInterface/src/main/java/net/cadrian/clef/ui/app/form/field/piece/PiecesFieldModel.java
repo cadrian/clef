@@ -26,12 +26,12 @@ import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.BeanCreator;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.BeanGetter;
+import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
-import net.cadrian.clef.ui.app.form.field.SimpleFieldModel;
 import net.cadrian.clef.ui.app.tab.DataPane;
 
-class PiecesFieldModel extends SimpleFieldModel<Work, Collection<Piece>, DataPane<Piece>> {
+class PiecesFieldModel extends AbstractSimpleFieldModel<Work, Collection<Piece>, DataPane<Piece>> {
 
 	private final BeanFormModel<Piece> beanFormModel;
 
@@ -43,7 +43,7 @@ class PiecesFieldModel extends SimpleFieldModel<Work, Collection<Piece>, DataPan
 	}
 
 	@Override
-	public FieldComponent<Collection<Piece>, DataPane<Piece>> createComponent(final Work contextBean,
+	protected FieldComponent<Collection<Piece>, DataPane<Piece>> createNewComponent(final Work contextBean,
 			final ApplicationContext context) throws ModelException {
 		final BeanGetter<Piece> beanGetter = () -> contextBean.getPieces();
 		final BeanCreator<Piece> beanCreator = () -> context.getBeans().createPiece(contextBean);

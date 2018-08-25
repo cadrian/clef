@@ -49,6 +49,9 @@ public class DateSelector extends JPanel {
 	private final DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	private boolean dirty;
 
+	private DateSelector upperBound;
+	private DateSelector lowerBound;
+
 	public DateSelector(final ApplicationContext context, final boolean writable) {
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -63,6 +66,9 @@ public class DateSelector extends JPanel {
 				date = new Date();
 				display.setText(df.format(date));
 				dirty = true;
+				if (upperBound != null && upperBound.getDate().before(date)) {
+					upperBound.setDate(date, true);
+				}
 			}
 
 		};
@@ -75,6 +81,12 @@ public class DateSelector extends JPanel {
 				final DateComponentPicker picker = new DateComponentPicker(context, date);
 				picker.setVisible(true);
 				date = picker.getDate();
+				if (lowerBound != null && lowerBound.getDate().after(date)) {
+					date = lowerBound.getDate();
+				}
+				if (upperBound != null && upperBound.getDate().before(date)) {
+					upperBound.setDate(date, true);
+				}
 				display.setText(df.format(date));
 				dirty = true;
 			}
@@ -93,6 +105,14 @@ public class DateSelector extends JPanel {
 		add(context.getPresentation().awesome(buttons));
 	}
 
+	public void setUpperBound(final DateSelector upperBound) {
+		this.upperBound = upperBound;
+	}
+
+	public void setLowerBound(final DateSelector lowerBound) {
+		this.lowerBound = lowerBound;
+	}
+
 	public Action getRefreshAction() {
 		return refresh;
 	}
@@ -105,9 +125,9 @@ public class DateSelector extends JPanel {
 		return date;
 	}
 
-	public void setDate(final Date date) {
+	private void setDate(final Date date, final boolean dirty) {
 		this.date = date;
-		dirty = false;
+		this.dirty = dirty;
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
@@ -115,6 +135,10 @@ public class DateSelector extends JPanel {
 				display.setText(date == null ? "" : df.format(date));
 			}
 		});
+	}
+
+	public void setDate(final Date date) {
+		setDate(date, false);
 	}
 
 	public String getDateString() {

@@ -16,8 +16,8 @@
  */
 package net.cadrian.clef.ui.app.form.model;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.swing.JComponent;
 
@@ -31,19 +31,13 @@ import net.cadrian.clef.ui.app.form.field.text.TextFieldComponentFactory;
 
 public class AuthorFormModel extends BeanFormModel<Author> {
 
-	private static final Map<String, FieldComponentFactory<Author, ?, ? extends JComponent>> COMPONENT_FACTORIES = new LinkedHashMap<>();
-	static {
-		final TextFieldComponentFactory<Author> nameFactory = new TextFieldComponentFactory<>(true);
-		final TextAreaComponentFactory<Author> notesFactory = new TextAreaComponentFactory<>(true);
-		final PropertiesComponentFactory<Author> propertiesFactory = new PropertiesComponentFactory<>(Entity.author,
-				true);
-		COMPONENT_FACTORIES.put("Name", nameFactory);
-		COMPONENT_FACTORIES.put("Notes", notesFactory);
-		COMPONENT_FACTORIES.put("Properties", propertiesFactory);
-	}
+	private static final Collection<FieldComponentFactory<Author, ?, ? extends JComponent>> COMPONENT_FACTORIES = Arrays
+			.asList(new TextFieldComponentFactory<>(Author.class, "Name", true),
+					new TextAreaComponentFactory<>(Author.class, "Notes", true),
+					new PropertiesComponentFactory<>(Author.class, "Properties", Entity.author, true));
 
 	public AuthorFormModel(final Class<Author> beanType) {
-		super(beanType, COMPONENT_FACTORIES);
+		super(COMPONENT_FACTORIES);
 	}
 
 }

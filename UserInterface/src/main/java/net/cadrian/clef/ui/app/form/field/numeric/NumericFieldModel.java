@@ -23,11 +23,11 @@ import javax.swing.JFormattedTextField;
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
-import net.cadrian.clef.ui.app.form.field.SimpleFieldModel;
 
-class NumericFieldModel<T extends Bean> extends SimpleFieldModel<T, Long, JFormattedTextField> {
+class NumericFieldModel<T extends Bean> extends AbstractSimpleFieldModel<T, Long, JFormattedTextField> {
 
 	NumericFieldModel(final String name, final String tab, final Method getter, final Method setter,
 			final FieldComponentFactory<T, Long, JFormattedTextField> componentFactory) {
@@ -35,7 +35,7 @@ class NumericFieldModel<T extends Bean> extends SimpleFieldModel<T, Long, JForma
 	}
 
 	@Override
-	public FieldComponent<Long, JFormattedTextField> createComponent(final T contextBean,
+	protected FieldComponent<Long, JFormattedTextField> createNewComponent(final T contextBean,
 			final ApplicationContext context) throws ModelException {
 		return new NumericFieldComponent(componentFactory.isWritable());
 	}

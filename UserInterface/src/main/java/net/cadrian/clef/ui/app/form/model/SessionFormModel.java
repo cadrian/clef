@@ -16,8 +16,8 @@
  */
 package net.cadrian.clef.ui.app.form.model;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.swing.JComponent;
 
@@ -31,21 +31,19 @@ import net.cadrian.clef.ui.app.form.field.text.TextAreaComponentFactory;
 
 public class SessionFormModel extends BeanFormModel<Session> {
 
-	private static final Map<String, FieldComponentFactory<Session, ?, ? extends JComponent>> COMPONENT_FACTORIES = new LinkedHashMap<>();
+	private static final Collection<FieldComponentFactory<Session, ?, ? extends JComponent>> COMPONENT_FACTORIES;
 	static {
-		final DateComponentFactory<Session> startFactory = new DateComponentFactory<>(false);
-		final DateComponentFactory<Session> stopFactory = new DateComponentFactory<>(true);
-		final TextAreaComponentFactory<Session> notesFactory = new TextAreaComponentFactory<>(true);
-		final PropertiesComponentFactory<Session> propertiesFactory = new PropertiesComponentFactory<>(Entity.session,
-				true);
-		COMPONENT_FACTORIES.put("Start", startFactory);
-		COMPONENT_FACTORIES.put("Stop", stopFactory);
-		COMPONENT_FACTORIES.put("Notes", notesFactory);
-		COMPONENT_FACTORIES.put("Properties", propertiesFactory);
+		final DateComponentFactory<Session> startFactory = new DateComponentFactory<>(Session.class, "Start", false);
+		final DateComponentFactory<Session> stopFactory = new DateComponentFactory<>(Session.class, "Stop", true);
+		startFactory.setUpperBound(stopFactory);
+		stopFactory.setLowerBound(startFactory);
+		COMPONENT_FACTORIES = Arrays.asList(startFactory, stopFactory,
+				new TextAreaComponentFactory<>(Session.class, "Notes", true),
+				new PropertiesComponentFactory<>(Session.class, "Properties", Entity.session, true));
 	}
 
 	public SessionFormModel(final Class<Session> beanType) {
-		super(beanType, COMPONENT_FACTORIES);
+		super(COMPONENT_FACTORIES);
 	}
 
 }

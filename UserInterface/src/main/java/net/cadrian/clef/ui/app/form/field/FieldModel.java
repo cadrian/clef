@@ -34,4 +34,7 @@ public interface FieldModel<T extends Bean, D, J extends JComponent> {
 
 	D load(T bean);
 
+	default void created(final T contextBean, final ApplicationContext context, final FieldComponent<D, J> component) {
+	}
+
 }

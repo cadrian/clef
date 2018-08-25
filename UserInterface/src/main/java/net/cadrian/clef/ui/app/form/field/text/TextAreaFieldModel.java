@@ -21,12 +21,12 @@ import java.lang.reflect.Method;
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
-import net.cadrian.clef.ui.app.form.field.SimpleFieldModel;
 import net.cadrian.clef.ui.widget.rte.RichTextEditor;
 
-class TextAreaFieldModel<T extends Bean> extends SimpleFieldModel<T, String, RichTextEditor> {
+class TextAreaFieldModel<T extends Bean> extends AbstractSimpleFieldModel<T, String, RichTextEditor> {
 
 	TextAreaFieldModel(final String name, final String tab, final Method getter, final Method setter,
 			final FieldComponentFactory<T, String, RichTextEditor> componentFactory) {
@@ -34,8 +34,8 @@ class TextAreaFieldModel<T extends Bean> extends SimpleFieldModel<T, String, Ric
 	}
 
 	@Override
-	public FieldComponent<String, RichTextEditor> createComponent(final T contextBean, final ApplicationContext context)
-			throws ModelException {
+	protected FieldComponent<String, RichTextEditor> createNewComponent(final T contextBean,
+			final ApplicationContext context) throws ModelException {
 		return new TextAreaComponent(context, componentFactory.isWritable());
 	}
 

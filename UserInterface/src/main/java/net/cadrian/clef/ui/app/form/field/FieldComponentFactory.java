@@ -23,7 +23,14 @@ import net.cadrian.clef.model.ModelException;
 
 public interface FieldComponentFactory<T extends Bean, D, J extends JComponent> {
 
-	FieldModel<T, D, J> createModel(Class<T> beanType, String fieldName) throws ModelException;
+	FieldModel<T, D, J> createModel() throws ModelException;
+
+	default void created(final FieldModel<T, D, J> model) {
+	}
+
+	Class<T> getBeanType();
+
+	String getFieldName();
 
 	Class<?> getDataType();
 
