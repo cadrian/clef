@@ -271,6 +271,22 @@ public class ModelBeans implements Beans {
 	}
 
 	@Override
+	public Piece createPieceVersion(Piece piece) {
+		final PieceBean result;
+		try {
+			final net.cadrian.clef.database.bean.Piece template = new net.cadrian.clef.database.bean.Piece();
+			template.setWorkId(((WorkBean) piece.getWork()).getId());
+			template.setPreviousId(((PieceBean) piece).getId());
+			final net.cadrian.clef.database.bean.Piece bean = db.getPieces().insert(template);
+			result = new PieceBean(bean, db);
+			piecesCache.put(bean.getId(), result);
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+		return result;
+	}
+
+	@Override
 	public Session createSession(final Piece piece) {
 		final SessionBean result;
 		try {

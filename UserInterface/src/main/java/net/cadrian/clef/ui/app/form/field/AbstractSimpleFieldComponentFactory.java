@@ -80,7 +80,7 @@ public abstract class AbstractSimpleFieldComponentFactory<T extends Bean, D, J e
 				final Method getter = beanType.getMethod("get" + fieldName);
 				if (!getter.getReturnType().equals(dataType)) {
 					LOGGER.error("BUG: invalid field model for {} -- {} vs {}", fieldName,
-							getter.getReturnType().getName(), dataType.getName());
+							getter.getReturnType().getName(), dataType.getName(), new Exception("BUG"));
 				} else {
 					final Method setter;
 					if (isWritable()) {

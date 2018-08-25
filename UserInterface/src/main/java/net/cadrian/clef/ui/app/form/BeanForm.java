@@ -109,9 +109,9 @@ public class BeanForm<T extends Bean> extends JPanel {
 	}
 
 	private <D, J extends JComponent> FieldView<T, D, J> getFieldView(final T bean, final ApplicationContext context,
-			final FieldModel<T, D, J> model) {
-		final FieldComponent<D, J> component = model.createComponent(bean, context);
-		return new FieldView<>(model, component);
+			final FieldModel<T, D, J> fieldModel) {
+		final FieldComponent<D, J> component = fieldModel.createComponent(bean, context);
+		return new FieldView<>(fieldModel, component);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -36,6 +36,8 @@ public interface Beans {
 
 	Piece createPiece(Work work);
 
+	Piece createPieceVersion(Piece piece);
+
 	Work createWork(Author author, Pricing pricing);
 
 	Author createAuthor();

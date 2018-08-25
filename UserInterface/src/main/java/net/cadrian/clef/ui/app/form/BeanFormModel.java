@@ -43,8 +43,9 @@ public abstract class BeanFormModel<T extends Bean> {
 		for (final FieldComponentFactory<T, ?, ? extends JComponent> componentFactory : componentFactories) {
 			final String fieldName = componentFactory.getFieldName();
 			LOGGER.info("Adding field model for {}", fieldName);
-			final FieldModel<T, ?, ?> model = componentFactory.createModel();
-			fields.put(fieldName, model);
+			final FieldModel<T, ?, ?> fieldModel = componentFactory.createModel();
+			fields.put(fieldName, fieldModel);
+			LOGGER.info("Added field model for {}: {}", fieldName, fieldModel);
 		}
 		for (final FieldComponentFactory<T, ?, ? extends JComponent> componentFactory : componentFactories) {
 			final String fieldName = componentFactory.getFieldName();

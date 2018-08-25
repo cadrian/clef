@@ -17,7 +17,13 @@
 package net.cadrian.clef.database.model.bean;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.database.DatabaseException;
 import net.cadrian.clef.database.bean.Work;
@@ -27,6 +33,8 @@ import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Pricing;
 
 public class WorkBean extends AbstractPropertyBean implements net.cadrian.clef.model.bean.Work {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WorkBean.class);
 
 	private final Work bean;
 
@@ -75,6 +83,23 @@ public class WorkBean extends AbstractPropertyBean implements net.cadrian.clef.m
 			template.setWorkId(getId());
 			final Map<Long, net.cadrian.clef.database.bean.Piece> pieces = db.getPieces().readMany(template, true);
 			result = db.getPieces(pieces.keySet());
+			// filter out older versions
+			final Set<PieceBean> old = new HashSet<>(result.size());
+			for (final PieceBean piece : result) {
+				final PieceBean previous = (PieceBean) piece.getPrevious();
+				if (previous != null) {
+					LOGGER.debug("old version: {}", previous);
+					old.add(previous);
+				}
+			}
+			final Iterator<PieceBean> it = result.iterator();
+			while (it.hasNext()) {
+				final PieceBean piece = it.next();
+				if (old.contains(piece)) {
+					LOGGER.debug("remove version: {}", piece);
+					it.remove();
+				}
+			}
 		} catch (final DatabaseException e) {
 			throw new ModelException(e);
 		}

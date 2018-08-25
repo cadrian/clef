@@ -29,7 +29,7 @@ import net.cadrian.clef.ui.app.tab.DataPane;
 
 class PiecesComponent implements FieldComponent<Collection<Piece>, DataPane<Piece>> {
 
-	private final DataPane<Piece> component;
+	final DataPane<Piece> component;
 
 	public PiecesComponent(final ApplicationContext context, final BeanGetter<Piece> beanGetter,
 			final BeanCreator<Piece> beanCreator, final BeanFormModel<Piece> beanFormModel) {

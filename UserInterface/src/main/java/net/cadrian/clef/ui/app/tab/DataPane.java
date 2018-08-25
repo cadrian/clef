@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -68,6 +69,8 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	private final BeanGetter<T> beanGetter;
 	private final BeanCreator<T> beanCreator;
 	private final ApplicationContext context;
+	private final BeanFormModel<T> beanFormModel;
+	private final List<String> tabs;
 
 	private BeanForm<T> currentForm;
 
@@ -81,9 +84,11 @@ public class DataPane<T extends Bean> extends JSplitPane {
 			final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final Comparator<T> beanComparator,
 			final BeanFormModel<T> beanFormModel, final List<String> tabs) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
-		this.beanGetter = beanGetter;
-		this.beanCreator = beanCreator;
-		this.context = context;
+		this.beanGetter = Objects.requireNonNull(beanGetter);
+		this.beanCreator = Objects.requireNonNull(beanCreator);
+		this.context = Objects.requireNonNull(context);
+		this.beanFormModel = Objects.requireNonNull(beanFormModel);
+		this.tabs = tabs;
 
 		model = new SortableListModel<>(beanComparator);
 		list = new JList<>(model);
@@ -100,28 +105,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 					LOGGER.debug("value still adjusting");
 					current.setEnabled(false);
 				} else {
-					final T selected = list.getSelectedValue();
-					current.removeAll();
-					if (selected != null) {
-						LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
-						currentForm = new BeanForm<>(context, selected, beanFormModel, tabs);
-						current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
-						currentForm.load();
-						delAction.setEnabled(true);
-						if (saveAction != null) {
-							saveAction.setEnabled(true);
-						}
-					} else {
-						LOGGER.debug("Selected nothing");
-						currentForm = null;
-						current.add(new JPanel());
-						delAction.setEnabled(false);
-						if (saveAction != null) {
-							saveAction.setEnabled(false);
-						}
-					}
-					current.setEnabled(true);
-					current.revalidate();
+					installBeanForm(list.getSelectedValue());
 				}
 			}
 		});
@@ -189,6 +173,39 @@ public class DataPane<T extends Bean> extends JSplitPane {
 
 	public T getSelection() {
 		return list.getSelectedValue();
+	}
+
+	public void select(T version, boolean refresh) {
+		LOGGER.debug("Select version: {}", version);
+		if (refresh) {
+			refreshList(version);
+		} else {
+			installBeanForm(version);
+		}
+	}
+
+	private void installBeanForm(final T selected) {
+		current.removeAll();
+		if (selected != null) {
+			LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
+			currentForm = new BeanForm<>(context, selected, beanFormModel, tabs);
+			current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
+			currentForm.load();
+			delAction.setEnabled(true);
+			if (saveAction != null) {
+				saveAction.setEnabled(true);
+			}
+		} else {
+			LOGGER.debug("Selected nothing");
+			currentForm = null;
+			current.add(new JPanel());
+			delAction.setEnabled(false);
+			if (saveAction != null) {
+				saveAction.setEnabled(false);
+			}
+		}
+		current.setEnabled(true);
+		current.revalidate();
 	}
 
 	void addData() {
