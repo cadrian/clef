@@ -172,7 +172,7 @@ public class SessionCreator implements BeanCreator<Session> {
 		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 		buttons.setFloatable(false);
 		buttons.add(addAction);
-		paramsContent.add(presentation.awesome(buttons), BorderLayout.SOUTH);
+		paramsContent.add(presentation.awesome(buttons), BorderLayout.NORTH);
 
 		params.pack();
 		params.setLocationRelativeTo(presentation.getApplicationFrame());

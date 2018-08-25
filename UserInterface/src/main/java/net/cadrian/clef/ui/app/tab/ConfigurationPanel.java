@@ -193,7 +193,7 @@ public class ConfigurationPanel extends JTabbedPane {
 		buttons.add(saveAction);
 		buttons.add(new JSeparator(SwingConstants.VERTICAL));
 		buttons.add(delAction);
-		result.add(context.getPresentation().awesome(buttons), BorderLayout.SOUTH);
+		result.add(context.getPresentation().awesome(buttons), BorderLayout.NORTH);
 
 		delAction.setEnabled(false);
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {

@@ -105,7 +105,7 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 					if (selected != null) {
 						LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
 						@SuppressWarnings("unchecked")
-						final C contextBean = (C) selected;
+						final C contextBean = (C) selected; // TODO plainly wrong
 						currentForm = new BeanForm<>(context, contextBean, selected, beanFormModel, tabs);
 						current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
 						currentForm.load();
@@ -172,7 +172,7 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 		}
 		buttons.add(new JSeparator(SwingConstants.VERTICAL));
 		buttons.add(delAction);
-		left.add(context.getPresentation().awesome(buttons), BorderLayout.PAGE_END);
+		left.add(context.getPresentation().awesome(buttons), BorderLayout.NORTH);
 
 		setLeftComponent(left);
 		setRightComponent(current);
