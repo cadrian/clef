@@ -48,7 +48,8 @@ class FilePropertyEditor extends AbstractFilePropertyEditor {
 
 	FilePropertyEditor(final ApplicationContext context, final boolean writable, final EditableProperty property) {
 		super(context, writable, property);
-		final byte[] serializedData = BASE64_DECODER.decode(property.getValue());
+		final String value = property.getValue();
+		final byte[] serializedData = BASE64_DECODER.decode(value.getBytes());
 		final int sep = indexOfSep(serializedData);
 		final String path = new String(serializedData, 0, sep);
 		content.setFile(path);
@@ -74,16 +75,20 @@ class FilePropertyEditor extends AbstractFilePropertyEditor {
 			LOGGER.error("error while reading file, not saving data", e);
 		}
 
-		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-			out.write(path.getBytes());
-			if (data != null) {
-				out.write(0);
-				out.write(data);
-			}
-		} catch (final IOException e) {
-			LOGGER.error("error while serializing data", e);
+		byte[] serializedData;
+		if (data == null) {
+			serializedData = path.getBytes();
+		} else {
+			final byte[] pathBytes = path.getBytes();
+			final int sep = pathBytes.length;
+			serializedData = new byte[sep + 1 + data.length];
+			System.arraycopy(pathBytes, 0, serializedData, 0, sep);
+			serializedData[sep] = 0;
+			System.arraycopy(data, 0, serializedData, sep + 1, data.length);
 		}
-		property.setValue(BASE64_ENCODER.encodeToString(data));
+
+		final String value = BASE64_ENCODER.encodeToString(serializedData);
+		property.setValue(value);
 		content.markSave();
 	}
 
