@@ -32,8 +32,9 @@ class FilePropertyDownloadFilter implements DownloadFilter {
 
 	private final String ext;
 	private final byte[] data;
+	private final int count;
 
-	public FilePropertyDownloadFilter(final String path, final byte[] data) {
+	public FilePropertyDownloadFilter(final String path, final byte[] data, final int count) {
 		final int dot = path.lastIndexOf('.');
 		final int sep = path.lastIndexOf(File.separatorChar);
 		if (dot > sep) {
@@ -43,13 +44,14 @@ class FilePropertyDownloadFilter implements DownloadFilter {
 		}
 
 		this.data = data;
+		this.count = count;
 	}
 
 	@Override
 	public File download(final File file) throws IOException {
 		final File temp = File.createTempFile("clef", ext);
 		try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(temp))) {
-			out.write(data);
+			out.write(data, 0, count);
 		}
 		temp.deleteOnExit();
 		LOGGER.debug("Opening {}", temp);

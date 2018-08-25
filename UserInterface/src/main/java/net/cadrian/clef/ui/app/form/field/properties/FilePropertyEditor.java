@@ -17,10 +17,13 @@
 package net.cadrian.clef.ui.app.form.field.properties;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Base64.Encoder;
@@ -39,73 +42,104 @@ class FilePropertyEditor extends AbstractFilePropertyEditor {
 	private static final Encoder BASE64_ENCODER = Base64.getEncoder();
 	private static final Decoder BASE64_DECODER = Base64.getDecoder();
 
-	private static int indexOfSep(final byte[] data) {
-		for (int i = 0; i < data.length; i++) {
-			if (data[i] == 0) {
-				return i;
-			}
-		}
-		return data.length;
-	}
-
 	FilePropertyEditor(final ApplicationContext context, final boolean writable, final EditableProperty property) {
 		super(context, writable, property);
 		final String value = property.getValue();
-		final byte[] serializedData = BASE64_DECODER.decode(value.getBytes());
-		final int sep = indexOfSep(serializedData);
-		final String path = new String(serializedData, 0, sep);
-		content.setFile(path);
+
+		try (ByteArrayInputStream in = new ByteArrayInputStream(value.getBytes());
+				InputStream b64 = BASE64_DECODER.wrap(in);
+				SpecialByteArrayOutputStream pathout = new SpecialByteArrayOutputStream()) {
+			String path = null;
+			while (true) {
+				final int b = b64.read();
+				if (b > 0) {
+					pathout.write(b);
+				} else {
+					path = pathout.toString();
+					break;
+				}
+			}
+			content.setFile(path);
+		} catch (final IOException e) {
+			LOGGER.error("error while reading file, not reading data", e);
+		}
 	}
 
 	@Override
 	public void save() {
 		final File file = content.getFile();
 		final String path = file.getAbsolutePath();
-		byte[] data = null;
+		String value = null;
 
 		// TODO support big files (1.5Gb max for now -- because of BASE64)
 
 		try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-				ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+				ByteArrayOutputStream valueout = new ByteArrayOutputStream();
+				OutputStream b64 = BASE64_ENCODER.wrap(valueout)) {
+			b64.write(path.getBytes());
+			b64.write(0);
 			final byte[] buffer = new byte[4096];
 			int n;
 			while ((n = in.read(buffer)) >= 0) {
-				out.write(buffer, 0, n);
+				b64.write(buffer, 0, n);
 			}
-			data = out.toByteArray();
+			value = new String(valueout.toByteArray());
 		} catch (final IOException e) {
 			LOGGER.error("error while reading file, not saving data", e);
+			value = path;
 		}
 
-		byte[] serializedData;
-		if (data == null) {
-			serializedData = path.getBytes();
-		} else {
-			final byte[] pathBytes = path.getBytes();
-			final int sep = pathBytes.length;
-			serializedData = new byte[sep + 1 + data.length];
-			System.arraycopy(pathBytes, 0, serializedData, 0, sep);
-			serializedData[sep] = 0;
-			System.arraycopy(data, 0, serializedData, sep + 1, data.length);
-		}
-
-		final String value = BASE64_ENCODER.encodeToString(serializedData);
 		property.setValue(value);
 		content.markSave();
 	}
 
+	private static class SpecialByteArrayOutputStream extends ByteArrayOutputStream {
+		FilePropertyDownloadFilter getDownloadFilter(final String path) {
+			return new FilePropertyDownloadFilter(path, buf, count);
+		}
+	}
+
 	@Override
 	protected DownloadFilter getDownloadFilter(final ApplicationContext context) {
-		final byte[] serializedData = BASE64_DECODER.decode(property.getValue().getBytes());
-		final int sep = indexOfSep(serializedData);
-		final String path = new String(serializedData, 0, sep);
-		final int length = serializedData.length - sep - 1;
-		if (length < 0) {
-			return new DefaultDownloadFilter();
+		final String value = property.getValue();
+		try (ByteArrayInputStream in = new ByteArrayInputStream(value.getBytes());
+				InputStream b64 = BASE64_DECODER.wrap(in);
+				SpecialByteArrayOutputStream pathout = new SpecialByteArrayOutputStream();
+				SpecialByteArrayOutputStream dataout = new SpecialByteArrayOutputStream();) {
+			int state = 0;
+			while (state >= 0) {
+				final int b = b64.read();
+				switch (b) {
+				case -1:
+					state = -1;
+					break;
+				case 0:
+					switch (state) {
+					case 0:
+						state = 1;
+						break;
+					case 1:
+						dataout.write(b);
+						break;
+					}
+					break;
+				default:
+					switch (state) {
+					case 0:
+						pathout.write(b);
+						break;
+					case 1:
+						dataout.write(b);
+						break;
+					}
+				}
+			}
+			return dataout.getDownloadFilter(pathout.toString());
+		} catch (final IOException e) {
+			LOGGER.error("error while reading file, not reading data", e);
 		}
-		final byte[] data = new byte[length];
-		System.arraycopy(serializedData, sep + 1, data, 0, length);
-		return new FilePropertyDownloadFilter(path, data);
+
+		return new DefaultDownloadFilter();
 	}
 
 }
