@@ -17,6 +17,7 @@
 package net.cadrian.clef.ui.widget.rte;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -84,6 +85,7 @@ public class RichTextEditor extends JPanel {
 		undoManager.setLimit(0);
 
 		editor.setDocument(document);
+		kit.setDefaultCursor(new Cursor(Cursor.TEXT_CURSOR));
 		add(new JScrollPane(editor), BorderLayout.CENTER);
 		final JToolBar tools = new JToolBar(SwingConstants.HORIZONTAL);
 		tools.setFloatable(false);
