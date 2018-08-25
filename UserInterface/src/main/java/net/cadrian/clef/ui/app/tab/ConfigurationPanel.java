@@ -137,7 +137,8 @@ public class ConfigurationPanel extends JTabbedPane {
 
 		final Presentation presentation = context.getPresentation();
 		for (final ConfigurableBeanDescription configurableBean : CONFIGURABLE_BEANS) {
-			addTab(presentation.getMessage(configurableBean.name), configurationPanel(context, configurableBean));
+			addTab(presentation.getMessage("Configuration." + configurableBean.name),
+					configurationPanel(context, configurableBean));
 		}
 
 		addTab(presentation.getMessage("AdvancedConfiguration"), advancedConfigurationPanel(context));

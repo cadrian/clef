@@ -112,7 +112,7 @@ public class DateSelector extends JPanel {
 
 			@Override
 			public void run() {
-				display.setText(df.format(date));
+				display.setText(date == null ? "" : df.format(date));
 			}
 		});
 	}

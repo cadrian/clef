@@ -92,13 +92,17 @@ public class WorkCreator implements BeanCreator<Work> {
 
 		final JList<Author> authors = new JList<>(authorsModel);
 		final JPanel authorsPanel = new JPanel(new BorderLayout());
-		authorsPanel.add(presentation.bold(new JLabel(presentation.getMessage("WorkCreatorAuthorsTitle"))),
+		authorsPanel.add(
+				presentation
+						.bold(new JLabel(presentation.getMessage("WorkCreatorAuthorsTitle"), SwingConstants.CENTER)),
 				BorderLayout.NORTH);
 		authorsPanel.add(new JScrollPane(authors), BorderLayout.CENTER);
 
 		final JList<Pricing> pricings = new JList<>(pricingsModel);
 		final JPanel pricingsPanel = new JPanel(new BorderLayout());
-		pricingsPanel.add(presentation.bold(new JLabel(presentation.getMessage("WorkCreatorPricingsTitle"))),
+		pricingsPanel.add(
+				presentation
+						.bold(new JLabel(presentation.getMessage("WorkCreatorPricingsTitle"), SwingConstants.CENTER)),
 				BorderLayout.NORTH);
 		pricingsPanel.add(new JScrollPane(pricings), BorderLayout.CENTER);
 

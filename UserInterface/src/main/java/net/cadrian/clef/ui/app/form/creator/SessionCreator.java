@@ -97,7 +97,9 @@ public class SessionCreator implements BeanCreator<Session> {
 
 		final JList<Work> works = new JList<>(worksModel);
 		final JPanel worksPanel = new JPanel(new BorderLayout());
-		worksPanel.add(presentation.bold(new JLabel(presentation.getMessage("SessionCreatorWorksTitle"))),
+		worksPanel.add(
+				presentation
+						.bold(new JLabel(presentation.getMessage("SessionCreatorWorksTitle"), SwingConstants.CENTER)),
 				BorderLayout.NORTH);
 		worksPanel.add(new JScrollPane(works), BorderLayout.CENTER);
 		works.addListSelectionListener(new ListSelectionListener() {
@@ -115,7 +117,9 @@ public class SessionCreator implements BeanCreator<Session> {
 
 		final JList<Piece> pieces = new JList<>(piecesModel);
 		final JPanel piecesPanel = new JPanel(new BorderLayout());
-		piecesPanel.add(presentation.bold(new JLabel(presentation.getMessage("SessionCreatorPiecesTitle"))),
+		piecesPanel.add(
+				presentation
+						.bold(new JLabel(presentation.getMessage("SessionCreatorPiecesTitle"), SwingConstants.CENTER)),
 				BorderLayout.NORTH);
 		piecesPanel.add(new JScrollPane(pieces), BorderLayout.CENTER);
 
