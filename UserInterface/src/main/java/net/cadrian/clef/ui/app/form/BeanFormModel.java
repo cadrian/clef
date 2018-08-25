@@ -16,6 +16,7 @@
  */
 package net.cadrian.clef.ui.app.form;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,24 +33,29 @@ public abstract class BeanFormModel<T extends Bean> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BeanFormModel.class);
 
-	private final Class<T> beanType;
 	private final Map<String, FieldModel<T, ?, ?>> fields = new LinkedHashMap<>();
 
-	protected BeanFormModel(final Class<T> beanType,
-			final Map<String, FieldComponentFactory<T, ?, ? extends JComponent>> componentFactories) {
-		this.beanType = beanType;
+	protected BeanFormModel(final Collection<FieldComponentFactory<T, ?, ? extends JComponent>> componentFactories) {
 		initFields(componentFactories);
 	}
 
-	private void initFields(final Map<String, FieldComponentFactory<T, ?, ? extends JComponent>> componentFactories) {
-		for (final Map.Entry<String, FieldComponentFactory<T, ?, ? extends JComponent>> entry : componentFactories
-				.entrySet()) {
-			final String fieldName = entry.getKey();
-			final FieldComponentFactory<T, ?, ? extends JComponent> componentFactory = entry.getValue();
+	private void initFields(final Collection<FieldComponentFactory<T, ?, ? extends JComponent>> componentFactories) {
+		for (final FieldComponentFactory<T, ?, ? extends JComponent> componentFactory : componentFactories) {
+			final String fieldName = componentFactory.getFieldName();
 			LOGGER.info("Adding field model for {}", fieldName);
-			final FieldModel<T, ?, ?> model = componentFactory.createModel(beanType, fieldName);
+			final FieldModel<T, ?, ?> model = componentFactory.createModel();
 			fields.put(fieldName, model);
 		}
+		for (final FieldComponentFactory<T, ?, ? extends JComponent> componentFactory : componentFactories) {
+			final String fieldName = componentFactory.getFieldName();
+			created(componentFactory, fieldName);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private <D, J extends JComponent> void created(final FieldComponentFactory<T, D, J> componentFactory,
+			final String fieldName) {
+		componentFactory.created((FieldModel<T, D, J>) fields.get(fieldName));
 	}
 
 	Map<String, FieldModel<T, ?, ?>> getFields() {

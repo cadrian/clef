@@ -27,12 +27,13 @@ import net.cadrian.clef.ui.app.form.field.FieldModel;
 public class NumericFieldComponentFactory<T extends Bean>
 		extends AbstractSimpleFieldComponentFactory<T, Long, JFormattedTextField> {
 
-	public NumericFieldComponentFactory(final boolean writable) {
-		this(writable, null);
+	public NumericFieldComponentFactory(final Class<T> beanType, final String fieldName, final boolean writable) {
+		this(beanType, fieldName, writable, null);
 	}
 
-	public NumericFieldComponentFactory(final boolean writable, final String tab) {
-		super(writable, tab);
+	public NumericFieldComponentFactory(final Class<T> beanType, final String fieldName, final boolean writable,
+			final String tab) {
+		super(beanType, fieldName, writable, tab);
 	}
 
 	@Override

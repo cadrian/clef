@@ -34,8 +34,8 @@ class TextAreaFieldModel<T extends Bean> extends SimpleFieldModel<T, String, Ric
 	}
 
 	@Override
-	public FieldComponent<String, RichTextEditor> createComponent(final T contextBean, final ApplicationContext context)
-			throws ModelException {
+	protected FieldComponent<String, RichTextEditor> createNewComponent(final T contextBean,
+			final ApplicationContext context) throws ModelException {
 		return new TextAreaComponent(context, componentFactory.isWritable());
 	}
 

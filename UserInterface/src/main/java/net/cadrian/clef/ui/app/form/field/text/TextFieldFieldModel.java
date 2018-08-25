@@ -35,8 +35,8 @@ class TextFieldFieldModel<T extends Bean> extends SimpleFieldModel<T, String, JT
 	}
 
 	@Override
-	public FieldComponent<String, JTextField> createComponent(final T contextBean, final ApplicationContext context)
-			throws ModelException {
+	protected FieldComponent<String, JTextField> createNewComponent(final T contextBean,
+			final ApplicationContext context) throws ModelException {
 		return new TextFieldComponent(componentFactory.isWritable());
 	}
 

@@ -18,6 +18,9 @@ package net.cadrian.clef.ui.app.form.field;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
 
@@ -26,10 +29,21 @@ import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
+import net.cadrian.clef.ui.ApplicationContext;
 
 public abstract class SimpleFieldModel<T extends Bean, D, J extends JComponent> implements FieldModel<T, D, J> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleFieldModel.class);
+
+	private static final Map<Bean, Map<String, FieldComponent<?, ?>>> CACHE = new WeakHashMap<>();
+
+	protected /* static */ FieldComponent<D, J> getCachedComponent(final T contextBean, final String name)
+			throws ModelException {
+		final Map<String, FieldComponent<?, ?>> cache = CACHE.get(contextBean);
+		@SuppressWarnings("unchecked")
+		final FieldComponent<D, J> result = cache == null ? null : (FieldComponent<D, J>) cache.get(name);
+		return result;
+	}
 
 	private final String name;
 	private final String tab;
@@ -45,6 +59,33 @@ public abstract class SimpleFieldModel<T extends Bean, D, J extends JComponent> 
 		this.setter = setter;
 		this.componentFactory = componentFactory;
 	}
+
+	@Override
+	public final FieldComponent<D, J> createComponent(final T contextBean, final ApplicationContext context)
+			throws ModelException {
+		FieldComponent<D, J> result = getCachedComponent(contextBean);
+		if (result == null) {
+			result = createNewComponent(contextBean, context);
+			setCachedComponent(contextBean, result);
+		}
+		return result;
+	}
+
+	private FieldComponent<D, J> getCachedComponent(final T contextBean) {
+		return getCachedComponent(contextBean, name);
+	}
+
+	private void setCachedComponent(final T contextBean, final FieldComponent<D, J> result) {
+		Map<String, FieldComponent<?, ?>> cache = CACHE.get(contextBean);
+		if (cache == null) {
+			cache = new HashMap<>();
+			CACHE.put(contextBean, cache);
+		}
+		cache.put(name, result);
+	}
+
+	protected abstract FieldComponent<D, J> createNewComponent(T contextBean, ApplicationContext context)
+			throws ModelException;
 
 	@Override
 	public String getName() {

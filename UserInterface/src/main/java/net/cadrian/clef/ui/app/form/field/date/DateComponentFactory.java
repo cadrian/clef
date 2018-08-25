@@ -26,12 +26,16 @@ import net.cadrian.clef.ui.widget.DateSelector;
 
 public class DateComponentFactory<T extends Bean> extends AbstractSimpleFieldComponentFactory<T, Date, DateSelector> {
 
-	public DateComponentFactory(final boolean writable) {
-		this(writable, null);
+	private DateComponentFactory<T> upperBound;
+	private DateComponentFactory<T> lowerBound;
+
+	public DateComponentFactory(final Class<T> beanType, final String fieldName, final boolean writable) {
+		this(beanType, fieldName, writable, null);
 	}
 
-	public DateComponentFactory(final boolean writable, final String tab) {
-		super(writable, tab);
+	public DateComponentFactory(final Class<T> beanType, final String fieldName, final boolean writable,
+			final String tab) {
+		super(beanType, fieldName, writable, tab);
 	}
 
 	@Override
@@ -41,8 +45,28 @@ public class DateComponentFactory<T extends Bean> extends AbstractSimpleFieldCom
 	}
 
 	@Override
+	public void created(FieldModel<T, Date, DateSelector> model) {
+		if (upperBound != null) {
+			((DateFieldModel<T>) model).setUpperBound(
+					(DateFieldModel<T>) getCachedModel(upperBound.getBeanType(), upperBound.getFieldName()));
+		}
+		if (lowerBound != null) {
+			((DateFieldModel<T>) model).setLowerBound(
+					(DateFieldModel<T>) getCachedModel(lowerBound.getBeanType(), lowerBound.getFieldName()));
+		}
+	}
+
+	@Override
 	public Class<Date> getDataType() {
 		return Date.class;
+	}
+
+	public void setUpperBound(final DateComponentFactory<T> upperBound) {
+		this.upperBound = upperBound;
+	}
+
+	public void setLowerBound(final DateComponentFactory<T> lowerBound) {
+		this.lowerBound = lowerBound;
 	}
 
 }

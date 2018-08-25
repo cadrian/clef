@@ -16,8 +16,8 @@
  */
 package net.cadrian.clef.ui.app.form.model;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.swing.JComponent;
 
@@ -35,27 +35,16 @@ import net.cadrian.clef.ui.app.form.field.text.TextFieldComponentFactory;
 
 public class WorkFormModel extends BeanFormModel<Work> {
 
-	private static final Map<String, FieldComponentFactory<Work, ?, ? extends JComponent>> COMPONENT_FACTORIES = new LinkedHashMap<>();
-	static {
-		final TextFieldComponentFactory<Work> nameFactory = new TextFieldComponentFactory<>(true, "Description");
-		final TextAreaComponentFactory<Work> notesFactory = new TextAreaComponentFactory<>(true, "Description");
-		final PropertiesComponentFactory<Work> propertiesFactory = new PropertiesComponentFactory<>(Entity.work, true,
-				"Description");
-		final BeanComponentFactory<Work, Author> authorFactory = new BeanComponentFactory<>(Author.class,
-				"Description");
-		final BeanComponentFactory<Work, Pricing> pricingFactory = new BeanComponentFactory<>(Pricing.class,
-				"Description");
-		final PiecesComponentFactory piecesFactory = new PiecesComponentFactory(new PieceFormModel(), "Pieces");
-		COMPONENT_FACTORIES.put("Author", authorFactory);
-		COMPONENT_FACTORIES.put("Pricing", pricingFactory);
-		COMPONENT_FACTORIES.put("Name", nameFactory);
-		COMPONENT_FACTORIES.put("Notes", notesFactory);
-		COMPONENT_FACTORIES.put("Properties", propertiesFactory);
-		COMPONENT_FACTORIES.put("Pieces", piecesFactory);
-	}
+	private static final Collection<FieldComponentFactory<Work, ?, ? extends JComponent>> COMPONENT_FACTORIES = Arrays
+			.asList(new BeanComponentFactory<>(Work.class, "Author", Author.class, "Description"),
+					new BeanComponentFactory<>(Work.class, "Pricing", Pricing.class, "Description"),
+					new TextFieldComponentFactory<>(Work.class, "Name", true, "Description"),
+					new TextAreaComponentFactory<>(Work.class, "Notes", true, "Description"),
+					new PropertiesComponentFactory<>(Work.class, "Properties", Entity.work, true, "Description"),
+					new PiecesComponentFactory(new PieceFormModel(), "Pieces"));
 
 	public WorkFormModel(final Class<Work> beanType) {
-		super(beanType, COMPONENT_FACTORIES);
+		super(COMPONENT_FACTORIES);
 	}
 
 }

@@ -26,12 +26,13 @@ import net.cadrian.clef.ui.widget.rte.RichTextEditor;
 public class TextAreaComponentFactory<T extends Bean>
 		extends AbstractSimpleFieldComponentFactory<T, String, RichTextEditor> {
 
-	public TextAreaComponentFactory(final boolean writable) {
-		this(writable, null);
+	public TextAreaComponentFactory(final Class<T> beanType, final String fieldName, final boolean writable) {
+		this(beanType, fieldName, writable, null);
 	}
 
-	public TextAreaComponentFactory(final boolean writable, final String tab) {
-		super(writable, tab);
+	public TextAreaComponentFactory(final Class<T> beanType, final String fieldName, final boolean writable,
+			final String tab) {
+		super(beanType, fieldName, writable, tab);
 	}
 
 	@Override

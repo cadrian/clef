@@ -35,7 +35,7 @@ class NumericFieldModel<T extends Bean> extends SimpleFieldModel<T, Long, JForma
 	}
 
 	@Override
-	public FieldComponent<Long, JFormattedTextField> createComponent(final T contextBean,
+	protected FieldComponent<Long, JFormattedTextField> createNewComponent(final T contextBean,
 			final ApplicationContext context) throws ModelException {
 		return new NumericFieldComponent(componentFactory.isWritable());
 	}

@@ -30,6 +30,7 @@ class DateComponent implements FieldComponent<Date, DateSelector> {
 
 	DateComponent(final ApplicationContext context, final boolean writable) {
 		final boolean w = context.getValue(AdvancedConfigurationEntry.allowStartWrite);
+
 		component = new DateSelector(context, writable || w);
 
 		context.addApplicationContextListener(AdvancedConfigurationEntry.allowStartWrite,
@@ -69,6 +70,14 @@ class DateComponent implements FieldComponent<Date, DateSelector> {
 	@Override
 	public boolean isDirty() {
 		return component.isDirty();
+	}
+
+	public void setUpperBound(final DateComponent upperBound) {
+		component.setUpperBound(upperBound.component);
+	}
+
+	public void setLowerBound(final DateComponent lowerBound) {
+		component.setLowerBound(lowerBound.component);
 	}
 
 }

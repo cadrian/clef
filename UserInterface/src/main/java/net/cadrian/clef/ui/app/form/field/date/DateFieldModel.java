@@ -29,15 +29,36 @@ import net.cadrian.clef.ui.widget.DateSelector;
 
 class DateFieldModel<T extends Bean> extends SimpleFieldModel<T, Date, DateSelector> {
 
+	private DateFieldModel<T> upperBound;
+	private DateFieldModel<T> lowerBound;
+
 	DateFieldModel(final String name, final String tab, final Method getter, final Method setter,
 			final FieldComponentFactory<T, Date, DateSelector> componentFactory) {
 		super(name, tab, getter, setter, componentFactory);
 	}
 
 	@Override
-	public FieldComponent<Date, DateSelector> createComponent(final T contextBean, final ApplicationContext context)
-			throws ModelException {
+	public void created(T contextBean, ApplicationContext context, FieldComponent<Date, DateSelector> component) {
+		if (upperBound != null) {
+			((DateComponent) component).setUpperBound((DateComponent) upperBound.createComponent(contextBean, context));
+		}
+		if (lowerBound != null) {
+			((DateComponent) component).setLowerBound((DateComponent) lowerBound.createComponent(contextBean, context));
+		}
+	}
+
+	@Override
+	protected FieldComponent<Date, DateSelector> createNewComponent(final T contextBean,
+			final ApplicationContext context) throws ModelException {
 		return new DateComponent(context, componentFactory.isWritable());
+	}
+
+	void setUpperBound(final DateFieldModel<T> upperBound) {
+		this.upperBound = upperBound;
+	}
+
+	void setLowerBound(final DateFieldModel<T> lowerBound) {
+		this.lowerBound = lowerBound;
 	}
 
 }

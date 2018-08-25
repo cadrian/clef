@@ -54,8 +54,11 @@ public class BeanForm<T extends Bean> extends JPanel {
 		this.bean = Objects.requireNonNull(bean);
 
 		for (final FieldModel<T, ?, ?> fieldModel : model.getFields().values()) {
-			final FieldView<T, ?, ?> fieldView = getFieldView(context, fieldModel, bean);
-			fields.put(fieldView.model.getName(), fieldView);
+			final FieldView<T, ?, ?> fieldView = getFieldView(bean, context, fieldModel);
+			fields.put(fieldModel.getName(), fieldView);
+		}
+		for (final FieldModel<T, ?, ?> fieldModel : model.getFields().values()) {
+			fieldCreated(bean, context, fieldModel);
 		}
 
 		final Presentation presentation = context.getPresentation();
@@ -105,10 +108,16 @@ public class BeanForm<T extends Bean> extends JPanel {
 		}
 	}
 
-	private <D, J extends JComponent> FieldView<T, D, J> getFieldView(final ApplicationContext context,
-			final FieldModel<T, D, J> model, final T bean) {
+	private <D, J extends JComponent> FieldView<T, D, J> getFieldView(final T bean, final ApplicationContext context,
+			final FieldModel<T, D, J> model) {
 		final FieldComponent<D, J> component = model.createComponent(bean, context);
 		return new FieldView<>(model, component);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <D, J extends JComponent> void fieldCreated(final T bean, final ApplicationContext context,
+			final FieldModel<T, D, J> fieldModel) {
+		fieldModel.created(bean, context, (FieldComponent<D, J>) fields.get(fieldModel.getName()).component);
 	}
 
 	public void load() {

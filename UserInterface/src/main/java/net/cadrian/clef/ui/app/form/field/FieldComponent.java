@@ -28,4 +28,5 @@ public interface FieldComponent<D, J extends JComponent> {
 	double getWeight();
 
 	boolean isDirty();
+
 }

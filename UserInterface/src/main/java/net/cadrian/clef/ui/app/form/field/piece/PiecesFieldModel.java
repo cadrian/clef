@@ -43,7 +43,7 @@ class PiecesFieldModel extends SimpleFieldModel<Work, Collection<Piece>, DataPan
 	}
 
 	@Override
-	public FieldComponent<Collection<Piece>, DataPane<Piece>> createComponent(final Work contextBean,
+	protected FieldComponent<Collection<Piece>, DataPane<Piece>> createNewComponent(final Work contextBean,
 			final ApplicationContext context) throws ModelException {
 		final BeanGetter<Piece> beanGetter = () -> contextBean.getPieces();
 		final BeanCreator<Piece> beanCreator = () -> context.getBeans().createPiece(contextBean);

@@ -32,7 +32,7 @@ public class PiecesComponentFactory
 	private final BeanFormModel<Piece> beanFormModel;
 
 	public PiecesComponentFactory(final BeanFormModel<Piece> beanFormModel, final String tab) {
-		super(false, tab);
+		super(Work.class, "Pieces", false, tab);
 		this.beanFormModel = beanFormModel;
 	}
 

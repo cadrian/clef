@@ -42,7 +42,7 @@ class PropertiesFieldModel<T extends Bean> extends SimpleFieldModel<T, Collectio
 	}
 
 	@Override
-	public FieldComponent<Collection<? extends Property>, JSplitPane> createComponent(final T contextBean,
+	protected FieldComponent<Collection<? extends Property>, JSplitPane> createNewComponent(final T contextBean,
 			final ApplicationContext context) throws ModelException {
 		return new PropertiesComponent(context, entity, componentFactory.isWritable());
 	}

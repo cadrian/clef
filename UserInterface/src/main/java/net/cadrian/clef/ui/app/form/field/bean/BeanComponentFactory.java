@@ -27,15 +27,16 @@ import net.cadrian.clef.ui.app.form.field.FieldModel;
 public class BeanComponentFactory<T extends Bean, D extends Bean>
 		extends AbstractSimpleFieldComponentFactory<T, D, JTextField> {
 
-	private final Class<D> beanType;
+	private final Class<D> beanDataType;
 
-	public BeanComponentFactory(final Class<D> beanType) {
-		this(beanType, null);
+	public BeanComponentFactory(final Class<T> beanType, final String fieldName, final Class<D> beanDataType) {
+		this(beanType, fieldName, beanDataType, null);
 	}
 
-	public BeanComponentFactory(final Class<D> beanType, final String tab) {
-		super(false, tab);
-		this.beanType = beanType;
+	public BeanComponentFactory(final Class<T> beanType, final String fieldName, final Class<D> beanDataType,
+			final String tab) {
+		super(beanType, fieldName, false, tab);
+		this.beanDataType = beanDataType;
 	}
 
 	@Override
@@ -46,7 +47,7 @@ public class BeanComponentFactory<T extends Bean, D extends Bean>
 
 	@Override
 	public Class<D> getDataType() {
-		return beanType;
+		return beanDataType;
 	}
 
 }
