@@ -17,6 +17,8 @@
 package net.cadrian.clef.ui.app.form.field.properties;
 
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.widget.DefaultDownloadFilter;
+import net.cadrian.clef.ui.widget.DownloadFilter;
 
 class PathPropertyEditor extends AbstractFilePropertyEditor {
 
@@ -29,5 +31,10 @@ class PathPropertyEditor extends AbstractFilePropertyEditor {
 	public void save() {
 		property.setValue(content.getFile().getAbsolutePath());
 		content.markSave();
+	}
+
+	@Override
+	protected DownloadFilter getDownloadFilter(final ApplicationContext context) {
+		return new DefaultDownloadFilter();
 	}
 }

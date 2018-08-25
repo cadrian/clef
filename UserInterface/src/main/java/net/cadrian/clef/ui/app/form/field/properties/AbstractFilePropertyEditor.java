@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.widget.DownloadFilter;
 import net.cadrian.clef.ui.widget.FileSelector;
 
 abstract class AbstractFilePropertyEditor implements PropertyEditor {
@@ -42,7 +43,7 @@ abstract class AbstractFilePropertyEditor implements PropertyEditor {
 	AbstractFilePropertyEditor(final ApplicationContext context, final boolean writable,
 			final EditableProperty property) {
 		this.property = property;
-		content = new FileSelector(context, writable);
+		content = new FileSelector(context, writable, getDownloadFilter(context));
 
 		container = new JPanel(new GridBagLayout());
 		final GridBagConstraints constraints = new GridBagConstraints();
@@ -51,6 +52,8 @@ abstract class AbstractFilePropertyEditor implements PropertyEditor {
 		constraints.weightx = 1;
 		container.add(content, constraints);
 	}
+
+	protected abstract DownloadFilter getDownloadFilter(ApplicationContext context);
 
 	@Override
 	public JComponent getEditor() {

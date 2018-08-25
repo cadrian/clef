@@ -16,14 +16,18 @@
  */
 package net.cadrian.clef.ui.widget;
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
@@ -32,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.Presentation;
 
 public class FileSelector extends JPanel {
 
@@ -43,15 +48,34 @@ public class FileSelector extends JPanel {
 	private static File lastDirectory;
 
 	private final JTextField display;
+	private final Action download;
 	private final Action browse;
 	private File file;
 	private boolean dirty;
 
-	public FileSelector(final ApplicationContext context, final boolean writable) {
+	public FileSelector(final ApplicationContext context, final boolean writable, final DownloadFilter downloadFilter) {
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
 		display = new JTextField();
 		display.setEditable(writable);
+
+		download = new AbstractAction("Download") {
+			private static final long serialVersionUID = 1306117769999262324L;
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				try {
+					final File filteredFile = downloadFilter.download(file);
+					Desktop.getDesktop().open(filteredFile);
+				} catch (final IOException x) {
+					LOGGER.error("Error while opening file: {}", file, x);
+					final Presentation presentation = context.getPresentation();
+					JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
+							presentation.getMessage("FileOpenFailedMessage", file.getPath()),
+							presentation.getMessage("FileOpenFailedTitle"), JOptionPane.WARNING_MESSAGE);
+				}
+			}
+		};
 
 		browse = new AbstractAction("Browse") {
 			private static final long serialVersionUID = -3091414439330672834L;
@@ -77,11 +101,14 @@ public class FileSelector extends JPanel {
 			}
 		};
 
+		download.setEnabled(true);
 		browse.setEnabled(writable);
 
 		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 		buttons.setFloatable(false);
 		buttons.add(browse);
+		buttons.add(new JSeparator(SwingConstants.HORIZONTAL));
+		buttons.add(download);
 
 		add(display);
 		add(context.getPresentation().awesome(buttons));

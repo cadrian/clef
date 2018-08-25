@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.Presentation;
 import net.cadrian.clef.ui.app.form.BeanCreator;
 import net.cadrian.clef.ui.app.form.BeanForm;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
@@ -208,9 +209,10 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 					}
 				} catch (final ModelException e) {
 					LOGGER.error("Error while adding data", e);
-					JOptionPane.showMessageDialog(DataPane.this,
-							context.getPresentation().getMessage("CreateFailedMessage"),
-							context.getPresentation().getMessage("CreateFailedTitle"), JOptionPane.WARNING_MESSAGE);
+					final Presentation presentation = context.getPresentation();
+					JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
+							presentation.getMessage("CreateFailedMessage"),
+							presentation.getMessage("CreateFailedTitle"), JOptionPane.WARNING_MESSAGE);
 				}
 				return null;
 			}
@@ -235,16 +237,17 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 
 	void delData() {
 		final T bean = list.getSelectedValue();
-		if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
-				context.getPresentation().getMessage("ConfirmDeleteMessage", bean),
-				context.getPresentation().getMessage("ConfirmDeleteTitle"), JOptionPane.YES_NO_OPTION)) {
+		final Presentation presentation = context.getPresentation();
+		if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(presentation.getApplicationFrame(),
+				presentation.getMessage("ConfirmDeleteMessage", bean), presentation.getMessage("ConfirmDeleteTitle"),
+				JOptionPane.YES_NO_OPTION)) {
 			try {
 				bean.delete();
 			} catch (final ModelException e) {
 				LOGGER.error("Error while deleting data", e);
-				JOptionPane.showMessageDialog(DataPane.this,
-						context.getPresentation().getMessage("DeleteFailedMessage"),
-						context.getPresentation().getMessage("DeleteFailedTitle"), JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
+						presentation.getMessage("DeleteFailedMessage"), presentation.getMessage("DeleteFailedTitle"),
+						JOptionPane.WARNING_MESSAGE);
 			} finally {
 				refreshList(null);
 			}
@@ -259,8 +262,10 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 			}
 		} catch (final ModelException e) {
 			LOGGER.error("Error while saving data", e);
-			JOptionPane.showMessageDialog(DataPane.this, context.getPresentation().getMessage("SaveFailedMessage"),
-					context.getPresentation().getMessage("SaveFailedTitle"), JOptionPane.WARNING_MESSAGE);
+			final Presentation presentation = context.getPresentation();
+			JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
+					presentation.getMessage("SaveFailedMessage"), presentation.getMessage("SaveFailedTitle"),
+					JOptionPane.WARNING_MESSAGE);
 		} finally {
 			refreshList(selected);
 		}
@@ -281,7 +286,7 @@ public class DataPane<T extends Bean, C extends Bean> extends JSplitPane {
 					}
 				} catch (final ModelException e) {
 					LOGGER.error("Error while refreshing data", e);
-					JOptionPane.showMessageDialog(DataPane.this,
+					JOptionPane.showMessageDialog(context.getPresentation().getApplicationFrame(),
 							context.getPresentation().getMessage("RefreshFailedMessage"),
 							context.getPresentation().getMessage("RefreshFailedTitle"), JOptionPane.WARNING_MESSAGE);
 				}

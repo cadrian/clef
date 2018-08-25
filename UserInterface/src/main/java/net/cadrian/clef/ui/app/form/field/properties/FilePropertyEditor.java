@@ -29,6 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.widget.DefaultDownloadFilter;
+import net.cadrian.clef.ui.widget.DownloadFilter;
 
 class FilePropertyEditor extends AbstractFilePropertyEditor {
 
@@ -90,6 +92,20 @@ class FilePropertyEditor extends AbstractFilePropertyEditor {
 		final String value = BASE64_ENCODER.encodeToString(serializedData);
 		property.setValue(value);
 		content.markSave();
+	}
+
+	@Override
+	protected DownloadFilter getDownloadFilter(final ApplicationContext context) {
+		final byte[] serializedData = BASE64_DECODER.decode(property.getValue().getBytes());
+		final int sep = indexOfSep(serializedData);
+		final String path = new String(serializedData, 0, sep);
+		final int length = serializedData.length - sep - 1;
+		if (length < 0) {
+			return new DefaultDownloadFilter();
+		}
+		final byte[] data = new byte[length];
+		System.arraycopy(serializedData, sep + 1, data, 0, length);
+		return new FilePropertyDownloadFilter(path, data);
 	}
 
 }
