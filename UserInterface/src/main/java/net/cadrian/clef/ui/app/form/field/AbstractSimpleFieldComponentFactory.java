@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
+import net.cadrian.clef.ui.app.tab.DataPane;
 
 public abstract class AbstractSimpleFieldComponentFactory<T extends Bean, D, J extends JComponent>
 		implements FieldComponentFactory<T, D, J> {
@@ -53,7 +54,7 @@ public abstract class AbstractSimpleFieldComponentFactory<T extends Bean, D, J e
 		this.beanType = beanType;
 		this.fieldName = fieldName;
 		this.writable = writable;
-		this.tab = tab;
+		this.tab = tab == null ? DataPane.DEFAULT_TAB : tab;
 	}
 
 	@Override

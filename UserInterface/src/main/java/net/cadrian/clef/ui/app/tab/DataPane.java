@@ -19,6 +19,7 @@ package net.cadrian.clef.ui.app.tab;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -58,6 +59,9 @@ public class DataPane<T extends Bean> extends JSplitPane {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DataPane.class);
 
+	public static final String DEFAULT_TAB = "Description";
+	private static final List<String> DEFAULT_TABS = Arrays.asList(DEFAULT_TAB);
+
 	private static final long serialVersionUID = -6198568152980667836L;
 
 	private final SortableListModel<T> model;
@@ -80,19 +84,13 @@ public class DataPane<T extends Bean> extends JSplitPane {
 
 	public DataPane(final ApplicationContext context, final boolean showSave, final Class<T> beanType,
 			final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final Comparator<T> beanComparator,
-			final BeanFormModel<T> beanFormModel) {
-		this(context, showSave, beanType, beanGetter, beanCreator, beanComparator, beanFormModel, null);
-	}
-
-	public DataPane(final ApplicationContext context, final boolean showSave, final Class<T> beanType,
-			final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final Comparator<T> beanComparator,
-			final BeanFormModel<T> beanFormModel, final List<String> tabs) {
+			final BeanFormModel<T> beanFormModel, final String... tabs) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
 		this.beanGetter = Objects.requireNonNull(beanGetter);
 		this.beanCreator = Objects.requireNonNull(beanCreator);
 		this.context = Objects.requireNonNull(context);
 		this.beanFormModel = Objects.requireNonNull(beanFormModel);
-		this.tabs = tabs;
+		this.tabs = tabs.length == 0 ? DEFAULT_TABS : Arrays.asList(tabs);
 
 		model = new SortableListModel<>(beanComparator);
 		list = new JList<>(model);

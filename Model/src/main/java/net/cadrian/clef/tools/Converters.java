@@ -16,52 +16,63 @@
  */
 package net.cadrian.clef.tools;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Converters {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Converters.class);
 
 	private Converters() {
 		// no instance
 	}
 
-	public static final String formatTime(final Long time) {
+	public static final String formatTime(final long time) {
 		final StringBuilder result = new StringBuilder();
 		long s = time;
-		long m = s / 60;
-		s -= m * 60;
-		final long h = m / 24;
-		m -= h * 24;
-		if (h < 10) {
+		long m = s / 60L;
+		s -= m * 60L;
+		final long h = m / 60L;
+		m -= h * 60L;
+		if (h < 10L) {
 			result.append("0");
 		}
 		result.append(h).append(":");
-		if (m < 10) {
+		if (m < 10L) {
 			result.append("0");
 		}
 		result.append(m).append(":");
-		if (s < 10) {
+		if (s < 10L) {
 			result.append("0");
 		}
 		result.append(s);
+		LOGGER.debug("{} => {}", time, result);
 		return result.toString();
 	}
 
-	public static final Long parseTime(final String time) {
+	public static final long parseTime(final String time) {
+		final long result;
 		String[] split = time.split(":");
 		switch (split.length) {
 		case 0: { // seconds
-			return Long.valueOf(split[0]);
+			result = Long.parseLong(split[0]);
+			break;
 		}
 		case 1: { // minutes and seconds
-			long s = Long.valueOf(split[1]);
-			long m = Long.valueOf(split[0]);
-			return m * 60L + s;
+			long s = Long.parseLong(split[1]);
+			long m = Long.parseLong(split[0]);
+			result = m * 60L + s;
+			break;
 		}
 		default: { // hours, minutes, and seconds -- ignore extra
-			long s = Long.valueOf(split[2]);
-			long m = Long.valueOf(split[1]);
-			long h = Long.valueOf(split[0]);
-			return h * 3600L + m * 60L + s;
+			long s = Long.parseLong(split[2]);
+			long m = Long.parseLong(split[1]);
+			long h = Long.parseLong(split[0]);
+			result = h * 3600L + m * 60L + s;
 		}
 		}
+		LOGGER.debug("{} => {}", time, result);
+		return result;
 	}
 
 }

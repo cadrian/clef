@@ -30,6 +30,7 @@ import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
 import net.cadrian.clef.ui.app.form.field.bean.BeanComponentFactory;
 import net.cadrian.clef.ui.app.form.field.piece.PiecesComponentFactory;
 import net.cadrian.clef.ui.app.form.field.properties.PropertiesComponentFactory;
+import net.cadrian.clef.ui.app.form.field.stat.WorkStatisticsComponentFactory;
 import net.cadrian.clef.ui.app.form.field.text.TextAreaComponentFactory;
 import net.cadrian.clef.ui.app.form.field.text.TextFieldComponentFactory;
 
@@ -41,7 +42,7 @@ public class WorkFormModel extends BeanFormModel<Work> {
 					new TextFieldComponentFactory<>(Work.class, "Name", true, "Description"),
 					new TextAreaComponentFactory<>(Work.class, "Notes", true, "Description"),
 					new PropertiesComponentFactory<>(Work.class, "Properties", Entity.work, true, "Description"),
-					new PiecesComponentFactory(new PieceFormModel(), "Pieces"));
+					new PiecesComponentFactory(new PieceFormModel(), "Pieces"), new WorkStatisticsComponentFactory());
 
 	public WorkFormModel(final Class<Work> beanType) {
 		super(COMPONENT_FACTORIES);

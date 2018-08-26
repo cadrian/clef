@@ -83,17 +83,21 @@ public class BeanForm<T extends Bean> extends JPanel {
 		int gridy = 0;
 		for (final FieldView<T, ?, ?> fieldView : fields.values()) {
 			if (tab == null || tab.equals(fieldView.model.getTab())) {
-				final GridBagConstraints labelConstraints = new GridBagConstraints();
-				labelConstraints.gridy = gridy;
-				labelConstraints.anchor = GridBagConstraints.NORTHWEST;
-				labelConstraints.insets = new Insets(8, 2, 2, 2);
 				final String name = fieldView.model.getName();
-				final String label = presentation.getMessage("Field." + name);
-				LOGGER.debug("Label for {} is {}", name, label);
-				panel.add(presentation.bold(new JLabel(label)), labelConstraints);
+				if (name != null) {
+					final GridBagConstraints labelConstraints = new GridBagConstraints();
+					labelConstraints.gridy = gridy;
+					labelConstraints.anchor = GridBagConstraints.NORTHWEST;
+					labelConstraints.insets = new Insets(8, 2, 2, 2);
+					final String label = presentation.getMessage("Field." + name);
+					LOGGER.debug("Label for {} is {}", name, label);
+					panel.add(presentation.bold(new JLabel(label)), labelConstraints);
+				}
 
 				final GridBagConstraints fieldConstraints = new GridBagConstraints();
-				fieldConstraints.gridx = 1;
+				if (name != null) {
+					fieldConstraints.gridx = 1;
+				}
 				fieldConstraints.gridy = gridy;
 				fieldConstraints.weightx = 1;
 				fieldConstraints.weighty = fieldView.component.getWeight();

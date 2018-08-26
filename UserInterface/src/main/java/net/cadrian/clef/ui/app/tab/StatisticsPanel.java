@@ -22,6 +22,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,11 +33,10 @@ import javax.swing.JPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Work;
-import net.cadrian.clef.tools.Converters;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.tools.StatisticsComputation;
 
 public class StatisticsPanel extends JPanel {
 
@@ -44,30 +44,24 @@ public class StatisticsPanel extends JPanel {
 
 	private static final long serialVersionUID = -2023860576290261246L;
 
-	private final ApplicationContext context;
-
-	private final JLabel meanPerWork;
-	private final JLabel stdevPerWork;
-	private final JLabel meanPerPiece;
-	private final JLabel stdevPerPiece;
+	private final StatisticsComputation computation;
 
 	public StatisticsPanel(final ApplicationContext context) {
 		super(new GridBagLayout());
-		this.context = context;
 
 		final JPanel titledPanel = new JPanel(new BorderLayout());
 		final JPanel panel = new JPanel(new GridBagLayout());
 
-		meanPerWork = new JLabel();
-		stdevPerWork = new JLabel();
-		meanPerPiece = new JLabel();
-		stdevPerPiece = new JLabel();
+		final JLabel meanPerWork = new JLabel();
+		final JLabel stdevPerWork = new JLabel();
+		final JLabel meanPerPiece = new JLabel();
+		final JLabel stdevPerPiece = new JLabel();
 		final Map<String, JLabel> labels = new LinkedHashMap<>();
 		labels.put("MeanPerWork", meanPerWork);
 		labels.put("StdDeviationPerWork", stdevPerWork);
 		labels.put("MeanPerPiece", meanPerPiece);
 		labels.put("StdDeviationPerPiece", stdevPerPiece);
-		addLabels(labels, panel);
+		addLabels(context, labels, panel);
 
 		panel.setBorder(BorderFactory.createEtchedBorder());
 
@@ -82,14 +76,28 @@ public class StatisticsPanel extends JPanel {
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentShown(final ComponentEvent e) {
-				refresh();
+				computation.refresh();
 			}
 		});
 
-		refresh();
+		computation = new StatisticsComputation(new StatisticsComputation.IterableProvider() {
+
+			@Override
+			public Iterable<Work> getWorks() {
+				return new ArrayList<>(context.getBeans().getWorks());
+			}
+
+			@Override
+			public Iterable<Piece> getPieces(Work work) {
+				return new ArrayList<>(work.getPieces());
+			}
+
+		}, meanPerWork, stdevPerWork, meanPerPiece, stdevPerPiece);
+
+		computation.refresh();
 	}
 
-	private void addLabels(final Map<String, JLabel> labels, final JPanel panel) {
+	private void addLabels(ApplicationContext context, final Map<String, JLabel> labels, final JPanel panel) {
 		int gridy = 0;
 		for (final Map.Entry<String, JLabel> entry : labels.entrySet()) {
 			final GridBagConstraints labelConstraints = new GridBagConstraints();
@@ -110,57 +118,6 @@ public class StatisticsPanel extends JPanel {
 
 			gridy++;
 		}
-	}
-
-	private void refresh() {
-		long nw = 0;
-		long tw = 0;
-		long np = 0;
-		long tp = 0;
-
-		final Beans beans = context.getBeans();
-
-		for (final Work work : beans.getWorks()) {
-			nw++;
-			long twp = 0;
-			for (final Piece piece : work.getPieces()) {
-				final Long duration = piece.getDuration();
-				if (duration != null) {
-					twp += duration;
-					tp += duration;
-					np++;
-				}
-			}
-			tw += twp;
-		}
-
-		final long mw = nw == 0 ? 0 : tw / nw;
-		final long mp = np == 0 ? 0 : tp / np;
-
-		long sw = 0;
-		long sp = 0;
-
-		for (final Work work : beans.getWorks()) {
-			long twp = 0;
-			for (final Piece piece : work.getPieces()) {
-				final Long duration = piece.getDuration();
-				if (duration != null) {
-					twp += duration;
-					final long dp = mp - duration;
-					sp += dp * dp;
-				}
-			}
-			final long dp = mw - twp;
-			sw += dp * dp;
-		}
-
-		sw = Math.round(Math.sqrt(sw));
-		sp = Math.round(Math.sqrt(sp));
-
-		meanPerWork.setText(Converters.formatTime(mw));
-		stdevPerWork.setText(Converters.formatTime(sw));
-		meanPerPiece.setText(Converters.formatTime(mp));
-		stdevPerPiece.setText(Converters.formatTime(sp));
 	}
 
 }

@@ -18,7 +18,6 @@ package net.cadrian.clef.ui.app;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -117,7 +116,7 @@ public class Application extends JFrame {
 				new SessionFormModel(Session.class));
 		final DataPane<Work> worksPanel = new DataPane<>(context, true, Work.class, beans::getWorks,
 				new WorkCreator(context), (w1, w2) -> BeanComparators.compareWorks(w1, w2),
-				new WorkFormModel(Work.class), Arrays.asList("Description", "Pieces"));
+				new WorkFormModel(Work.class), "Description", "Pieces", "Statistics");
 		final DataPane<Author> authorsPanel = new DataPane<>(context, true, Author.class, beans::getAuthors,
 				beans::createAuthor, (a1, a2) -> BeanComparators.compareAuthors(a1, a2),
 				new AuthorFormModel(Author.class));

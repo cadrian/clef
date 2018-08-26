@@ -54,7 +54,7 @@ class DateComponentPicker extends JDialog {
 		pickerPanel.add(new JLabel(context.getPresentation().getMessage("DatePickerMessage")), BorderLayout.NORTH);
 
 		final ZoneId zone = ZoneId.systemDefault();
-		final LocalDateTime ldt = LocalDateTime.ofInstant(date.toInstant(), zone);
+		final LocalDateTime ldt = date == null ? LocalDateTime.now() : LocalDateTime.ofInstant(date.toInstant(), zone);
 
 		final DatePickerSettings dateSettings = new DatePickerSettings();
 		dateSettings.setFormatForDatesCommonEra("yyyy/MM/dd");
