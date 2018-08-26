@@ -34,6 +34,14 @@ public class PieceBean extends AbstractPropertyBean implements net.cadrian.clef.
 
 	private final Piece bean;
 
+	/**
+	 * "next" version cache. Only available after the next's "previous" was computed
+	 * -- but that's OK since a piece can only be accessed via its latest version
+	 * (from work) and through "previous" links first. "Next" links are simply a
+	 * convenience.
+	 */
+	private volatile PieceBean next;
+
 	public PieceBean(final Piece bean, final DatabaseBeansHolder db) {
 		super(bean, db);
 		this.bean = bean;
@@ -71,13 +79,25 @@ public class PieceBean extends AbstractPropertyBean implements net.cadrian.clef.
 			return null;
 		}
 		LOGGER.debug("looking for previous piece {}", previousId);
-		return db.getPiece(previousId);
+		final PieceBean result = db.getPiece(previousId);
+		if (result != null) {
+			result.next = this;
+		}
+		return result;
 	}
 
 	@Override
 	public void setPrevious(final net.cadrian.clef.model.bean.Piece piece) {
 		bean.setPreviousId(((PieceBean) piece).getId());
+		if (piece != null) {
+			((PieceBean) piece).next = this;
+		}
 		update();
+	}
+
+	@Override
+	public net.cadrian.clef.model.bean.Piece getNext() {
+		return next;
 	}
 
 	@Override

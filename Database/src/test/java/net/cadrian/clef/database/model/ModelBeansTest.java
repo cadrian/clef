@@ -68,9 +68,17 @@ public class ModelBeansTest extends AbstractDatabaseTestHarness {
 		waltz.setName("WALTZ");
 		waltz.setDuration(3 * 60L + 37L); // 03:37 -- enough to kiss a girl
 
+		final Piece lullaby2 = beans.createPieceVersion(lullaby);
+		lullaby.setName("LULLABY");
+		lullaby.setDuration(53L); // 00:53 -- a bit longer
+
+		Assert.assertSame(lullaby, lullaby2.getPrevious());
+		Assert.assertSame(lullaby2, lullaby.getNext());
+
 		final Collection<? extends Piece> pieces = work.getPieces();
 		Assert.assertEquals(2, pieces.size());
-		Assert.assertTrue(pieces.contains(lullaby));
+		Assert.assertFalse(pieces.contains(lullaby));
+		Assert.assertTrue(pieces.contains(lullaby2));
 		Assert.assertTrue(pieces.contains(waltz));
 
 		final Property copyright = beans.createProperty(copyrightPropertyDescriptor);

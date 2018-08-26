@@ -38,6 +38,8 @@ public interface Piece extends PropertyBean {
 
 	Piece getPrevious();
 
+	Piece getNext();
+
 	void setPrevious(Piece piece);
 
 	Long getDuration();
