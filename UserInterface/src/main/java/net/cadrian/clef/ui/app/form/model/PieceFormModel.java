@@ -25,7 +25,7 @@ import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
-import net.cadrian.clef.ui.app.form.field.numeric.NumericFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.numeric.DurationFieldComponentFactory;
 import net.cadrian.clef.ui.app.form.field.piece.PieceVersionComponentFactory;
 import net.cadrian.clef.ui.app.form.field.properties.PropertiesComponentFactory;
 import net.cadrian.clef.ui.app.form.field.text.TextAreaComponentFactory;
@@ -35,7 +35,7 @@ public class PieceFormModel extends BeanFormModel<Piece> {
 
 	private static final Collection<FieldComponentFactory<Piece, ?, ? extends JComponent>> COMPONENT_FACTORIES = Arrays
 			.asList(new TextFieldComponentFactory<>(Piece.class, "Name", true), new PieceVersionComponentFactory(),
-					new NumericFieldComponentFactory<>(Piece.class, "Duration", true),
+					new DurationFieldComponentFactory<>(Piece.class, "Duration", true),
 					new TextAreaComponentFactory<>(Piece.class, "Notes", true),
 					new PropertiesComponentFactory<>(Piece.class, "Properties", Entity.piece, true));
 

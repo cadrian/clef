@@ -25,6 +25,7 @@ import net.cadrian.clef.database.DatabaseException;
 import net.cadrian.clef.database.bean.Session;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.model.bean.Piece;
+import net.cadrian.clef.tools.Converters;
 
 public class SessionBean extends AbstractPropertyBean implements net.cadrian.clef.model.bean.Session {
 
@@ -107,25 +108,8 @@ public class SessionBean extends AbstractPropertyBean implements net.cadrian.cle
 		final DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		result.append(df.format(start)).append(" - ").append(getPiece().getName());
 		if (stop != null) {
-			final long duration = stop.getTime() - start.getTime();
-			long s = duration / 1000;
-			long m = s / 60;
-			s -= m * 60;
-			final long h = m / 24;
-			m -= h * 24;
-			result.append(" (");
-			if (h < 10) {
-				result.append("0");
-			}
-			result.append(h).append(":");
-			if (m < 10) {
-				result.append("0");
-			}
-			result.append(m).append(":");
-			if (s < 10) {
-				result.append("0");
-			}
-			result.append(s).append(")");
+			final long duration = (stop.getTime() - start.getTime()) / 1000;
+			result.append(" (").append(Converters.formatTime(duration)).append(")");
 		}
 		return result.toString();
 	}

@@ -16,24 +16,21 @@
  */
 package net.cadrian.clef.ui.app.form.field.numeric;
 
-import java.text.NumberFormat;
-
-import javax.swing.JFormattedTextField;
-
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
+import net.cadrian.clef.ui.widget.DurationTextField;
 
-class NumericFieldComponent implements FieldComponent<Long, JFormattedTextField> {
+class DurationFieldComponent implements FieldComponent<Long, DurationTextField> {
 
-	private final JFormattedTextField component;
+	private final DurationTextField component;
 	private String savedData = "";
 
-	NumericFieldComponent(final boolean writable) {
-		component = new JFormattedTextField(NumberFormat.getIntegerInstance());
+	DurationFieldComponent(final boolean writable) {
+		component = new DurationTextField();
 		component.setEditable(writable);
 	}
 
 	@Override
-	public JFormattedTextField getComponent() {
+	public DurationTextField getComponent() {
 		return component;
 	}
 

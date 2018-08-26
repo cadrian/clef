@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Work;
+import net.cadrian.clef.tools.Converters;
 import net.cadrian.clef.ui.ApplicationContext;
 
 public class StatisticsPanel extends JPanel {
@@ -151,32 +152,10 @@ public class StatisticsPanel extends JPanel {
 		sw = Math.round(Math.sqrt(sw));
 		sp = Math.round(Math.sqrt(sp));
 
-		meanPerWork.setText(format(mw));
-		stdevPerWork.setText(format(sw));
-		meanPerPiece.setText(format(mp));
-		stdevPerPiece.setText(format(sp));
-	}
-
-	private final String format(final long time) {
-		final StringBuilder result = new StringBuilder();
-		long s = time;
-		long m = s / 60;
-		s -= m * 60;
-		final long h = m / 24;
-		m -= h * 24;
-		if (h < 10) {
-			result.append("0");
-		}
-		result.append(h).append(":");
-		if (m < 10) {
-			result.append("0");
-		}
-		result.append(m).append(":");
-		if (s < 10) {
-			result.append("0");
-		}
-		result.append(s);
-		return result.toString();
+		meanPerWork.setText(Converters.formatTime(mw));
+		stdevPerWork.setText(Converters.formatTime(sw));
+		meanPerPiece.setText(Converters.formatTime(mp));
+		stdevPerPiece.setText(Converters.formatTime(sp));
 	}
 
 }
