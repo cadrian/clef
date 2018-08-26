@@ -16,6 +16,7 @@
  */
 package net.cadrian.clef.ui.app.tab;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -54,6 +55,7 @@ public class StatisticsPanel extends JPanel {
 		super(new GridBagLayout());
 		this.context = context;
 
+		final JPanel titledPanel = new JPanel(new BorderLayout());
 		final JPanel panel = new JPanel(new GridBagLayout());
 
 		meanPerWork = new JLabel();
@@ -69,10 +71,13 @@ public class StatisticsPanel extends JPanel {
 
 		panel.setBorder(BorderFactory.createEtchedBorder());
 
+		titledPanel.add(new JLabel(context.getPresentation().getMessage("StatisticsMessage")), BorderLayout.NORTH);
+		titledPanel.add(panel, BorderLayout.CENTER);
+
 		final GridBagConstraints constraints = new GridBagConstraints();
 		constraints.anchor = GridBagConstraints.CENTER;
 		constraints.fill = GridBagConstraints.BOTH;
-		add(panel, constraints);
+		add(titledPanel, constraints);
 
 		addComponentListener(new ComponentAdapter() {
 			@Override
