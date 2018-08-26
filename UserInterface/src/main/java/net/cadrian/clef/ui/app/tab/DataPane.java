@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.WeakHashMap;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -71,6 +73,8 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	private final ApplicationContext context;
 	private final BeanFormModel<T> beanFormModel;
 	private final List<String> tabs;
+
+	private final Map<T, BeanForm<T>> formCache = new WeakHashMap<>();
 
 	private BeanForm<T> currentForm;
 
@@ -188,7 +192,11 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		current.removeAll();
 		if (selected != null) {
 			LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
-			currentForm = new BeanForm<>(context, selected, beanFormModel, tabs);
+			currentForm = formCache.get(selected);
+			if (currentForm == null) {
+				currentForm = new BeanForm<>(context, selected, beanFormModel, tabs);
+				formCache.put(selected, currentForm);
+			}
 			current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
 			currentForm.load();
 			delAction.setEnabled(true);
