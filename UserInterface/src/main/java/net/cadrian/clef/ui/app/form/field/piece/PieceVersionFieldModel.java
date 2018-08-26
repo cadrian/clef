@@ -19,6 +19,9 @@ package net.cadrian.clef.ui.app.form.field.piece;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Work;
@@ -30,6 +33,8 @@ import net.cadrian.clef.ui.app.tab.DataPane;
 import net.cadrian.clef.ui.widget.VersionSpinner;
 
 class PieceVersionFieldModel extends AbstractSimpleFieldModel<Piece, Long, VersionSpinner> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PieceVersionFieldModel.class);
 
 	protected PieceVersionFieldModel(final String tab, final Method getter, final Method setter,
 			final FieldComponentFactory<Piece, Long, VersionSpinner> componentFactory) {
@@ -45,18 +50,47 @@ class PieceVersionFieldModel extends AbstractSimpleFieldModel<Piece, Long, Versi
 	@Override
 	public void created(final Piece contextBean, final ApplicationContext context,
 			final FieldComponent<Long, VersionSpinner> component) {
+		LOGGER.debug("Created: {}", contextBean);
 
 		final PiecesComponent piecesComponent = (PiecesComponent) AbstractSimpleFieldModel
 				.<Work, Collection<Piece>, DataPane<Piece>>getCachedComponent(contextBean.getWork(), "Pieces");
+		LOGGER.debug("  >> piecesComponent={}", piecesComponent);
 		((PieceVersionComponent) component).setPiecesComponent(piecesComponent);
 
 		final Piece previous = contextBean.getPrevious();
+		LOGGER.debug("  >> previous={}", previous);
 		if (previous != null) {
-			final PieceVersionComponent previousComponent = (PieceVersionComponent) createNewComponent(previous,
-					context);
-			((PieceVersionComponent) component).setPrevious(previousComponent);
-			created(previous, context, previousComponent);
+			final PieceVersionComponent cachedPreviousComponent = (PieceVersionComponent) AbstractSimpleFieldModel
+					.<Piece, Long, VersionSpinner>getCachedComponent(previous, "Version");
+			if (cachedPreviousComponent == null) {
+				LOGGER.debug("    (no cached component yet)");
+				final PieceVersionComponent previousComponent = (PieceVersionComponent) createComponent(previous,
+						context);
+				((PieceVersionComponent) component).setPrevious(previousComponent);
+				created(previous, context, previousComponent);
+				previousComponent.setNext((PieceVersionComponent) component);
+			} else {
+				LOGGER.debug("    (already created: {})", cachedPreviousComponent);
+			}
 		}
+
+		final Piece next = contextBean.getNext();
+		LOGGER.debug("  >> next={}", previous);
+		if (next != null) {
+			final PieceVersionComponent cachedNextComponent = (PieceVersionComponent) AbstractSimpleFieldModel
+					.<Piece, Long, VersionSpinner>getCachedComponent(next, "Version");
+			if (cachedNextComponent == null) {
+				LOGGER.debug("    (no cached component yet)");
+				final PieceVersionComponent nextComponent = (PieceVersionComponent) createComponent(next, context);
+				((PieceVersionComponent) component).setNext(nextComponent);
+				created(next, context, nextComponent);
+				nextComponent.setPrevious((PieceVersionComponent) component);
+			} else {
+				LOGGER.debug("    (already created: {})", cachedNextComponent);
+			}
+		}
+
+		LOGGER.debug("  >> done for {}", contextBean);
 	}
 
 }

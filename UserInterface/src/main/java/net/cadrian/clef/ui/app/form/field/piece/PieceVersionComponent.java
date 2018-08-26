@@ -115,9 +115,12 @@ class PieceVersionComponent implements FieldComponent<Long, VersionSpinner> {
 
 	void setPrevious(final PieceVersionComponent previous) {
 		this.previous = previous;
-		previous.next = this;
 		component.refresh();
-		previous.component.refresh();
+	}
+
+	void setNext(final PieceVersionComponent next) {
+		this.next = next;
+		component.refresh();
 	}
 
 	public void setPiecesComponent(final PiecesComponent piecesComponent) {
