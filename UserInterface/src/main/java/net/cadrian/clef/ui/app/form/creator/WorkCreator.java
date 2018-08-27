@@ -78,11 +78,10 @@ public class WorkCreator implements BeanCreator<Work> {
 			return null;
 		}
 
-		final SortableListModel<Author> authorsModel = new SortableListModel<>(
-				(a1, a2) -> BeanComparators.compareAuthors(a1, a2), allAuthors);
-
-		final SortableListModel<Pricing> pricingsModel = new SortableListModel<>(
-				(p1, p2) -> BeanComparators.comparePricings(p1, p2), allPricings);
+		final SortableListModel<Author> authorsModel = new SortableListModel<>(BeanComparators::compareAuthors,
+				allAuthors);
+		final SortableListModel<Pricing> pricingsModel = new SortableListModel<>(BeanComparators::comparePricings,
+				allPricings);
 
 		final JDialog params = new JDialog(parent, presentation.getMessage("WorkCreatorTitle"), true);
 

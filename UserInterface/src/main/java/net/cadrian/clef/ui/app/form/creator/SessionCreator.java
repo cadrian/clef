@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -83,10 +82,8 @@ public class SessionCreator implements BeanCreator<Session> {
 			return null;
 		}
 
-		final SortableListModel<Work> worksModel = new SortableListModel<>(
-				(w1, w2) -> BeanComparators.compareWorks(w1, w2), allWorks);
-
-		final DefaultListModel<Piece> piecesModel = new DefaultListModel<>();
+		final SortableListModel<Work> worksModel = new SortableListModel<>(BeanComparators::compareWorks, allWorks);
+		final SortableListModel<Piece> piecesModel = new SortableListModel<>(BeanComparators::comparePieces);
 
 		final JDialog params = new JDialog(presentation.getApplicationFrame(),
 				presentation.getMessage("SessionCreatorTitle"), true);
@@ -108,8 +105,16 @@ public class SessionCreator implements BeanCreator<Session> {
 			public void valueChanged(final ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					// TODO swing niceties using an async worker
+					piecesModel.removeAll();
 					for (final Piece piece : works.getSelectedValue().getPieces()) {
-						piecesModel.addElement(piece);
+						piecesModel.add(piece);
+						if (context.<Boolean>getValue(ApplicationContext.AdvancedConfigurationEntry.offlineMode)) {
+							Piece p = piece.getPrevious();
+							while (p != null) {
+								piecesModel.add(p);
+								p = p.getPrevious();
+							}
+						}
 					}
 				}
 			}

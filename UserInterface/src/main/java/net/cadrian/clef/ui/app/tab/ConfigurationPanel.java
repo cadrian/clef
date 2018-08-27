@@ -210,20 +210,20 @@ public class ConfigurationPanel extends JTabbedPane {
 	private JPanel advancedConfigurationPanel(final ApplicationContext context) {
 		final JPanel result = new JPanel(new BorderLayout());
 
-		final JToggleButton allowStartWriteButton = context.getPresentation().awesome(new JToggleButton("Attention"));
-		allowStartWriteButton.setForeground(Color.RED);
-		final JLabel allowStartWriteLabel = new JLabel(context.getPresentation().getMessage("AllowStartWriteLabel"));
+		final JToggleButton offlineModeButton = context.getPresentation().awesome(new JToggleButton("Attention"));
+		offlineModeButton.setForeground(Color.RED);
+		final JLabel offlineModeLabel = new JLabel(context.getPresentation().getMessage("OfflineModeLabel"));
 
 		final JPanel content = new JPanel();
 		content.setLayout(new BoxLayout(content, BoxLayout.X_AXIS));
-		content.add(allowStartWriteButton);
-		content.add(allowStartWriteLabel);
+		content.add(offlineModeButton);
+		content.add(offlineModeLabel);
 
-		allowStartWriteButton.addChangeListener(new ChangeListener() {
+		offlineModeButton.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				context.setValue(AdvancedConfigurationEntry.allowStartWrite, allowStartWriteButton.isSelected());
+				context.setValue(AdvancedConfigurationEntry.offlineMode, offlineModeButton.isSelected());
 			}
 		});
 

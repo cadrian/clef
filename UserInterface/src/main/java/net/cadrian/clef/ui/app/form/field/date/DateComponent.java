@@ -29,11 +29,11 @@ class DateComponent implements FieldComponent<Date, DateSelector> {
 	private final DateSelector component;
 
 	DateComponent(final ApplicationContext context, final boolean writable) {
-		final boolean w = context.getValue(AdvancedConfigurationEntry.allowStartWrite);
+		final boolean w = context.getValue(AdvancedConfigurationEntry.offlineMode);
 
 		component = new DateSelector(context, writable && w);
 
-		context.addApplicationContextListener(AdvancedConfigurationEntry.allowStartWrite,
+		context.addApplicationContextListener(AdvancedConfigurationEntry.offlineMode,
 				new ApplicationContextListener<Boolean>() {
 
 					@Override

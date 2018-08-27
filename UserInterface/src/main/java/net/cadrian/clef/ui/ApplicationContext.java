@@ -21,7 +21,11 @@ import net.cadrian.clef.model.Beans;
 public interface ApplicationContext {
 
 	enum AdvancedConfigurationEntry {
-		allowStartWrite;
+		/**
+		 * Mode used to insert data (esp. session data) outside of normal usage. Useful
+		 * for data import at startup.
+		 */
+		offlineMode;
 	}
 
 	interface ApplicationContextListener<T> {

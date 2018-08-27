@@ -33,8 +33,8 @@ class PiecesComponent implements FieldComponent<Collection<Piece>, DataPane<Piec
 
 	public PiecesComponent(final ApplicationContext context, final BeanGetter<Piece> beanGetter,
 			final BeanCreator<Piece> beanCreator, final BeanFormModel<Piece> beanFormModel) {
-		component = new DataPane<>(context, false, Piece.class, beanGetter, beanCreator,
-				(p1, p2) -> BeanComparators.comparePieces(p1, p2), beanFormModel);
+		component = new DataPane<>(context, false, Piece.class, beanGetter, beanCreator, BeanComparators::comparePieces,
+				beanFormModel);
 	}
 
 	@Override

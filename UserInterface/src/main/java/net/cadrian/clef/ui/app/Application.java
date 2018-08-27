@@ -60,7 +60,7 @@ public class Application extends JFrame {
 	public Application(final Beans beans) {
 		final PresentationImpl presentation = getPresentation();
 		context = new ApplicationContextImpl(beans, presentation);
-		context.setValue(AdvancedConfigurationEntry.allowStartWrite, false);
+		context.setValue(AdvancedConfigurationEntry.offlineMode, false);
 		initUI();
 	}
 
@@ -112,17 +112,14 @@ public class Application extends JFrame {
 		final Beans beans = context.getBeans();
 
 		final DataPane<Session> sessionsPanel = new DataPane<>(context, true, Session.class, beans::getSessions,
-				new SessionCreator(context), (s1, s2) -> BeanComparators.compareSessions(s1, s2),
-				new SessionFormModel(Session.class));
+				new SessionCreator(context), BeanComparators::compareSessions, new SessionFormModel(Session.class));
 		final DataPane<Work> worksPanel = new DataPane<>(context, true, Work.class, beans::getWorks,
-				new WorkCreator(context), (w1, w2) -> BeanComparators.compareWorks(w1, w2),
-				new WorkFormModel(Work.class), "Description", "Pieces", "Statistics");
+				new WorkCreator(context), BeanComparators::compareWorks, new WorkFormModel(Work.class), "Description",
+				"Pieces", "Statistics");
 		final DataPane<Author> authorsPanel = new DataPane<>(context, true, Author.class, beans::getAuthors,
-				beans::createAuthor, (a1, a2) -> BeanComparators.compareAuthors(a1, a2),
-				new AuthorFormModel(Author.class));
+				beans::createAuthor, BeanComparators::compareAuthors, new AuthorFormModel(Author.class));
 		final DataPane<Pricing> pricingsPanel = new DataPane<>(context, true, Pricing.class, beans::getPricings,
-				beans::createPricing, (p1, p2) -> BeanComparators.comparePricings(p1, p2),
-				new PricingFormModel(Pricing.class));
+				beans::createPricing, BeanComparators::comparePricings, new PricingFormModel(Pricing.class));
 		final ConfigurationPanel configurationPanel = new ConfigurationPanel(context);
 
 		mainPane.addTab(context.getPresentation().getMessage("Sessions"), sessionsPanel);
