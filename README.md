@@ -11,10 +11,9 @@ Clef splits artwork into two levels:
 
 "Sessions" are how time is tracked: simply start a new session, work, and stop the session when it is done for the day. Clef will track a few statistics on how you spent that time.
 
-Clef also includes tons of "notes" that may help you track your ideas as you work. It also manages "properties" that you can attach to pretty much any Clef concept ("author", "work", "piece", "session"; "pricing" does not have them, yet).
-
-Note: although I use it for musical composition, Clef can be used for any kind of artwork: books, cinema, ...
+Clef also includes tons of "notes" that may help you track your ideas as you work. It also manages "properties" that you can attach to any Clef concept ("pricing", "author", "work", "piece", "session").
 
 # TODO
 - import, export of data
 - some actual code cleanup
+- add statistics on authors and pricings
