@@ -81,11 +81,17 @@ public class DateSelector extends JPanel {
 				final DateComponentPicker picker = new DateComponentPicker(context, date);
 				picker.setVisible(true);
 				date = picker.getDate();
-				if (lowerBound != null && lowerBound.getDate().after(date)) {
-					date = lowerBound.getDate();
+				if (lowerBound != null) {
+					final Date lowerDate = lowerBound.getDate();
+					if (lowerDate != null && lowerDate.after(date)) {
+						date = lowerDate;
+					}
 				}
-				if (upperBound != null && upperBound.getDate().before(date)) {
-					upperBound.setDate(date, true);
+				if (upperBound != null) {
+					final Date upperDate = upperBound.getDate();
+					if (upperDate == null || upperDate.before(date)) {
+						upperBound.setDate(date, true);
+					}
 				}
 				display.setText(df.format(date));
 				dirty = true;
