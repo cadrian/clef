@@ -64,11 +64,16 @@ public class DateSelector extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				date = new Date();
+				LOGGER.debug("Setting date to now: {}", date);
+				if (upperBound != null) {
+					final Date upperDate = upperBound.getDate();
+					if (upperDate == null || upperDate.before(date)) {
+						LOGGER.debug("bouncing upper bound");
+						upperBound.setDate(date, true);
+					}
+				}
 				display.setText(df.format(date));
 				dirty = true;
-				if (upperBound != null && upperBound.getDate().before(date)) {
-					upperBound.setDate(date, true);
-				}
 			}
 
 		};
@@ -81,15 +86,18 @@ public class DateSelector extends JPanel {
 				final DateComponentPicker picker = new DateComponentPicker(context, date);
 				picker.setVisible(true);
 				date = picker.getDate();
+				LOGGER.debug("picked date: {}", date);
 				if (lowerBound != null) {
 					final Date lowerDate = lowerBound.getDate();
 					if (lowerDate != null && lowerDate.after(date)) {
+						LOGGER.debug("lower bound is {}", lowerDate);
 						date = lowerDate;
 					}
 				}
 				if (upperBound != null) {
 					final Date upperDate = upperBound.getDate();
 					if (upperDate == null || upperDate.before(date)) {
+						LOGGER.debug("bouncing upper bound");
 						upperBound.setDate(date, true);
 					}
 				}
@@ -128,10 +136,12 @@ public class DateSelector extends JPanel {
 	}
 
 	public Date getDate() {
+		LOGGER.debug("got date: {}", date);
 		return date;
 	}
 
 	private void setDate(final Date date, final boolean dirty) {
+		LOGGER.debug("set date to {}", date);
 		this.date = date;
 		this.dirty = dirty;
 		SwingUtilities.invokeLater(new Runnable() {
@@ -153,6 +163,7 @@ public class DateSelector extends JPanel {
 
 	public void setDateString(final String date) {
 		try {
+			LOGGER.debug("set date to {}", date);
 			setDate(df.parse(date));
 		} catch (final ParseException e) {
 			LOGGER.error("Error while setting date", e);
@@ -168,6 +179,7 @@ public class DateSelector extends JPanel {
 	}
 
 	public void markSave() {
+		LOGGER.debug("mark save: date is {}", date);
 		dirty = false;
 	}
 
