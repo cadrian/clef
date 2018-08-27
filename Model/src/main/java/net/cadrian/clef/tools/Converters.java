@@ -16,12 +16,7 @@
  */
 package net.cadrian.clef.tools;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Converters {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(Converters.class);
 
 	private Converters() {
 		// no instance
@@ -46,7 +41,6 @@ public class Converters {
 			result.append("0");
 		}
 		result.append(s);
-		LOGGER.debug("{} => {}", time, result);
 		return result.toString();
 	}
 
@@ -71,7 +65,6 @@ public class Converters {
 			result = h * 3600L + m * 60L + s;
 		}
 		}
-		LOGGER.debug("{} => {}", time, result);
 		return result;
 	}
 

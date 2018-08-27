@@ -1,7 +1,7 @@
 #/usr/bin/env bash
 
 rm -rf pkg
-mkdir -p pkg/build
+mkdir -p pkg/build pkg/debs
 cd pkg
 
 function prepareModule() {
@@ -42,6 +42,8 @@ function buildModule() {
         cd ..
         sudo dpkg -i *.deb || exit 1
     ) || exit 1
+
+    mv build/*.deb debs/
 }
 
 if [ $# -gt 0 ]; then
