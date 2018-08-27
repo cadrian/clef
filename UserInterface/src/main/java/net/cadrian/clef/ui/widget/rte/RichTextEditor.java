@@ -52,6 +52,7 @@ import javax.swing.undo.UndoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.cadrian.clef.tools.Converters;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.Presentation;
 
@@ -80,6 +81,7 @@ public class RichTextEditor extends JPanel {
 		setBorder(BorderFactory.createEtchedBorder());
 		document = (StyledDocument) kit.createDefaultDocument();
 		editor = new JTextPane();
+		editor.setContentType("text/html;charset=UTF-8");
 		editor.setEditorKit(kit);
 		undoManager = new UndoManager();
 		undoManager.setLimit(0);
@@ -243,7 +245,7 @@ public class RichTextEditor extends JPanel {
 			} catch (IOException | BadLocationException e) {
 				LOGGER.error("Error while writing text", e);
 			}
-			text = new String(out.toByteArray());
+			text = new String(out.toByteArray(), Converters.CHARSET);
 		} catch (final IOException e) {
 			LOGGER.error("Could not get RTF, text is lost", e);
 			text = "";
@@ -252,7 +254,7 @@ public class RichTextEditor extends JPanel {
 	}
 
 	public void setText(final String text) {
-		try (ByteArrayInputStream in = new ByteArrayInputStream(text.getBytes())) {
+		try (ByteArrayInputStream in = new ByteArrayInputStream(text.getBytes(Converters.CHARSET))) {
 			try {
 				document.remove(0, document.getLength());
 				kit.read(in, document, 0);

@@ -31,6 +31,7 @@ import java.util.Base64.Encoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.cadrian.clef.tools.Converters;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.widget.DefaultDownloadFilter;
 import net.cadrian.clef.ui.widget.DownloadFilter;
@@ -46,7 +47,7 @@ class FilePropertyEditor extends AbstractFilePropertyEditor {
 		super(context, writable, property);
 		final String value = property.getValue();
 
-		try (ByteArrayInputStream in = new ByteArrayInputStream(value.getBytes());
+		try (ByteArrayInputStream in = new ByteArrayInputStream(value.getBytes(Converters.CHARSET));
 				InputStream b64 = BASE64_DECODER.wrap(in);
 				SpecialByteArrayOutputStream pathout = new SpecialByteArrayOutputStream()) {
 			String path = null;
@@ -76,14 +77,14 @@ class FilePropertyEditor extends AbstractFilePropertyEditor {
 		try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
 				ByteArrayOutputStream valueout = new ByteArrayOutputStream();
 				OutputStream b64 = BASE64_ENCODER.wrap(valueout)) {
-			b64.write(path.getBytes());
+			b64.write(path.getBytes(Converters.CHARSET));
 			b64.write(0);
 			final byte[] buffer = new byte[4096];
 			int n;
 			while ((n = in.read(buffer)) >= 0) {
 				b64.write(buffer, 0, n);
 			}
-			value = new String(valueout.toByteArray());
+			value = new String(valueout.toByteArray(), Converters.CHARSET);
 		} catch (final IOException e) {
 			LOGGER.error("error while reading file, not saving data", e);
 			value = path;
@@ -102,7 +103,7 @@ class FilePropertyEditor extends AbstractFilePropertyEditor {
 	@Override
 	protected DownloadFilter getDownloadFilter(final ApplicationContext context) {
 		final String value = property.getValue();
-		try (ByteArrayInputStream in = new ByteArrayInputStream(value.getBytes());
+		try (ByteArrayInputStream in = new ByteArrayInputStream(value.getBytes(Converters.CHARSET));
 				InputStream b64 = BASE64_DECODER.wrap(in);
 				SpecialByteArrayOutputStream pathout = new SpecialByteArrayOutputStream();
 				SpecialByteArrayOutputStream dataout = new SpecialByteArrayOutputStream();) {

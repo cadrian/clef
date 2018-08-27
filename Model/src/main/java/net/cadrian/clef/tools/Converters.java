@@ -16,7 +16,11 @@
  */
 package net.cadrian.clef.tools;
 
+import java.nio.charset.Charset;
+
 public class Converters {
+
+	public static final Charset CHARSET = Charset.forName("UTF-8");
 
 	private Converters() {
 		// no instance
