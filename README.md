@@ -17,3 +17,4 @@ Clef also includes tons of "notes" that may help you track your ideas as you wor
 - import, export of data
 - some actual code cleanup
 - add statistics on authors and pricings
+- add filters in the sessions tab
