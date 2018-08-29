@@ -17,4 +17,6 @@ Clef also includes tons of "notes" that may help you track your ideas as you wor
 - import, export of data
 - some actual code cleanup
 - add statistics on authors and pricings
-- add filters in the sessions tab
+- add filters in the sessions and works tabs:
+  - sessions: filter on author and/or work
+  - works: filter on author
