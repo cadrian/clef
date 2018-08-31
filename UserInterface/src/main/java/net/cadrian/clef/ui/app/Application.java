@@ -18,8 +18,6 @@ package net.cadrian.clef.ui.app;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -58,7 +56,7 @@ public class Application extends JFrame {
 	private final ApplicationContextImpl context;
 
 	public Application(final Beans beans) {
-		final PresentationImpl presentation = getPresentation();
+		final PresentationImpl presentation = new PresentationImpl(this);
 		context = new ApplicationContextImpl(beans, presentation);
 		context.setValue(AdvancedConfigurationEntry.offlineMode, false);
 		initUI();
@@ -71,13 +69,6 @@ public class Application extends JFrame {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		initComponents();
 		pack();
-	}
-
-	private PresentationImpl getPresentation() {
-		final Locale locale = Locale.getDefault();
-		LOGGER.info("Current locale: {}", locale);
-		final ResourceBundle messages = ResourceBundle.getBundle("Clef");
-		return new PresentationImpl(messages, this);
 	}
 
 	private void setLookAndFeel(final boolean system) {

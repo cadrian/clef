@@ -19,6 +19,7 @@ package net.cadrian.clef.ui.app;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -40,8 +41,11 @@ class PresentationImpl implements Presentation {
 	private final JFrame frame;
 	private final Font awesomeFont;
 
-	PresentationImpl(final ResourceBundle messages, final JFrame frame) {
-		this.messages = messages;
+	PresentationImpl(final JFrame frame) {
+		final Locale locale = Locale.getDefault();
+		LOGGER.info("Current locale: {}", locale);
+		this.messages = ResourceBundle.getBundle("ClefMessages");
+
 		this.frame = frame;
 
 		Font ft = null;
