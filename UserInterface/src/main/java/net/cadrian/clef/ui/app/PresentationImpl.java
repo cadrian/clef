@@ -19,6 +19,7 @@ package net.cadrian.clef.ui.app;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -44,13 +45,14 @@ class PresentationImpl implements Presentation {
 	PresentationImpl(final JFrame frame) {
 		final Locale locale = Locale.getDefault();
 		LOGGER.info("Current locale: {}", locale);
-		this.messages = ResourceBundle.getBundle("ClefMessages");
+		messages = ResourceBundle.getBundle("ClefMessages");
+		LOGGER.info("Messages bundle: {}", messages);
 
 		this.frame = frame;
 
 		Font ft = null;
 		for (final String f : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
-			if (f.equals("FontAwesome")) {
+			if (f.equals("FontAwesome") || f.equals("Font Awesome 5 Free Regular")) {
 				LOGGER.debug("Awesome!");
 				ft = Font.decode(f);
 				break;
@@ -61,6 +63,11 @@ class PresentationImpl implements Presentation {
 		}
 		awesomeFont = new Font(ft.getName(), ft.getStyle(), 16);
 		LOGGER.debug("Font Awesome: {}", awesomeFont);
+
+		final Enumeration<String> keys = messages.getKeys();
+		while (keys.hasMoreElements()) {
+			LOGGER.debug("bundle key: {}", keys.nextElement());
+		}
 	}
 
 	/*

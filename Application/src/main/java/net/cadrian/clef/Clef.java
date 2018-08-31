@@ -18,6 +18,7 @@ package net.cadrian.clef;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -80,7 +81,8 @@ public class Clef {
 		}
 
 		final BasicDataSource result = new BasicDataSource();
-		final String dbPath = properties.getProperty(PROPERTY_DB_PATH, "./target/db");
+		final File dbFile = new File(properties.getProperty(PROPERTY_DB_PATH, "./target/db"));
+		final String dbPath = dbFile.getAbsolutePath();
 		LOGGER.info("Database path: {}", dbPath);
 		result.setUrl("jdbc:h2:file:" + dbPath);
 		result.setUsername(properties.getProperty(PROPEERTY_DB_USERNAME, "sa"));
