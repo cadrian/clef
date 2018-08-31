@@ -27,7 +27,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
@@ -107,7 +106,7 @@ public class FileSelector extends JPanel {
 		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
 		buttons.setFloatable(false);
 		buttons.add(browse);
-		buttons.add(new JSeparator(SwingConstants.HORIZONTAL));
+		buttons.addSeparator();
 		buttons.add(download);
 
 		add(display);

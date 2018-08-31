@@ -17,20 +17,15 @@
 package net.cadrian.clef.ui.widget;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.components.DateTimePicker;
@@ -78,21 +73,23 @@ class DateComponentPicker extends JDialog {
 
 		pickerPanel.add(picker, BorderLayout.CENTER);
 
-		final Action saveAction = new AbstractAction("Save") {
-			private static final long serialVersionUID = -8659808353683696964L;
+		final ClefTools tools = new ClefTools(context, ClefTools.Tool.Save);
+		tools.addListener(new ClefTools.Listener() {
 
 			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final LocalDateTime ldt = picker.getDateTimeStrict();
-				DateComponentPicker.this.date = Date.from(ldt.atZone(zone).toInstant());
-				DateComponentPicker.this.setVisible(false);
+			public void toolCalled(ClefTools tools, ClefTools.Tool tool) {
+				switch (tool) {
+				case Save:
+					final LocalDateTime ldt = picker.getDateTimeStrict();
+					DateComponentPicker.this.date = Date.from(ldt.atZone(zone).toInstant());
+					DateComponentPicker.this.setVisible(false);
+					break;
+				default:
+				}
 			}
-		};
+		});
 
-		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
-		buttons.setFloatable(false);
-		buttons.add(saveAction);
-		pickerPanel.add(context.getPresentation().awesome(buttons), BorderLayout.SOUTH);
+		pickerPanel.add(tools, BorderLayout.SOUTH);
 
 		pack();
 		setLocationRelativeTo(context.getPresentation().getApplicationFrame());

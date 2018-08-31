@@ -17,12 +17,9 @@
 package net.cadrian.clef.ui.app.form.creator;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -31,7 +28,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -48,6 +44,7 @@ import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.Presentation;
 import net.cadrian.clef.ui.app.form.BeanCreator;
 import net.cadrian.clef.ui.tools.SortableListModel;
+import net.cadrian.clef.ui.widget.ClefTools;
 
 public class WorkCreator implements BeanCreator<Work> {
 
@@ -112,31 +109,39 @@ public class WorkCreator implements BeanCreator<Work> {
 
 		paramsContent.add(lists, BorderLayout.CENTER);
 
-		final AtomicBoolean saved = new AtomicBoolean(false);
-		final Action addAction = new AbstractAction("Add") {
-			private static final long serialVersionUID = -8659808353683696964L;
+		final ClefTools tools = new ClefTools(context, ClefTools.Tool.Add);
 
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final Author author = authors.getSelectedValue();
-				final Pricing pricing = pricings.getSelectedValue();
-				if (author != null && pricing != null) {
-					saved.set(true);
-					params.setVisible(false);
-				}
-			}
-		};
-		addAction.setEnabled(false);
-
+		final AtomicBoolean added = new AtomicBoolean(false);
 		final AtomicBoolean authorsSelected = new AtomicBoolean(false);
 		final AtomicBoolean pricingsSelected = new AtomicBoolean(false);
+
+		tools.addListener(new ClefTools.Listener() {
+
+			@Override
+			public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
+				switch (tool) {
+				case Add:
+					final Author author = authors.getSelectedValue();
+					final Pricing pricing = pricings.getSelectedValue();
+					if (author != null && pricing != null) {
+						added.set(true);
+						params.setVisible(false);
+					}
+					break;
+				default:
+				}
+			}
+		});
+
+		tools.getAction(ClefTools.Tool.Add).setEnabled(false);
+
 		authors.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(final ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					authorsSelected.set(true);
-					addAction.setEnabled(pricingsSelected.get());
-					saved.set(false);
+					tools.getAction(ClefTools.Tool.Add).setEnabled(pricingsSelected.get());
+					added.set(false);
 				}
 			}
 		});
@@ -145,16 +150,13 @@ public class WorkCreator implements BeanCreator<Work> {
 			public void valueChanged(final ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					pricingsSelected.set(true);
-					addAction.setEnabled(authorsSelected.get());
-					saved.set(false);
+					tools.getAction(ClefTools.Tool.Add).setEnabled(authorsSelected.get());
+					added.set(false);
 				}
 			}
 		});
 
-		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
-		buttons.setFloatable(false);
-		buttons.add(addAction);
-		paramsContent.add(presentation.awesome(buttons), BorderLayout.NORTH);
+		paramsContent.add(tools, BorderLayout.NORTH);
 
 		params.pack();
 		params.setLocationRelativeTo(parent);
@@ -164,7 +166,7 @@ public class WorkCreator implements BeanCreator<Work> {
 		final Author author = authors.getSelectedValue();
 		final Pricing pricing = pricings.getSelectedValue();
 
-		if (!saved.get()) {
+		if (!added.get()) {
 			LOGGER.debug("Not saved, not creating work");
 			return null;
 		}

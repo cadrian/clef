@@ -17,12 +17,9 @@
 package net.cadrian.clef.ui.app.form.creator;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -30,7 +27,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -46,6 +42,7 @@ import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.Presentation;
 import net.cadrian.clef.ui.app.form.BeanCreator;
 import net.cadrian.clef.ui.tools.SortableListModel;
+import net.cadrian.clef.ui.widget.ClefTools;
 
 public class SessionCreator implements BeanCreator<Session> {
 
@@ -135,31 +132,38 @@ public class SessionCreator implements BeanCreator<Session> {
 
 		paramsContent.add(lists, BorderLayout.CENTER);
 
-		final AtomicBoolean saved = new AtomicBoolean(false);
-		final Action addAction = new AbstractAction("Add") {
-			private static final long serialVersionUID = -8659808353683696964L;
+		final ClefTools tools = new ClefTools(context, ClefTools.Tool.Add);
 
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final Work work = works.getSelectedValue();
-				final Piece piece = pieces.getSelectedValue();
-				if (work != null && piece != null) {
-					saved.set(true);
-					params.setVisible(false);
-				}
-			}
-		};
-		addAction.setEnabled(false);
-
+		final AtomicBoolean added = new AtomicBoolean(false);
 		final AtomicBoolean worksSelected = new AtomicBoolean(false);
 		final AtomicBoolean piecesSelected = new AtomicBoolean(false);
+
+		tools.addListener(new ClefTools.Listener() {
+
+			@Override
+			public void toolCalled(ClefTools tools, ClefTools.Tool tool) {
+				switch (tool) {
+				case Add:
+					final Work work = works.getSelectedValue();
+					final Piece piece = pieces.getSelectedValue();
+					if (work != null && piece != null) {
+						added.set(true);
+						params.setVisible(false);
+					}
+					break;
+				default:
+				}
+			}
+		});
+		tools.getAction(ClefTools.Tool.Add).setEnabled(false);
+
 		works.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(final ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					worksSelected.set(true);
-					addAction.setEnabled(piecesSelected.get());
-					saved.set(false);
+					tools.getAction(ClefTools.Tool.Add).setEnabled(piecesSelected.get());
+					added.set(false);
 				}
 			}
 		});
@@ -168,16 +172,13 @@ public class SessionCreator implements BeanCreator<Session> {
 			public void valueChanged(final ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					piecesSelected.set(true);
-					addAction.setEnabled(worksSelected.get());
-					saved.set(false);
+					tools.getAction(ClefTools.Tool.Add).setEnabled(worksSelected.get());
+					added.set(false);
 				}
 			}
 		});
 
-		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
-		buttons.setFloatable(false);
-		buttons.add(addAction);
-		paramsContent.add(presentation.awesome(buttons), BorderLayout.NORTH);
+		paramsContent.add(tools, BorderLayout.NORTH);
 
 		params.pack();
 		params.setLocationRelativeTo(presentation.getApplicationFrame());
@@ -186,8 +187,8 @@ public class SessionCreator implements BeanCreator<Session> {
 
 		final Piece piece = pieces.getSelectedValue();
 
-		if (!saved.get()) {
-			LOGGER.debug("Not saved, not creating session");
+		if (!added.get()) {
+			LOGGER.debug("Not added, not creating session");
 			return null;
 		}
 		if (piece == null) {

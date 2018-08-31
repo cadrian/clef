@@ -18,7 +18,6 @@ package net.cadrian.clef.ui.app.tab;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,8 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
@@ -36,13 +33,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -65,6 +59,8 @@ import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
 import net.cadrian.clef.ui.Presentation;
+import net.cadrian.clef.ui.widget.ClefTools;
+import net.cadrian.clef.ui.widget.ClefTools.Tool;
 
 public class ConfigurationPanel extends JTabbedPane {
 
@@ -159,48 +155,34 @@ public class ConfigurationPanel extends JTabbedPane {
 		table.setAutoCreateRowSorter(true);
 		result.add(new JScrollPane(table), BorderLayout.CENTER);
 
-		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
-		buttons.setFloatable(false);
-
-		final Action addAction = new AbstractAction("Add") {
-			private static final long serialVersionUID = -5722810007033837355L;
+		final ClefTools tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Save);
+		tools.addListener(new ClefTools.Listener() {
 
 			@Override
-			public void actionPerformed(final ActionEvent e) {
-				model.addRow(table.getSelectedRow());
+			public void toolCalled(final ClefTools tools, final Tool tool) {
+				switch (tool) {
+				case Add:
+					model.addRow(table.getSelectedRow());
+					break;
+				case Del:
+					model.delRow(table.getSelectedRow());
+					break;
+				case Save:
+					model.save();
+					break;
+				default:
+				}
 			}
-		};
 
-		final Action delAction = new AbstractAction("Del") {
-			private static final long serialVersionUID = -8206872556606892261L;
+		});
 
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				model.delRow(table.getSelectedRow());
-			}
-		};
+		result.add(tools, BorderLayout.NORTH);
 
-		final Action saveAction = new AbstractAction("Save") {
-			private static final long serialVersionUID = -8659808353683696964L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				model.save();
-			}
-		};
-
-		buttons.add(addAction);
-		buttons.add(saveAction);
-		buttons.add(new JSeparator(SwingConstants.VERTICAL));
-		buttons.add(delAction);
-		result.add(context.getPresentation().awesome(buttons), BorderLayout.NORTH);
-
-		delAction.setEnabled(false);
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
 			@Override
 			public void valueChanged(final ListSelectionEvent e) {
-				delAction.setEnabled(model.canDelRow(table.getSelectedRow()));
+				tools.getAction(ClefTools.Tool.Del).setEnabled(model.canDelRow(table.getSelectedRow()));
 			}
 		});
 

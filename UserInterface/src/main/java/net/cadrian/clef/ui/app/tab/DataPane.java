@@ -17,7 +17,6 @@
 package net.cadrian.clef.ui.app.tab;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,17 +26,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -54,6 +49,8 @@ import net.cadrian.clef.ui.app.form.BeanForm;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.BeanGetter;
 import net.cadrian.clef.ui.tools.SortableListModel;
+import net.cadrian.clef.ui.widget.ClefTools;
+import net.cadrian.clef.ui.widget.ClefTools.Tool;
 
 public class DataPane<T extends Bean> extends JSplitPane {
 
@@ -67,10 +64,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	private final SortableListModel<T> model;
 	private final JList<T> list;
 	private final JPanel current = new JPanel(new BorderLayout());
-
-	private final Action addAction;
-	private final Action delAction;
-	private final Action saveAction;
+	private final ClefTools tools;
 
 	private final BeanGetter<T> beanGetter;
 	private final BeanCreator<T> beanCreator;
@@ -112,51 +106,34 @@ public class DataPane<T extends Bean> extends JSplitPane {
 			}
 		});
 
-		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
-		buttons.setFloatable(false);
-
-		addAction = new AbstractAction("Add") {
-			private static final long serialVersionUID = -5722810007033837355L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				addData();
-			}
-		};
-
-		delAction = new AbstractAction("Del") {
-			private static final long serialVersionUID = -8206872556606892261L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				delData();
-			}
-		};
-
 		if (showSave) {
-			saveAction = new AbstractAction("Save") {
-				private static final long serialVersionUID = -8659808353683696964L;
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					saveData();
-				}
-			};
-
-			saveAction.setEnabled(false);
+			tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Save,
+					ClefTools.Tool.Filter);
 		} else {
-			saveAction = null;
+			tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Filter);
 		}
+		tools.addListener(new ClefTools.Listener() {
 
-		delAction.setEnabled(false);
+			@Override
+			public void toolCalled(final ClefTools tools, final Tool tool) {
+				switch (tool) {
+				case Add:
+					addData();
+					break;
+				case Del:
+					delData();
+					break;
+				case Save:
+					saveData();
+					break;
+				case Filter:
+					// TODO
+					break;
+				}
+			}
+		});
 
-		buttons.add(addAction);
-		if (saveAction != null) {
-			buttons.add(saveAction);
-		}
-		buttons.add(new JSeparator(SwingConstants.VERTICAL));
-		buttons.add(delAction);
-		left.add(context.getPresentation().awesome(buttons), BorderLayout.NORTH);
+		left.add(tools, BorderLayout.NORTH);
 
 		setLeftComponent(left);
 		setRightComponent(current);
@@ -177,7 +154,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		return list.getSelectedValue();
 	}
 
-	public void select(T version, boolean refresh) {
+	public void select(final T version, final boolean refresh) {
 		LOGGER.debug("Select version: {}", version);
 		if (refresh) {
 			refreshList(version);
@@ -188,6 +165,8 @@ public class DataPane<T extends Bean> extends JSplitPane {
 
 	private void installBeanForm(final T selected) {
 		current.removeAll();
+		final Action delAction = tools.getAction(ClefTools.Tool.Del);
+		final Action saveAction = tools.getAction(ClefTools.Tool.Save);
 		if (selected != null) {
 			LOGGER.debug("Selected: {} [{}]", selected, selected.hashCode());
 			currentForm = formCache.get(selected);

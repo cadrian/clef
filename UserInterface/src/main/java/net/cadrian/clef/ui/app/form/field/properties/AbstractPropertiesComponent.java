@@ -17,7 +17,6 @@
 package net.cadrian.clef.ui.app.form.field.properties;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,17 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -51,6 +45,7 @@ import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.tools.SortedListModel;
+import net.cadrian.clef.ui.widget.ClefTools;
 
 abstract class AbstractPropertiesComponent implements FieldComponent<Collection<? extends Property>, JSplitPane> {
 
@@ -83,47 +78,40 @@ abstract class AbstractPropertiesComponent implements FieldComponent<Collection<
 		left.add(new JScrollPane(list), BorderLayout.CENTER);
 
 		if (writable) {
-			final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
-			buttons.setFloatable(false);
-
-			final Action addAction = new AbstractAction("Add") {
-				private static final long serialVersionUID = -5722810007033837355L;
+			ClefTools tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del);
+			tools.addListener(new ClefTools.Listener() {
 
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final int index = addData();
-					if (index >= 0) {
-						list.setSelectedIndex(index);
+				public void toolCalled(ClefTools tools, ClefTools.Tool tool) {
+					switch (tool) {
+					case Add:
+						final int index = addData();
+						if (index >= 0) {
+							list.setSelectedIndex(index);
+						}
+						tools.getAction(ClefTools.Tool.Add).setEnabled(!getAddableDescriptors().isEmpty());
+						break;
+					case Del:
+						delData(list.getSelectedIndex());
+						tools.getAction(ClefTools.Tool.Add).setEnabled(true);
+						break;
+					default:
 					}
-					setEnabled(!getAddableDescriptors().isEmpty());
 				}
-			};
+			});
 
-			final Action delAction = new AbstractAction("Del") {
-				private static final long serialVersionUID = -8206872556606892261L;
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					delData(list.getSelectedIndex());
-					addAction.setEnabled(true);
-				}
-			};
-
-			buttons.add(addAction);
-			buttons.add(new JSeparator(SwingConstants.VERTICAL));
-			buttons.add(delAction);
-			left.add(context.getPresentation().awesome(buttons), BorderLayout.NORTH);
+			left.add(tools, BorderLayout.NORTH);
 
 			list.addListSelectionListener(new ListSelectionListener() {
 
 				@Override
 				public void valueChanged(final ListSelectionEvent e) {
-					delAction.setEnabled(!list.isSelectionEmpty());
+					tools.getAction(ClefTools.Tool.Del).setEnabled(!list.isSelectionEmpty());
 				}
 			});
 
-			addAction.setEnabled(!getAddableDescriptors().isEmpty());
-			delAction.setEnabled(false);
+			tools.getAction(ClefTools.Tool.Add).setEnabled(!getAddableDescriptors().isEmpty());
+			tools.getAction(ClefTools.Tool.Del).setEnabled(false);
 		}
 
 		component.setLeftComponent(left);

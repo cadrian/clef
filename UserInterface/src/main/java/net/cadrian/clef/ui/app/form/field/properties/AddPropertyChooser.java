@@ -17,25 +17,21 @@
 package net.cadrian.clef.ui.app.form.field.properties;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 
 import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.Presentation;
+import net.cadrian.clef.ui.widget.ClefTools;
 
 class AddPropertyChooser extends JDialog {
 
@@ -63,20 +59,22 @@ class AddPropertyChooser extends JDialog {
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		panel.add(new JScrollPane(list), BorderLayout.CENTER);
 
-		final JToolBar buttons = new JToolBar(SwingConstants.HORIZONTAL);
-		buttons.setFloatable(false);
-
-		final Action addAction = new AbstractAction("Add") {
-			private static final long serialVersionUID = -8659808353683696964L;
+		final ClefTools tools = new ClefTools(context, ClefTools.Tool.Add);
+		tools.addListener(new ClefTools.Listener() {
 
 			@Override
-			public void actionPerformed(final ActionEvent e) {
-				selected = list.getSelectedValue();
-				setVisible(false);
+			public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
+				switch (tool) {
+				case Add:
+					selected = list.getSelectedValue();
+					setVisible(false);
+					break;
+				default:
+				}
 			}
-		};
-		buttons.add(addAction);
-		panel.add(presentation.awesome(buttons), BorderLayout.SOUTH);
+		});
+
+		panel.add(tools, BorderLayout.SOUTH);
 
 		pack();
 		setLocationRelativeTo(presentation.getApplicationFrame());
