@@ -292,7 +292,9 @@ public class ModelBeans implements Beans {
 		try {
 			final net.cadrian.clef.database.bean.Session template = new net.cadrian.clef.database.bean.Session();
 			template.setPieceId(((PieceBean) piece).getId());
-			template.setStart(new Timestamp(System.currentTimeMillis()));
+			final Timestamp now = new Timestamp(System.currentTimeMillis());
+			template.setStart(now);
+			template.setStop(now);
 			final net.cadrian.clef.database.bean.Session bean = db.getSessions().insert(template);
 			result = new SessionBean(bean, db);
 			sessionsCache.put(bean.getId(), result);

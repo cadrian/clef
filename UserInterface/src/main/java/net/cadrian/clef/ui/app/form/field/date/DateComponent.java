@@ -31,7 +31,7 @@ class DateComponent implements FieldComponent<Date, DateSelector> {
 	DateComponent(final ApplicationContext context, final boolean writable) {
 		final boolean w = context.getValue(AdvancedConfigurationEntry.offlineMode);
 
-		component = new DateSelector(context, writable && w);
+		component = new DateSelector(context, writable || w);
 
 		context.addApplicationContextListener(AdvancedConfigurationEntry.offlineMode,
 				new ApplicationContextListener<Boolean>() {

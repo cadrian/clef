@@ -83,10 +83,14 @@ public abstract class AbstractSimpleFieldComponentFactory<T extends Bean, D, J e
 					LOGGER.error("BUG: invalid field model for {} -- {} vs {}", fieldName,
 							getter.getReturnType().getName(), dataType.getName(), new Exception("BUG"));
 				} else {
-					final Method setter;
-					if (isWritable()) {
+					Method setter;
+					try {
 						setter = beanType.getMethod("set" + fieldName, dataType);
-					} else {
+					} catch (NoSuchMethodException e) {
+						if (isWritable()) {
+							throw e;
+						}
+						LOGGER.debug("No setter, but {} is not writable anyway", fieldName);
 						setter = null;
 					}
 					result = createModel(fieldName, getter, setter);

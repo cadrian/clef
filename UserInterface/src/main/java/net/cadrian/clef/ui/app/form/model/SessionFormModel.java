@@ -33,7 +33,7 @@ public class SessionFormModel extends BeanFormModel<Session> {
 
 	private static final Collection<FieldComponentFactory<Session, ?, ? extends JComponent>> COMPONENT_FACTORIES;
 	static {
-		final DateComponentFactory<Session> startFactory = new DateComponentFactory<>(Session.class, "Start", true);
+		final DateComponentFactory<Session> startFactory = new DateComponentFactory<>(Session.class, "Start", false);
 		final DateComponentFactory<Session> stopFactory = new DateComponentFactory<>(Session.class, "Stop", true);
 		startFactory.setUpperBound(stopFactory);
 		stopFactory.setLowerBound(startFactory);

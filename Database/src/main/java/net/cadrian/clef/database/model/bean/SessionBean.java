@@ -54,7 +54,7 @@ public class SessionBean extends AbstractPropertyBean implements net.cadrian.cle
 
 	@Override
 	public void setStart(final Date start) {
-		final Timestamp ts = new Timestamp(start.getTime());
+		final Timestamp ts = new Timestamp(start == null ? System.currentTimeMillis() : start.getTime());
 		bean.setStart(ts);
 		update();
 	}
@@ -66,7 +66,7 @@ public class SessionBean extends AbstractPropertyBean implements net.cadrian.cle
 
 	@Override
 	public void setStop(final Date stop) {
-		final Timestamp ts = new Timestamp(stop.getTime());
+		final Timestamp ts = new Timestamp(stop == null ? System.currentTimeMillis() : stop.getTime());
 		bean.setStop(ts);
 		update();
 	}
@@ -103,8 +103,11 @@ public class SessionBean extends AbstractPropertyBean implements net.cadrian.cle
 	@Override
 	public String toString() {
 		final StringBuilder result = new StringBuilder();
-		final Date start = getStart();
-		final Date stop = getStop();
+		final Date now = new Date();
+		final Date start0 = getStart();
+		final Date start = start0 == null ? now : start0;
+		final Date stop0 = getStop();
+		final Date stop = stop0 == null ? now : stop0;
 		final DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		result.append(df.format(start)).append(" - ").append(getPiece().getName());
 		if (stop != null) {
