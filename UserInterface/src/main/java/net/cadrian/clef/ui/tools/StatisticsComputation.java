@@ -18,11 +18,17 @@ package net.cadrian.clef.ui.tools;
 
 import javax.swing.JLabel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.cadrian.clef.model.bean.Piece;
+import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.tools.Converters;
 
 public class StatisticsComputation {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsComputation.class);
 
 	public interface IterableProvider {
 		Iterable<Work> getWorks();
@@ -48,59 +54,88 @@ public class StatisticsComputation {
 	}
 
 	public void refresh() {
-		long nw = 0;
-		long tw = 0;
-		long np = 0;
-		long tp = 0;
+		double dw = 0; // duration of works (in minutes)
+		long tw = 0; // work time for works
+		double dp = 0; // duration of pieces (in minutes)
+		long tp = 0; // work time for pieces
 
 		for (final Work work : iterableProvider.getWorks()) {
-			nw++;
-			long twp = 0;
+			long tws = 0;
+			double dw0 = 0;
 			for (final Piece piece : iterableProvider.getPieces(work)) {
-				final Long duration = piece.getDuration();
-				if (duration != null) {
-					twp += duration;
-					tp += duration;
-					np++;
+				long tps = 0;
+				for (final Session session : piece.getSessions()) {
+					final long t = (session.getStop().getTime() - session.getStart().getTime()) / 1000;
+					LOGGER.debug("work time for session {}: {} ({})", session.toString(), t, Converters.formatTime(t));
+					tps += t;
+				}
+				LOGGER.debug("work time for piece {}: {} ({})", piece.getName(), tps, Converters.formatTime(tps));
+				tp += tps;
+				tws += tps;
+				final Long dpL = piece.getDuration();
+				if (dpL != null && dpL > 0) {
+					final double dp0 = dpL.doubleValue() / 60;
+					dw0 += dp0;
+					dp += dp0;
 				}
 			}
-			tw += twp;
+			LOGGER.debug("work time for work {}: {} ({})", work.getName(), tws, Converters.formatTime(tws));
+			tw += tws;
+			dw += dw0;
 		}
 
-		final long mw = nw == 0 ? 0 : tw / nw;
-		final long mp = np == 0 ? 0 : tp / np;
+		LOGGER.debug("total work time for pieces: {} ({})", tp, Converters.formatTime(tp));
+		LOGGER.debug("total work time for works:  {} ({})", tw, Converters.formatTime(tw));
+		LOGGER.debug("total duration for pieces: {} ({})", dp, Converters.formatTime((long) (dp * 60)));
+		LOGGER.debug("total duration for works:  {} ({})", dw, Converters.formatTime((long) (dw * 60)));
 
-		long sw = 0;
-		long sp = 0;
+		final double mw = dw == 0 ? 0 : tw / dw; // mean work per minute for works
+		final double mp = dp == 0 ? 0 : tp / dp; // mean work per minute for pieces
+
+		LOGGER.debug("mean work time for pieces: {} ({})", mw, Converters.formatTime((long) mp));
+		LOGGER.debug("mean work time for works:  {} ({})", mw, Converters.formatTime((long) mw));
+
+		double sw = 0; // std deviation of work per minute for works
+		double sp = 0; // std deviation of work per minute for pieces
 
 		for (final Work work : iterableProvider.getWorks()) {
-			long twp = 0;
+			long tws = 0;
+			double dw0 = 0;
 			for (final Piece piece : iterableProvider.getPieces(work)) {
-				final Long duration = piece.getDuration();
-				if (duration != null) {
-					twp += duration;
-					final long dp = mp - duration;
-					sp += dp * dp;
+				long tps = 0;
+				for (final Session session : piece.getSessions()) {
+					final long t = (session.getStop().getTime() - session.getStart().getTime()) / 1000;
+					tps += t;
+				}
+				tws += tps;
+				final Long dpL = piece.getDuration();
+				if (dpL != null && dpL > 0) {
+					final double dp0 = dpL.doubleValue() / 60;
+					dw0 += dp0;
+					final double ddp = mp - tps / dp0;
+					sp += ddp * ddp;
 				}
 			}
-			final long dp = mw - twp;
-			sw += dp * dp;
+			final double ddw = mw - tws / dw0;
+			sw += ddw * ddw;
 		}
 
-		sw = Math.round(Math.sqrt(sw));
-		sp = Math.round(Math.sqrt(sp));
+		final long mwL = Math.round(mw);
+		final long mpL = Math.round(mp);
+		final long swL = Math.round(Math.sqrt(sw));
+		final long spL = Math.round(Math.sqrt(sp));
 
 		if (meanPerWork != null) {
-			meanPerWork.setText(Converters.formatTime(mw));
+			meanPerWork.setText(Converters.formatTime(mwL));
 		}
 		if (stdevPerWork != null) {
-			stdevPerWork.setText(Converters.formatTime(sw));
+			stdevPerWork.setText(Converters.formatTime(swL));
 		}
 		if (meanPerPiece != null) {
-			meanPerPiece.setText(Converters.formatTime(mp));
+			meanPerPiece.setText(Converters.formatTime(mpL));
 		}
 		if (stdevPerPiece != null) {
-			stdevPerPiece.setText(Converters.formatTime(sp));
+			stdevPerPiece.setText(Converters.formatTime(spL));
 		}
 	}
 
