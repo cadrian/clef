@@ -77,7 +77,6 @@ public class ClefTools extends JToolBar {
 						fireToolCalled(Tool.Save);
 					}
 				};
-				action.setEnabled(false);
 				break;
 			case Del:
 				action = new AbstractAction("Del") {
@@ -88,7 +87,6 @@ public class ClefTools extends JToolBar {
 						fireToolCalled(Tool.Del);
 					}
 				};
-				action.setEnabled(false);
 				break;
 			case Filter:
 				if (needSeparator) {

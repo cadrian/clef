@@ -175,6 +175,8 @@ public class ConfigurationPanel extends JTabbedPane {
 			}
 
 		});
+		tools.getAction(ClefTools.Tool.Save).setEnabled(false);
+		tools.getAction(ClefTools.Tool.Del).setEnabled(false);
 
 		result.add(tools, BorderLayout.NORTH);
 

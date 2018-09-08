@@ -132,6 +132,10 @@ public class DataPane<T extends Bean> extends JSplitPane {
 				}
 			}
 		});
+		if (showSave) {
+			tools.getAction(ClefTools.Tool.Save).setEnabled(false);
+		}
+		tools.getAction(ClefTools.Tool.Del).setEnabled(false);
 
 		left.add(tools, BorderLayout.NORTH);
 
