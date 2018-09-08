@@ -57,18 +57,34 @@ public class Application extends JFrame {
 
 	private final ApplicationContextImpl context;
 
+	private final DataPane<Session> sessionsPanel;
+	private final DataPane<Work> worksPanel;
+	private final DataPane<Author> authorsPanel;
+	private final DataPane<Pricing> pricingsPanel;
+	private final StatisticsPanel statisticsPanel;
+	private final ConfigurationPanel configurationPanel;
+
 	public Application(final Beans beans) {
 		final PresentationImpl presentation = new PresentationImpl(this);
 		context = new ApplicationContextImpl(beans, presentation);
 		context.setValue(AdvancedConfigurationEntry.offlineMode, false);
-		initUI();
-	}
 
-	private void initUI() {
 		setLookAndFeel(false);
-		setTitle(context.getPresentation().getMessage("ClefTitle"));
+		setTitle(presentation.getMessage("ClefTitle"));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+		sessionsPanel = new DataPane<>(context, true, Session.class, beans::getSessions, new SessionCreator(context),
+				BeanComparators::compareSessions, new SessionFormModel(Session.class));
+		worksPanel = new DataPane<>(context, true, Work.class, beans::getWorks, new WorkCreator(context),
+				BeanComparators::compareWorks, new WorkFormModel(Work.class), "Description", "Pieces", "Statistics");
+		authorsPanel = new DataPane<>(context, true, Author.class, beans::getAuthors, beans::createAuthor,
+				BeanComparators::compareAuthors, new AuthorFormModel(Author.class));
+		pricingsPanel = new DataPane<>(context, true, Pricing.class, beans::getPricings, beans::createPricing,
+				BeanComparators::comparePricings, new PricingFormModel(Pricing.class));
+		statisticsPanel = new StatisticsPanel(context);
+		configurationPanel = new ConfigurationPanel(context);
+
 		initComponents();
 		pack();
 	}
@@ -102,19 +118,6 @@ public class Application extends JFrame {
 		getContentPane().add(mainPane);
 
 		final JTabbedPane mgtPane = new JTabbedPane(SwingConstants.TOP);
-		final Beans beans = context.getBeans();
-
-		final DataPane<Session> sessionsPanel = new DataPane<>(context, true, Session.class, beans::getSessions,
-				new SessionCreator(context), BeanComparators::compareSessions, new SessionFormModel(Session.class));
-		final DataPane<Work> worksPanel = new DataPane<>(context, true, Work.class, beans::getWorks,
-				new WorkCreator(context), BeanComparators::compareWorks, new WorkFormModel(Work.class), "Description",
-				"Pieces", "Statistics");
-		final DataPane<Author> authorsPanel = new DataPane<>(context, true, Author.class, beans::getAuthors,
-				beans::createAuthor, BeanComparators::compareAuthors, new AuthorFormModel(Author.class));
-		final DataPane<Pricing> pricingsPanel = new DataPane<>(context, true, Pricing.class, beans::getPricings,
-				beans::createPricing, BeanComparators::comparePricings, new PricingFormModel(Pricing.class));
-		final StatisticsPanel statisticsPanel = new StatisticsPanel(context);
-		final ConfigurationPanel configurationPanel = new ConfigurationPanel(context);
 
 		mgtPane.addTab(context.getPresentation().getMessage("Works"), worksPanel);
 		mgtPane.addTab(context.getPresentation().getMessage("Authors"), authorsPanel);
@@ -123,7 +126,7 @@ public class Application extends JFrame {
 		mgtPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				refreshMgtPane(mgtPane, worksPanel, authorsPanel, pricingsPanel);
+				refreshMgtPane(mgtPane.getSelectedIndex());
 			}
 		});
 
@@ -135,8 +138,7 @@ public class Application extends JFrame {
 		mainPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				refreshMainPane(mainPane, sessionsPanel, statisticsPanel, mgtPane, worksPanel, authorsPanel,
-						pricingsPanel);
+				refreshMainPane(mainPane.getSelectedIndex(), mgtPane.getSelectedIndex());
 			}
 		});
 
@@ -175,9 +177,9 @@ public class Application extends JFrame {
 		});
 	}
 
-	private static void refreshMgtPane(final JTabbedPane mgtPane, final DataPane<Work> worksPanel,
-			final DataPane<Author> authorsPanel, final DataPane<Pricing> pricingsPanel) {
-		switch (mgtPane.getSelectedIndex()) {
+	private void refreshMgtPane(final int selectedMgtIndex) {
+		LOGGER.debug("Selected management index {}", selectedMgtIndex);
+		switch (selectedMgtIndex) {
 		case 0:
 			worksPanel.refresh();
 			break;
@@ -188,24 +190,24 @@ public class Application extends JFrame {
 			pricingsPanel.refresh();
 			break;
 		default:
-			// ignored
+			LOGGER.debug("ignored strange management index {}", selectedMgtIndex);
 		}
 	}
 
-	private static void refreshMainPane(final JTabbedPane mainPane, final DataPane<Session> sessionsPanel,
-			final StatisticsPanel statisticsPanel, final JTabbedPane mgtPane, final DataPane<Work> worksPanel,
-			final DataPane<Author> authorsPanel, final DataPane<Pricing> pricingsPanel) {
-		switch (mainPane.getSelectedIndex()) {
+	private void refreshMainPane(final int selectedMainIndex, final int selectedMgtIndex) {
+		LOGGER.debug("Selected main index {}", selectedMainIndex);
+		switch (selectedMainIndex) {
 		case 0:
 			sessionsPanel.refresh();
 			break;
 		case 1:
-			refreshMgtPane(mgtPane, worksPanel, authorsPanel, pricingsPanel);
+			refreshMgtPane(selectedMgtIndex);
 			break;
 		case 2:
 			statisticsPanel.refresh();
+			break;
 		default:
-			// ignored
+			LOGGER.debug("ignored strange main index {}", selectedMainIndex);
 		}
 	}
 
