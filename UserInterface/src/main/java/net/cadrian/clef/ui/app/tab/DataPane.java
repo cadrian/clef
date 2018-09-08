@@ -17,6 +17,10 @@
 package net.cadrian.clef.ui.app.tab;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,12 +31,14 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 
 import javax.swing.Action;
+import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -45,9 +51,11 @@ import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.Presentation;
 import net.cadrian.clef.ui.app.form.BeanCreator;
+import net.cadrian.clef.ui.app.form.BeanFilter;
 import net.cadrian.clef.ui.app.form.BeanForm;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.BeanGetter;
+import net.cadrian.clef.ui.app.tab.filter.JBeanFilter;
 import net.cadrian.clef.ui.tools.SortableListModel;
 import net.cadrian.clef.ui.widget.ClefTools;
 import net.cadrian.clef.ui.widget.ClefTools.Tool;
@@ -68,6 +76,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 
 	private final BeanGetter<T> beanGetter;
 	private final BeanCreator<T> beanCreator;
+	private final BeanFilter<T> beanFilter;
 	private final ApplicationContext context;
 	private final BeanFormModel<T> beanFormModel;
 	private final List<String> tabs;
@@ -77,11 +86,12 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	private BeanForm<T> currentForm;
 
 	public DataPane(final ApplicationContext context, final boolean showSave, final Class<T> beanType,
-			final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final Comparator<T> beanComparator,
-			final BeanFormModel<T> beanFormModel, final String... tabs) {
+			final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final BeanFilter<T> beanFilter,
+			final Comparator<T> beanComparator, final BeanFormModel<T> beanFormModel, final String... tabs) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
 		this.beanGetter = Objects.requireNonNull(beanGetter);
 		this.beanCreator = Objects.requireNonNull(beanCreator);
+		this.beanFilter = beanFilter;
 		this.context = Objects.requireNonNull(context);
 		this.beanFormModel = Objects.requireNonNull(beanFormModel);
 		this.tabs = tabs.length == 0 ? DEFAULT_TABS : Arrays.asList(tabs);
@@ -107,10 +117,18 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		});
 
 		if (showSave) {
-			tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Save,
-					ClefTools.Tool.Filter);
+			if (beanFilter == null) {
+				tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Save);
+			} else {
+				tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Save,
+						ClefTools.Tool.Filter);
+			}
 		} else {
-			tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Filter);
+			if (beanFilter == null) {
+				tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del);
+			} else {
+				tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Filter);
+			}
 		}
 		tools.addListener(new ClefTools.Listener() {
 
@@ -127,7 +145,14 @@ public class DataPane<T extends Bean> extends JSplitPane {
 					saveData();
 					break;
 				case Filter:
-					// TODO
+					final Point frameLocationOnScreen = context.getPresentation().getApplicationFrame().getLayeredPane()
+							.getLocationOnScreen();
+					final Point toolLocationOnScreen = tools.getLocationOnScreen(tool);
+					final Dimension toolSize = tools.getSize(tool);
+					final int x = toolLocationOnScreen.x - frameLocationOnScreen.x + toolSize.width / 2;
+					final int y = toolLocationOnScreen.y - frameLocationOnScreen.y + toolSize.height / 2;
+					final Point position = new Point(x, y);
+					showFilter(position, tools.getAction(tool));
 					break;
 				}
 			}
@@ -282,6 +307,31 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		}
 	}
 
+	private void showFilter(final Point position, final Action filterAction) {
+		LOGGER.debug("Showing filter");
+		filterAction.setEnabled(false);
+		final JLayeredPane layeredPane = context.getPresentation().getApplicationFrame().getLayeredPane();
+		final JBeanFilter<T> beanFilterComponent = beanFilter.getFilterComponent(context);
+		beanFilterComponent.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				layeredPane.remove(beanFilterComponent);
+				SwingUtilities.invokeLater(new Runnable() {
+
+					@Override
+					public void run() {
+						layeredPane.repaint();
+						filterAction.setEnabled(true);
+					}
+				});
+				refreshList(list.getSelectedValue());
+			}
+		});
+		beanFilterComponent.setLocation(position);
+		layeredPane.add(beanFilterComponent, JLayeredPane.MODAL_LAYER, 1000);
+	}
+
 	void refreshList(final T selected) {
 		if (context.applicationIsClosing()) {
 			return;
@@ -292,8 +342,16 @@ public class DataPane<T extends Bean> extends JSplitPane {
 			@Override
 			protected Void doInBackground() throws Exception {
 				try {
-					for (final T bean : beanGetter.getAllBeans()) {
-						publish(bean);
+					if (beanFilter == null) {
+						for (final T bean : beanGetter.getAllBeans()) {
+							publish(bean);
+						}
+					} else {
+						for (final T bean : beanGetter.getAllBeans()) {
+							if (beanFilter.isVisible(bean)) {
+								publish(bean);
+							}
+						}
 					}
 				} catch (final ModelException e) {
 					LOGGER.error("Error while refreshing data", e);

@@ -38,6 +38,7 @@ abstract class AbstractSortedListModel<E> extends AbstractListModel<E> {
 	public AbstractSortedListModel(final Comparator<E> comparator, final Collection<? extends E> init) {
 		this.comparator = comparator;
 		elements.addAll(init);
+		Collections.sort(elements, comparator);
 		fireIntervalAdded(this, 0, elements.size() - 1);
 	}
 
@@ -55,6 +56,7 @@ abstract class AbstractSortedListModel<E> extends AbstractListModel<E> {
 		final int oldSize = elements.size();
 		elements.clear();
 		elements.addAll(init);
+		Collections.sort(elements, comparator);
 		final int size = elements.size();
 		if (size < oldSize) {
 			if (size > 0) {

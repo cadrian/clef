@@ -1,0 +1,201 @@
+/*
+ * This file is part of Clef.
+ *
+ * Clef is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * Clef is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+package net.cadrian.clef.ui.app.tab.filter;
+
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.cadrian.clef.model.Beans;
+import net.cadrian.clef.model.bean.Author;
+import net.cadrian.clef.model.bean.BeanComparators;
+import net.cadrian.clef.model.bean.Piece;
+import net.cadrian.clef.model.bean.Session;
+import net.cadrian.clef.model.bean.Work;
+import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
+import net.cadrian.clef.ui.Presentation;
+import net.cadrian.clef.ui.tools.SortableListModel;
+import net.cadrian.clef.ui.widget.ClefTools;
+
+public class JSessionFilter extends JBeanFilter<Session> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(JSessionFilter.class);
+
+	private static final long serialVersionUID = 6199756832553677405L;
+
+	private final JList<Author> authors;
+	private final JList<Work> works;
+	private final JList<Piece> pieces;
+
+	public JSessionFilter(final ApplicationContext context) {
+		super(new BorderLayout());
+
+		final Beans beans = context.getBeans();
+		final Presentation presentation = context.getPresentation();
+
+		final Collection<? extends Author> allAuthors = beans.getAuthors();
+		final SortableListModel<Author> authorsModel = new SortableListModel<>(BeanComparators::compareAuthors,
+				allAuthors);
+		authors = new JList<>(authorsModel);
+
+		final JPanel authorsPanel = new JPanel(new BorderLayout());
+		authorsPanel.add(
+				presentation
+						.bold(new JLabel(presentation.getMessage("SessionFilterAuthorsTitle"), SwingConstants.CENTER)),
+				BorderLayout.NORTH);
+		authorsPanel.add(new JScrollPane(authors), BorderLayout.CENTER);
+
+		final Collection<? extends Work> allWorks = context.getBeans().getWorks();
+		final SortableListModel<Work> worksModel = new SortableListModel<>(BeanComparators::compareWorks, allWorks);
+		works = new JList<>(worksModel);
+
+		final JPanel worksPanel = new JPanel(new BorderLayout());
+		worksPanel.add(
+				presentation
+						.bold(new JLabel(presentation.getMessage("SessionFilterWorksTitle"), SwingConstants.CENTER)),
+				BorderLayout.NORTH);
+		worksPanel.add(new JScrollPane(works), BorderLayout.CENTER);
+
+		final SortableListModel<Piece> piecesModel = new SortableListModel<>(BeanComparators::comparePieces);
+		pieces = new JList<>(piecesModel);
+		final JPanel piecesPanel = new JPanel(new BorderLayout());
+		piecesPanel.add(
+				presentation
+						.bold(new JLabel(presentation.getMessage("SessionFilterPiecesTitle"), SwingConstants.CENTER)),
+				BorderLayout.NORTH);
+		piecesPanel.add(new JScrollPane(pieces), BorderLayout.CENTER);
+
+		authors.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(final ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) {
+					final Author author = authors.getSelectedValue();
+					if (author == null) {
+						worksModel.replaceAll(allWorks);
+					} else {
+						final List<Work> authorWorks = new ArrayList<>();
+						for (final Work work : context.getBeans().getWorks()) {
+							if (author.equals(work.getAuthor())) {
+								authorWorks.add(work);
+							}
+						}
+						worksModel.replaceAll(authorWorks);
+					}
+				}
+			}
+		});
+
+		works.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) {
+					final Work work = works.getSelectedValue();
+					if (work == null) {
+						piecesModel.removeAll();
+					} else {
+						if (context.<Boolean>getValue(AdvancedConfigurationEntry.offlineMode)) {
+							final List<Piece> workPieces = new ArrayList<>();
+							for (Piece piece : work.getPieces()) {
+								do {
+									workPieces.add(piece);
+									piece = piece.getPrevious();
+								} while (piece != null);
+							}
+							piecesModel.replaceAll(workPieces);
+						} else {
+							piecesModel.replaceAll(work.getPieces());
+						}
+					}
+				}
+			}
+		});
+
+		final JPanel lists = new JPanel();
+		lists.setLayout(new BoxLayout(lists, BoxLayout.X_AXIS));
+		lists.add(authorsPanel);
+		lists.add(worksPanel);
+		lists.add(piecesPanel);
+
+		final ClefTools tools = new ClefTools(context, ClefTools.Tool.Del, ClefTools.Tool.Filter);
+		tools.addListener(new ClefTools.Listener() {
+
+			@Override
+			public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
+				switch (tool) {
+				case Del:
+					pieces.clearSelection();
+					works.clearSelection();
+					authors.clearSelection();
+					break;
+				case Filter:
+					final ActionEvent e = new ActionEvent(JSessionFilter.this, ActionEvent.ACTION_PERFORMED,
+							tool.name());
+					fireActionPerformed(e);
+					break;
+				default:
+				}
+			}
+		});
+
+		add(lists, BorderLayout.CENTER);
+		add(tools, BorderLayout.NORTH);
+
+		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+
+		setSize(getLayout().preferredLayoutSize(this));
+	}
+
+	@Override
+	public boolean isBeanVisible(final Session bean) {
+		final Piece piece = pieces.getSelectedValue();
+		LOGGER.debug("selected piece: {}", piece);
+		if (piece != null && !piece.equals(bean.getPiece())) {
+			return false;
+		}
+		final Work work = works.getSelectedValue();
+		LOGGER.debug("selected work: {}", work);
+		if (work != null && !work.equals(bean.getPiece().getWork())) {
+			return false;
+		}
+		final Author author = authors.getSelectedValue();
+		LOGGER.debug("selected author: {}", author);
+		if (author != null && !author.equals(bean.getPiece().getWork().getAuthor())) {
+			return false;
+		}
+		return true;
+	}
+
+}

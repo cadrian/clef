@@ -16,6 +16,8 @@
  */
 package net.cadrian.clef.ui.widget;
 
+import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +27,7 @@ import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
@@ -43,6 +46,7 @@ public class ClefTools extends JToolBar {
 	}
 
 	private final Map<Tool, Action> actions = new HashMap<>();
+	private final Map<Tool, JButton> buttons = new HashMap<>();
 
 	private final List<Listener> listeners = new ArrayList<>();
 
@@ -105,7 +109,7 @@ public class ClefTools extends JToolBar {
 				throw new IllegalArgumentException("Unknown tool: " + tool);
 			}
 			actions.put(tool, action);
-			add(action);
+			buttons.put(tool, add(action));
 			needSeparator = true;
 		}
 
@@ -124,6 +128,39 @@ public class ClefTools extends JToolBar {
 
 	public Action getAction(final Tool tool) {
 		return actions.get(tool);
+	}
+
+	public Point getLocation(final Tool tool) {
+		final Point result;
+		final JButton button = buttons.get(tool);
+		if (button != null) {
+			result = button.getLocation();
+		} else {
+			result = null;
+		}
+		return result;
+	}
+
+	public Dimension getSize(final Tool tool) {
+		final Dimension result;
+		final JButton button = buttons.get(tool);
+		if (button != null) {
+			result = button.getSize();
+		} else {
+			result = null;
+		}
+		return result;
+	}
+
+	public Point getLocationOnScreen(final Tool tool) {
+		final Point result;
+		final JButton button = buttons.get(tool);
+		if (button != null) {
+			result = button.getLocationOnScreen();
+		} else {
+			result = null;
+		}
+		return result;
 	}
 
 }
