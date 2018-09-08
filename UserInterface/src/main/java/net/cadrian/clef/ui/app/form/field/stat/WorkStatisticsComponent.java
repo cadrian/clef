@@ -169,7 +169,7 @@ class WorkStatisticsComponent extends JPanel {
 				final Date start = session.getStart();
 				final Date stop = session.getStop();
 				if (start != null && stop != null) {
-					long wt = stop.getTime() - start.getTime();
+					final long wt = stop.getTime() - start.getTime();
 					if (wt > 0) {
 						workTime += wt;
 					}
@@ -183,7 +183,7 @@ class WorkStatisticsComponent extends JPanel {
 				final Date start = session.getStart();
 				final Date stop = session.getStop();
 				if (start != null && stop != null) {
-					long wt = stop.getTime() - start.getTime();
+					final long wt = stop.getTime() - start.getTime();
 					if (wt > 0) {
 						allWorkTime += wt;
 					}

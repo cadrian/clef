@@ -122,7 +122,7 @@ public class ClefTools extends JToolBar {
 		listeners.add(listener);
 	}
 
-	public Action getAction(Tool tool) {
+	public Action getAction(final Tool tool) {
 		return actions.get(tool);
 	}
 

@@ -30,11 +30,11 @@ public class ReflectFieldGetter<T extends Bean, D> implements FieldGetter<T, D> 
 		this.getter = getter;
 	}
 
-	public ReflectFieldGetter(Class<T> beanType, String fieldName) {
+	public ReflectFieldGetter(final Class<T> beanType, final String fieldName) {
 		this(getMethod(beanType, fieldName));
 	}
 
-	static <T extends Bean> Method getMethod(Class<T> beanType, String fieldName) {
+	static <T extends Bean> Method getMethod(final Class<T> beanType, final String fieldName) {
 		try {
 			return beanType.getMethod("get" + fieldName);
 		} catch (NoSuchMethodException | SecurityException e) {

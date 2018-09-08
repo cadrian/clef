@@ -141,7 +141,7 @@ public class SessionCreator implements BeanCreator<Session> {
 		tools.addListener(new ClefTools.Listener() {
 
 			@Override
-			public void toolCalled(ClefTools tools, ClefTools.Tool tool) {
+			public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
 				switch (tool) {
 				case Add:
 					final Work work = works.getSelectedValue();

@@ -271,7 +271,7 @@ public class ModelBeans implements Beans {
 	}
 
 	@Override
-	public Piece createPieceVersion(Piece piece) {
+	public Piece createPieceVersion(final Piece piece) {
 		final PieceBean result;
 		try {
 			final net.cadrian.clef.database.bean.Piece template = new net.cadrian.clef.database.bean.Piece();

@@ -35,20 +35,21 @@ public class ReflectFieldSetter<T extends Bean, D> implements FieldSetter<T, D> 
 		this.setter = setter;
 	}
 
-	public ReflectFieldSetter(Class<T> beanType, String fieldName, boolean writable) {
+	public ReflectFieldSetter(final Class<T> beanType, final String fieldName, final boolean writable) {
 		this(setMethod(beanType, fieldName, writable, ReflectFieldGetter.<T>getMethod(beanType, fieldName)));
 	}
 
-	static <T extends Bean> Method setMethod(Class<T> beanType, String fieldName, boolean writable, Method getter) {
+	static <T extends Bean> Method setMethod(final Class<T> beanType, final String fieldName, final boolean writable,
+			final Method getter) {
 		try {
 			return beanType.getMethod("set" + fieldName, getter.getReturnType());
-		} catch (NoSuchMethodException e) {
+		} catch (final NoSuchMethodException e) {
 			if (writable) {
 				throw new ModelException(e);
 			}
 			LOGGER.debug("No setter, but {} is not writable anyway", fieldName);
 			return null;
-		} catch (SecurityException e) {
+		} catch (final SecurityException e) {
 			throw new ModelException(e);
 		}
 	}

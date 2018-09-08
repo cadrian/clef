@@ -78,11 +78,11 @@ abstract class AbstractPropertiesComponent implements FieldComponent<Collection<
 		left.add(new JScrollPane(list), BorderLayout.CENTER);
 
 		if (writable) {
-			ClefTools tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del);
+			final ClefTools tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del);
 			tools.addListener(new ClefTools.Listener() {
 
 				@Override
-				public void toolCalled(ClefTools tools, ClefTools.Tool tool) {
+				public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
 					switch (tool) {
 					case Add:
 						final int index = addData();

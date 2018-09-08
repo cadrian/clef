@@ -50,22 +50,22 @@ public class Converters {
 
 	public static final long parseTime(final String time) {
 		final long result;
-		String[] split = time.split(":");
+		final String[] split = time.split(":");
 		switch (split.length) {
 		case 0: { // seconds
 			result = Long.parseLong(split[0]);
 			break;
 		}
 		case 1: { // minutes and seconds
-			long s = Long.parseLong(split[1]);
-			long m = Long.parseLong(split[0]);
+			final long s = Long.parseLong(split[1]);
+			final long m = Long.parseLong(split[0]);
 			result = m * 60L + s;
 			break;
 		}
 		default: { // hours, minutes, and seconds -- ignore extra
-			long s = Long.parseLong(split[2]);
-			long m = Long.parseLong(split[1]);
-			long h = Long.parseLong(split[0]);
+			final long s = Long.parseLong(split[2]);
+			final long m = Long.parseLong(split[1]);
+			final long h = Long.parseLong(split[0]);
 			result = h * 3600L + m * 60L + s;
 		}
 		}

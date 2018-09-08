@@ -77,7 +77,7 @@ class DateComponentPicker extends JDialog {
 		tools.addListener(new ClefTools.Listener() {
 
 			@Override
-			public void toolCalled(ClefTools tools, ClefTools.Tool tool) {
+			public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
 				switch (tool) {
 				case Save:
 					final LocalDateTime ldt = picker.getDateTimeStrict();
