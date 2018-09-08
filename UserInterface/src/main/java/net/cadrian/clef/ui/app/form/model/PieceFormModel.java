@@ -47,7 +47,7 @@ public class PieceFormModel extends BeanFormModel<Piece> {
 		super(COMPONENT_FACTORIES);
 	}
 
-	private static Long getWorkTime(final Piece piece) {
+	static Long getWorkTime(final Piece piece) {
 		long result = 0;
 		for (final Session session : piece.getSessions()) {
 			final Date start = session.getStart();

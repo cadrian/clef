@@ -21,11 +21,13 @@ import java.util.Collection;
 
 import javax.swing.JComponent;
 
+import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
 import net.cadrian.clef.ui.app.form.field.bean.BeanComponentFactory;
+import net.cadrian.clef.ui.app.form.field.numeric.DurationFieldComponentFactory;
 import net.cadrian.clef.ui.app.form.field.piece.PiecesComponentFactory;
 import net.cadrian.clef.ui.app.form.field.properties.PropertiesComponentFactory;
 import net.cadrian.clef.ui.app.form.field.stat.WorkStatisticsComponentFactory;
@@ -40,10 +42,19 @@ public class WorkFormModel extends BeanFormModel<Work> {
 					new TextFieldComponentFactory<>(Work.class, "Name", true, "Description"),
 					new TextAreaComponentFactory<>(Work.class, "Notes", true, "Description"),
 					new PropertiesComponentFactory<>(Work.class, "Properties", Entity.work, true, "Description"),
+					new DurationFieldComponentFactory<>(Work.class, "WorkTime", WorkFormModel::getWorkTime),
 					new PiecesComponentFactory(new PieceFormModel(), "Pieces"), new WorkStatisticsComponentFactory());
 
 	public WorkFormModel(final Class<Work> beanType) {
 		super(COMPONENT_FACTORIES);
+	}
+
+	static Long getWorkTime(final Work work) {
+		long result = 0;
+		for (final Piece piece : work.getPieces()) {
+			result += PieceFormModel.getWorkTime(piece);
+		}
+		return result;
 	}
 
 }
