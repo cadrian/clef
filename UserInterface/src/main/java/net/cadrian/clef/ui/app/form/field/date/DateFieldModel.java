@@ -16,7 +16,6 @@
  */
 package net.cadrian.clef.ui.app.form.field.date;
 
-import java.lang.reflect.Method;
 import java.util.Date;
 
 import net.cadrian.clef.model.Bean;
@@ -25,6 +24,8 @@ import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 import net.cadrian.clef.ui.widget.DateSelector;
 
 class DateFieldModel<T extends Bean> extends AbstractSimpleFieldModel<T, Date, DateSelector> {
@@ -32,8 +33,8 @@ class DateFieldModel<T extends Bean> extends AbstractSimpleFieldModel<T, Date, D
 	private DateFieldModel<T> upperBound;
 	private DateFieldModel<T> lowerBound;
 
-	DateFieldModel(final String name, final String tab, final Method getter, final Method setter,
-			final FieldComponentFactory<T, Date, DateSelector> componentFactory) {
+	DateFieldModel(final String name, final String tab, final FieldGetter<T, Date> getter,
+			final FieldSetter<T, Date> setter, final FieldComponentFactory<T, Date, DateSelector> componentFactory) {
 		super(name, tab, getter, setter, componentFactory);
 	}
 

@@ -16,7 +16,6 @@
  */
 package net.cadrian.clef.ui.app.form.field.properties;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
 
 import javax.swing.JSplitPane;
@@ -29,13 +28,17 @@ import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 
 class PropertiesFieldModel<T extends Bean>
 		extends AbstractSimpleFieldModel<T, Collection<? extends Property>, JSplitPane> {
 
 	private final Entity entity;
 
-	PropertiesFieldModel(final String name, final String tab, final Method getter, final Method setter,
+	PropertiesFieldModel(final String name, final String tab,
+			final FieldGetter<T, Collection<? extends Property>> getter,
+			final FieldSetter<T, Collection<? extends Property>> setter,
 			final FieldComponentFactory<T, Collection<? extends Property>, JSplitPane> componentFactory,
 			final Entity entity) {
 		super(name, tab, getter, setter, componentFactory);

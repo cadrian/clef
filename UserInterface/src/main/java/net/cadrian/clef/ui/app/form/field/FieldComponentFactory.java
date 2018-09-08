@@ -32,8 +32,6 @@ public interface FieldComponentFactory<T extends Bean, D, J extends JComponent> 
 
 	String getFieldName();
 
-	Class<?> getDataType();
-
 	boolean isWritable();
 
 }

@@ -16,7 +16,6 @@
  */
 package net.cadrian.clef.ui.app.form.field.piece;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
 
 import org.slf4j.Logger;
@@ -29,6 +28,8 @@ import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 import net.cadrian.clef.ui.app.tab.DataPane;
 import net.cadrian.clef.ui.widget.VersionSpinner;
 
@@ -36,7 +37,8 @@ class PieceVersionFieldModel extends AbstractSimpleFieldModel<Piece, Long, Versi
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PieceVersionFieldModel.class);
 
-	protected PieceVersionFieldModel(final String tab, final Method getter, final Method setter,
+	protected PieceVersionFieldModel(final String tab, final FieldGetter<Piece, Long> getter,
+			final FieldSetter<Piece, Long> setter,
 			final FieldComponentFactory<Piece, Long, VersionSpinner> componentFactory) {
 		super("Version", tab, getter, setter, componentFactory);
 	}

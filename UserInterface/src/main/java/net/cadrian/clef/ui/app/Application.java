@@ -26,6 +26,8 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,15 +115,28 @@ public class Application extends JFrame {
 				beans::createPricing, BeanComparators::comparePricings, new PricingFormModel(Pricing.class));
 		final ConfigurationPanel configurationPanel = new ConfigurationPanel(context);
 
-		mainPane.addTab(context.getPresentation().getMessage("Sessions"), sessionsPanel);
-
 		mgtPane.addTab(context.getPresentation().getMessage("Works"), worksPanel);
 		mgtPane.addTab(context.getPresentation().getMessage("Authors"), authorsPanel);
 		mgtPane.addTab(context.getPresentation().getMessage("Pricings"), pricingsPanel);
 
+		mgtPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				refreshMgtPane(mgtPane, worksPanel, authorsPanel, pricingsPanel);
+			}
+		});
+
+		mainPane.addTab(context.getPresentation().getMessage("Sessions"), sessionsPanel);
 		mainPane.addTab(context.getPresentation().getMessage("Management"), mgtPane);
 		mainPane.addTab(context.getPresentation().getMessage("Statistics"), new StatisticsPanel(context));
 		mainPane.addTab(context.getPresentation().getMessage("Configuration"), configurationPanel);
+
+		mainPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				refreshMainPane(mainPane, mgtPane, sessionsPanel, worksPanel, authorsPanel, pricingsPanel);
+			}
+		});
 
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -156,6 +171,38 @@ public class Application extends JFrame {
 				dispose();
 			}
 		});
+	}
+
+	private static void refreshMgtPane(final JTabbedPane mgtPane, final DataPane<Work> worksPanel,
+			final DataPane<Author> authorsPanel, final DataPane<Pricing> pricingsPanel) {
+		switch (mgtPane.getSelectedIndex()) {
+		case 0:
+			worksPanel.refresh();
+			break;
+		case 1:
+			authorsPanel.refresh();
+			break;
+		case 2:
+			pricingsPanel.refresh();
+			break;
+		default:
+			// ignored
+		}
+	}
+
+	private static void refreshMainPane(final JTabbedPane mainPane, final JTabbedPane mgtPane,
+			final DataPane<Session> sessionsPanel, final DataPane<Work> worksPanel, final DataPane<Author> authorsPanel,
+			final DataPane<Pricing> pricingsPanel) {
+		switch (mainPane.getSelectedIndex()) {
+		case 0:
+			sessionsPanel.refresh();
+			break;
+		case 1:
+			refreshMgtPane(mgtPane, worksPanel, authorsPanel, pricingsPanel);
+			break;
+		default:
+			// ignored
+		}
 	}
 
 }

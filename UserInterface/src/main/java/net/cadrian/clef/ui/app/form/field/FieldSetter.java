@@ -14,24 +14,17 @@
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package net.cadrian.clef.ui.app.form.field.stat;
-
-import javax.swing.JPanel;
+package net.cadrian.clef.ui.app.form.field;
 
 import net.cadrian.clef.model.Bean;
-import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
 
-abstract class AbstractStatisticsComponentFactory<T extends Bean, D extends StatisticsData<T>>
-		implements FieldComponentFactory<T, D, JPanel> {
+@FunctionalInterface
+public interface FieldSetter<T extends Bean, D> {
 
-	@Override
-	public String getFieldName() {
-		return null;
-	}
+	void set(T bean, D data);
 
-	@Override
-	public boolean isWritable() {
-		return false;
+	default boolean isSynthetic() {
+		return !(this instanceof ReflectFieldSetter);
 	}
 
 }

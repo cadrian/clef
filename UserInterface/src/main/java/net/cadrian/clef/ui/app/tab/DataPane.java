@@ -158,6 +158,13 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		return list.getSelectedValue();
 	}
 
+	public void refresh() {
+		final T selection = getSelection();
+		if (selection != null) {
+			refreshList(selection);
+		}
+	}
+
 	public void select(final T version, final boolean refresh) {
 		LOGGER.debug("Select version: {}", version);
 		if (refresh) {

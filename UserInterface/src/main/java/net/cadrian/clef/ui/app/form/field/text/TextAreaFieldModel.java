@@ -16,19 +16,20 @@
  */
 package net.cadrian.clef.ui.app.form.field.text;
 
-import java.lang.reflect.Method;
-
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 import net.cadrian.clef.ui.widget.rte.RichTextEditor;
 
 class TextAreaFieldModel<T extends Bean> extends AbstractSimpleFieldModel<T, String, RichTextEditor> {
 
-	TextAreaFieldModel(final String name, final String tab, final Method getter, final Method setter,
+	TextAreaFieldModel(final String name, final String tab, final FieldGetter<T, String> getter,
+			final FieldSetter<T, String> setter,
 			final FieldComponentFactory<T, String, RichTextEditor> componentFactory) {
 		super(name, tab, getter, setter, componentFactory);
 	}

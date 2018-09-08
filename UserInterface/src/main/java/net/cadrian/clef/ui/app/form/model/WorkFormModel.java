@@ -21,8 +21,6 @@ import java.util.Collection;
 
 import javax.swing.JComponent;
 
-import net.cadrian.clef.model.bean.Author;
-import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
@@ -37,8 +35,8 @@ import net.cadrian.clef.ui.app.form.field.text.TextFieldComponentFactory;
 public class WorkFormModel extends BeanFormModel<Work> {
 
 	private static final Collection<FieldComponentFactory<Work, ?, ? extends JComponent>> COMPONENT_FACTORIES = Arrays
-			.asList(new BeanComponentFactory<>(Work.class, "Author", Author.class, "Description"),
-					new BeanComponentFactory<>(Work.class, "Pricing", Pricing.class, "Description"),
+			.asList(new BeanComponentFactory<>(Work.class, "Author", "Description"),
+					new BeanComponentFactory<>(Work.class, "Pricing", "Description"),
 					new TextFieldComponentFactory<>(Work.class, "Name", true, "Description"),
 					new TextAreaComponentFactory<>(Work.class, "Notes", true, "Description"),
 					new PropertiesComponentFactory<>(Work.class, "Properties", Entity.work, true, "Description"),

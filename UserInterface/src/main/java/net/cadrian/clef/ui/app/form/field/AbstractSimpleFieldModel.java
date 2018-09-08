@@ -16,8 +16,6 @@
  */
 package net.cadrian.clef.ui.app.form.field;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -45,14 +43,14 @@ public abstract class AbstractSimpleFieldModel<T extends Bean, D, J extends JCom
 		return result;
 	}
 
-	private final String name;
-	private final String tab;
-	private final Method getter;
-	private final Method setter;
+	protected final String name;
+	protected final String tab;
+	protected final FieldGetter<T, D> getter;
+	protected final FieldSetter<T, D> setter;
 	protected final FieldComponentFactory<T, D, J> componentFactory;
 
-	protected AbstractSimpleFieldModel(final String name, final String tab, final Method getter, final Method setter,
-			final FieldComponentFactory<T, D, J> componentFactory) {
+	protected AbstractSimpleFieldModel(final String name, final String tab, final FieldGetter<T, D> getter,
+			final FieldSetter<T, D> setter, final FieldComponentFactory<T, D, J> componentFactory) {
 		this.name = name;
 		this.tab = tab;
 		this.getter = getter;
@@ -99,13 +97,7 @@ public abstract class AbstractSimpleFieldModel<T extends Bean, D, J extends JCom
 
 	@Override
 	public D load(final T bean) {
-		try {
-			@SuppressWarnings("unchecked")
-			final D data = (D) getter.invoke(bean);
-			return data;
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new ModelException(e);
-		}
+		return getter.get(bean);
 	}
 
 	@Override
@@ -113,11 +105,7 @@ public abstract class AbstractSimpleFieldModel<T extends Bean, D, J extends JCom
 		if (setter == null) {
 			LOGGER.info("no setter for {}", name);
 		} else {
-			try {
-				setter.invoke(bean, data);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new ModelException(e);
-			}
+			setter.set(bean, data);
 		}
 	}
 

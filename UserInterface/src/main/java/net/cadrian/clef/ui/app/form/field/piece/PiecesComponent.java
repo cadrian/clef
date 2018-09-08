@@ -50,7 +50,7 @@ class PiecesComponent implements FieldComponent<Collection<Piece>, DataPane<Piec
 
 	@Override
 	public void setData(final Collection<Piece> data) {
-		// ignored
+		component.refresh();
 	}
 
 	@Override

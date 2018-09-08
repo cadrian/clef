@@ -16,11 +16,11 @@
  */
 package net.cadrian.clef.ui.app.form.field.text;
 
-import java.lang.reflect.Method;
-
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
 import net.cadrian.clef.ui.app.form.field.FieldModel;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 import net.cadrian.clef.ui.widget.rte.RichTextEditor;
 
 public class TextAreaComponentFactory<T extends Bean>
@@ -36,14 +36,9 @@ public class TextAreaComponentFactory<T extends Bean>
 	}
 
 	@Override
-	protected FieldModel<T, String, RichTextEditor> createModel(final String fieldName, final Method getter,
-			final Method setter) {
+	protected FieldModel<T, String, RichTextEditor> createModel(final String fieldName,
+			final FieldGetter<T, String> getter, final FieldSetter<T, String> setter) {
 		return new TextAreaFieldModel<>(fieldName, tab, getter, setter, this);
-	}
-
-	@Override
-	public Class<String> getDataType() {
-		return String.class;
 	}
 
 }

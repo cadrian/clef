@@ -16,13 +16,13 @@
  */
 package net.cadrian.clef.ui.app.form.field.text;
 
-import java.lang.reflect.Method;
-
 import javax.swing.JTextField;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
 import net.cadrian.clef.ui.app.form.field.FieldModel;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 
 public class TextFieldComponentFactory<T extends Bean>
 		extends AbstractSimpleFieldComponentFactory<T, String, JTextField> {
@@ -37,14 +37,9 @@ public class TextFieldComponentFactory<T extends Bean>
 	}
 
 	@Override
-	protected FieldModel<T, String, JTextField> createModel(final String fieldName, final Method getter,
-			final Method setter) {
+	protected FieldModel<T, String, JTextField> createModel(final String fieldName, final FieldGetter<T, String> getter,
+			final FieldSetter<T, String> setter) {
 		return new TextFieldFieldModel<>(fieldName, tab, getter, setter, this);
-	}
-
-	@Override
-	public Class<String> getDataType() {
-		return String.class;
 	}
 
 }

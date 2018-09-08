@@ -16,12 +16,13 @@
  */
 package net.cadrian.clef.ui.app.form.field.date;
 
-import java.lang.reflect.Method;
 import java.util.Date;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
 import net.cadrian.clef.ui.app.form.field.FieldModel;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 import net.cadrian.clef.ui.widget.DateSelector;
 
 public class DateComponentFactory<T extends Bean> extends AbstractSimpleFieldComponentFactory<T, Date, DateSelector> {
@@ -39,8 +40,8 @@ public class DateComponentFactory<T extends Bean> extends AbstractSimpleFieldCom
 	}
 
 	@Override
-	protected FieldModel<T, Date, DateSelector> createModel(final String fieldName, final Method getter,
-			final Method setter) {
+	protected FieldModel<T, Date, DateSelector> createModel(final String fieldName, final FieldGetter<T, Date> getter,
+			final FieldSetter<T, Date> setter) {
 		return new DateFieldModel<>(fieldName, tab, getter, setter, this);
 	}
 
@@ -54,11 +55,6 @@ public class DateComponentFactory<T extends Bean> extends AbstractSimpleFieldCom
 			((DateFieldModel<T>) model).setLowerBound((DateFieldModel<T>) AbstractSimpleFieldComponentFactory
 					.<T, Date, DateSelector>getCachedModel(lowerBound.getBeanType(), lowerBound.getFieldName()));
 		}
-	}
-
-	@Override
-	public Class<Date> getDataType() {
-		return Date.class;
 	}
 
 	public void setUpperBound(final DateComponentFactory<T> upperBound) {

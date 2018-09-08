@@ -38,7 +38,7 @@ public class DurationTextField extends JFormattedTextField {
 		@Override
 		public Object stringToValue(final String text) throws ParseException {
 			if (text != null && !text.isEmpty()) {
-				Long result = Converters.parseTime(text);
+				final Long result = Converters.parseTime(text);
 				LOGGER.debug("{} => {}", text, result);
 				return result;
 			}

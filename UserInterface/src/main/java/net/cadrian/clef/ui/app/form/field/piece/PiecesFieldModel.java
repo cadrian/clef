@@ -16,7 +16,6 @@
  */
 package net.cadrian.clef.ui.app.form.field.piece;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
 
 import net.cadrian.clef.model.ModelException;
@@ -29,13 +28,16 @@ import net.cadrian.clef.ui.app.form.BeanGetter;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 import net.cadrian.clef.ui.app.tab.DataPane;
 
 class PiecesFieldModel extends AbstractSimpleFieldModel<Work, Collection<Piece>, DataPane<Piece>> {
 
 	private final BeanFormModel<Piece> beanFormModel;
 
-	protected PiecesFieldModel(final String name, final String tab, final Method getter, final Method setter,
+	protected PiecesFieldModel(final String name, final String tab, final FieldGetter<Work, Collection<Piece>> getter,
+			final FieldSetter<Work, Collection<Piece>> setter,
 			final FieldComponentFactory<Work, Collection<Piece>, DataPane<Piece>> componentFactory,
 			final BeanFormModel<Piece> beanFormModel) {
 		super(name, tab, getter, setter, componentFactory);

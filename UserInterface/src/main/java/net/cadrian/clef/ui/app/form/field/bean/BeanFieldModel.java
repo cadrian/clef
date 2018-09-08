@@ -16,8 +16,6 @@
  */
 package net.cadrian.clef.ui.app.form.field.bean;
 
-import java.lang.reflect.Method;
-
 import javax.swing.JTextField;
 
 import net.cadrian.clef.model.Bean;
@@ -26,10 +24,12 @@ import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 
 class BeanFieldModel<T extends Bean, D extends Bean> extends AbstractSimpleFieldModel<T, D, JTextField> {
 
-	BeanFieldModel(final String name, final String tab, final Method getter, final Method setter,
+	BeanFieldModel(final String name, final String tab, final FieldGetter<T, D> getter, final FieldSetter<T, D> setter,
 			final FieldComponentFactory<T, D, JTextField> componentFactory) {
 		super(name, tab, getter, setter, componentFactory);
 	}

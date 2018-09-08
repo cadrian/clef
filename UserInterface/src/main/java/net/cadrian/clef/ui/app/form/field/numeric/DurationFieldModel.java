@@ -16,19 +16,20 @@
  */
 package net.cadrian.clef.ui.app.form.field.numeric;
 
-import java.lang.reflect.Method;
-
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 import net.cadrian.clef.ui.widget.DurationTextField;
 
 class DurationFieldModel<T extends Bean> extends AbstractSimpleFieldModel<T, Long, DurationTextField> {
 
-	DurationFieldModel(final String name, final String tab, final Method getter, final Method setter,
+	DurationFieldModel(final String name, final String tab, final FieldGetter<T, Long> getter,
+			final FieldSetter<T, Long> setter,
 			final FieldComponentFactory<T, Long, DurationTextField> componentFactory) {
 		super(name, tab, getter, setter, componentFactory);
 	}

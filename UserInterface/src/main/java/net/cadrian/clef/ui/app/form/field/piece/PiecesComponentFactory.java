@@ -16,14 +16,15 @@
  */
 package net.cadrian.clef.ui.app.form.field.piece;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
 
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
 import net.cadrian.clef.ui.app.form.field.FieldModel;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 import net.cadrian.clef.ui.app.tab.DataPane;
 
 public class PiecesComponentFactory
@@ -38,13 +39,8 @@ public class PiecesComponentFactory
 
 	@Override
 	protected FieldModel<Work, Collection<Piece>, DataPane<Piece>> createModel(final String fieldName,
-			final Method getter, final Method setter) {
+			final FieldGetter<Work, Collection<Piece>> getter, final FieldSetter<Work, Collection<Piece>> setter) {
 		return new PiecesFieldModel(fieldName, tab, getter, setter, this, beanFormModel);
-	}
-
-	@Override
-	public Class<?> getDataType() {
-		return Collection.class;
 	}
 
 }

@@ -16,38 +16,29 @@
  */
 package net.cadrian.clef.ui.app.form.field.bean;
 
-import java.lang.reflect.Method;
-
 import javax.swing.JTextField;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
 import net.cadrian.clef.ui.app.form.field.FieldModel;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 
 public class BeanComponentFactory<T extends Bean, D extends Bean>
 		extends AbstractSimpleFieldComponentFactory<T, D, JTextField> {
 
-	private final Class<D> beanDataType;
-
-	public BeanComponentFactory(final Class<T> beanType, final String fieldName, final Class<D> beanDataType) {
-		this(beanType, fieldName, beanDataType, null);
+	public BeanComponentFactory(final Class<T> beanType, final String fieldName) {
+		this(beanType, fieldName, null);
 	}
 
-	public BeanComponentFactory(final Class<T> beanType, final String fieldName, final Class<D> beanDataType,
-			final String tab) {
+	public BeanComponentFactory(final Class<T> beanType, final String fieldName, final String tab) {
 		super(beanType, fieldName, false, tab);
-		this.beanDataType = beanDataType;
 	}
 
 	@Override
-	protected FieldModel<T, D, JTextField> createModel(final String fieldName, final Method getter,
-			final Method setter) {
+	protected FieldModel<T, D, JTextField> createModel(final String fieldName, final FieldGetter<T, D> getter,
+			final FieldSetter<T, D> setter) {
 		return new BeanFieldModel<>(fieldName, tab, getter, setter, this);
-	}
-
-	@Override
-	public Class<D> getDataType() {
-		return beanDataType;
 	}
 
 }

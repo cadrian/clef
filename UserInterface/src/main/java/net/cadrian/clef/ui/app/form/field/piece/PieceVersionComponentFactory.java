@@ -16,11 +16,11 @@
  */
 package net.cadrian.clef.ui.app.form.field.piece;
 
-import java.lang.reflect.Method;
-
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.FieldGetter;
 import net.cadrian.clef.ui.app.form.field.FieldModel;
+import net.cadrian.clef.ui.app.form.field.FieldSetter;
 import net.cadrian.clef.ui.widget.VersionSpinner;
 
 public class PieceVersionComponentFactory extends AbstractSimpleFieldComponentFactory<Piece, Long, VersionSpinner> {
@@ -34,14 +34,9 @@ public class PieceVersionComponentFactory extends AbstractSimpleFieldComponentFa
 	}
 
 	@Override
-	protected FieldModel<Piece, Long, VersionSpinner> createModel(final String fieldName, final Method getter,
-			final Method setter) {
+	protected FieldModel<Piece, Long, VersionSpinner> createModel(final String fieldName,
+			final FieldGetter<Piece, Long> getter, final FieldSetter<Piece, Long> setter) {
 		return new PieceVersionFieldModel(tab, getter, setter, this);
-	}
-
-	@Override
-	public Class<?> getDataType() {
-		return Long.class;
 	}
 
 }
