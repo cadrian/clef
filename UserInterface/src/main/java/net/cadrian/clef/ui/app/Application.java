@@ -113,6 +113,7 @@ public class Application extends JFrame {
 				beans::createAuthor, BeanComparators::compareAuthors, new AuthorFormModel(Author.class));
 		final DataPane<Pricing> pricingsPanel = new DataPane<>(context, true, Pricing.class, beans::getPricings,
 				beans::createPricing, BeanComparators::comparePricings, new PricingFormModel(Pricing.class));
+		final StatisticsPanel statisticsPanel = new StatisticsPanel(context);
 		final ConfigurationPanel configurationPanel = new ConfigurationPanel(context);
 
 		mgtPane.addTab(context.getPresentation().getMessage("Works"), worksPanel);
@@ -128,13 +129,14 @@ public class Application extends JFrame {
 
 		mainPane.addTab(context.getPresentation().getMessage("Sessions"), sessionsPanel);
 		mainPane.addTab(context.getPresentation().getMessage("Management"), mgtPane);
-		mainPane.addTab(context.getPresentation().getMessage("Statistics"), new StatisticsPanel(context));
+		mainPane.addTab(context.getPresentation().getMessage("Statistics"), statisticsPanel);
 		mainPane.addTab(context.getPresentation().getMessage("Configuration"), configurationPanel);
 
 		mainPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				refreshMainPane(mainPane, mgtPane, sessionsPanel, worksPanel, authorsPanel, pricingsPanel);
+				refreshMainPane(mainPane, sessionsPanel, statisticsPanel, mgtPane, worksPanel, authorsPanel,
+						pricingsPanel);
 			}
 		});
 
@@ -190,9 +192,9 @@ public class Application extends JFrame {
 		}
 	}
 
-	private static void refreshMainPane(final JTabbedPane mainPane, final JTabbedPane mgtPane,
-			final DataPane<Session> sessionsPanel, final DataPane<Work> worksPanel, final DataPane<Author> authorsPanel,
-			final DataPane<Pricing> pricingsPanel) {
+	private static void refreshMainPane(final JTabbedPane mainPane, final DataPane<Session> sessionsPanel,
+			final StatisticsPanel statisticsPanel, final JTabbedPane mgtPane, final DataPane<Work> worksPanel,
+			final DataPane<Author> authorsPanel, final DataPane<Pricing> pricingsPanel) {
 		switch (mainPane.getSelectedIndex()) {
 		case 0:
 			sessionsPanel.refresh();
@@ -200,6 +202,8 @@ public class Application extends JFrame {
 		case 1:
 			refreshMgtPane(mgtPane, worksPanel, authorsPanel, pricingsPanel);
 			break;
+		case 2:
+			statisticsPanel.refresh();
 		default:
 			// ignored
 		}

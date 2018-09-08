@@ -88,7 +88,7 @@ public class StatisticsPanel extends JPanel {
 			}
 
 			@Override
-			public Iterable<Piece> getPieces(Work work) {
+			public Iterable<Piece> getPieces(final Work work) {
 				return new ArrayList<>(work.getPieces());
 			}
 
@@ -97,7 +97,7 @@ public class StatisticsPanel extends JPanel {
 		computation.refresh();
 	}
 
-	private void addLabels(ApplicationContext context, final Map<String, JLabel> labels, final JPanel panel) {
+	private void addLabels(final ApplicationContext context, final Map<String, JLabel> labels, final JPanel panel) {
 		int gridy = 0;
 		for (final Map.Entry<String, JLabel> entry : labels.entrySet()) {
 			final GridBagConstraints labelConstraints = new GridBagConstraints();
@@ -118,6 +118,10 @@ public class StatisticsPanel extends JPanel {
 
 			gridy++;
 		}
+	}
+
+	public void refresh() {
+		computation.refresh();
 	}
 
 }
