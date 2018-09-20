@@ -33,9 +33,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.BeanComparators;
@@ -49,8 +46,6 @@ import net.cadrian.clef.ui.tools.SortableListModel;
 import net.cadrian.clef.ui.widget.ClefTools;
 
 public class JSessionFilter extends JBeanFilter<Session> {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(JSessionFilter.class);
 
 	private static final long serialVersionUID = 6199756832553677405L;
 
@@ -120,7 +115,7 @@ public class JSessionFilter extends JBeanFilter<Session> {
 		works.addListSelectionListener(new ListSelectionListener() {
 
 			@Override
-			public void valueChanged(ListSelectionEvent e) {
+			public void valueChanged(final ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					final Work work = works.getSelectedValue();
 					if (work == null) {
@@ -180,22 +175,27 @@ public class JSessionFilter extends JBeanFilter<Session> {
 
 	@Override
 	public boolean isBeanVisible(final Session bean) {
-		final Piece piece = pieces.getSelectedValue();
-		LOGGER.debug("selected piece: {}", piece);
-		if (piece != null && !piece.equals(bean.getPiece())) {
+		if (!isVisible(bean.getPiece(), pieces.getSelectedValuesList())) {
 			return false;
 		}
-		final Work work = works.getSelectedValue();
-		LOGGER.debug("selected work: {}", work);
-		if (work != null && !work.equals(bean.getPiece().getWork())) {
+		if (!isVisible(bean.getPiece().getWork(), works.getSelectedValuesList())) {
 			return false;
 		}
-		final Author author = authors.getSelectedValue();
-		LOGGER.debug("selected author: {}", author);
-		if (author != null && !author.equals(bean.getPiece().getWork().getAuthor())) {
+		if (!isVisible(bean.getPiece().getWork().getAuthor(), authors.getSelectedValuesList())) {
 			return false;
 		}
 		return true;
+	}
+
+	private static <T> boolean isVisible(final T value, final List<T> values) {
+		final boolean result;
+		if (values.isEmpty()) {
+			// nothing selected, as if everything was selected
+			result = true;
+		} else {
+			result = values.contains(value);
+		}
+		return result;
 	}
 
 }
