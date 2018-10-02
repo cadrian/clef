@@ -48,6 +48,9 @@ public class BeanForm<T extends Bean> extends JPanel {
 	private final T bean;
 	private final Map<String, FieldView<T, ?, ?>> fields = new LinkedHashMap<>();
 
+	private final List<String> tabs;
+	private final JTabbedPane tabbedPane;
+
 	public BeanForm(final ApplicationContext context, final T bean, final BeanFormModel<T> model,
 			final List<String> tabs) {
 		super(new BorderLayout());
@@ -63,12 +66,14 @@ public class BeanForm<T extends Bean> extends JPanel {
 
 		final Presentation presentation = context.getPresentation();
 
+		this.tabs = tabs;
 		if (tabs == null) {
+			tabbedPane = null;
 			final JPanel panel = new JPanel(new GridBagLayout());
 			addFields(presentation, panel, null);
 			add(panel, BorderLayout.CENTER);
 		} else {
-			final JTabbedPane tabbedPane = new JTabbedPane();
+			tabbedPane = new JTabbedPane();
 			for (final String tab : tabs) {
 				LOGGER.info("Adding tab: {}", tab);
 				final JPanel panel = new JPanel(new GridBagLayout());
@@ -76,6 +81,19 @@ public class BeanForm<T extends Bean> extends JPanel {
 				tabbedPane.add(presentation.getMessage(tab), panel);
 			}
 			add(tabbedPane, BorderLayout.CENTER);
+		}
+	}
+
+	public String getTab() {
+		if (tabs == null) {
+			return null;
+		}
+		return tabs.get(tabbedPane.getSelectedIndex());
+	}
+
+	public void setTab(final String tab) {
+		if (tabbedPane != null) {
+			tabbedPane.setSelectedIndex(tabs.indexOf(tab));
 		}
 	}
 

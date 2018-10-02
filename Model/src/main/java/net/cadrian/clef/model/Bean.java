@@ -16,8 +16,19 @@
  */
 package net.cadrian.clef.model;
 
+import net.cadrian.clef.model.bean.Piece;
+
 public interface Bean {
 
 	void delete();
+
+	/**
+	 * Similar to equals() but returns <code>true</code> if the bean is another
+	 * "version" of the same bean (e.g. for {@link Piece})
+	 *
+	 * @param selected
+	 * @return
+	 */
+	boolean isVersionOf(Bean bean);
 
 }

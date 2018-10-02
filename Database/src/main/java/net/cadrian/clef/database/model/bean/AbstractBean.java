@@ -40,6 +40,11 @@ abstract class AbstractBean implements Bean {
 	}
 
 	@Override
+	public boolean isVersionOf(final Bean bean) {
+		return equals(bean);
+	}
+
+	@Override
 	public int hashCode() {
 		final Long id = getId();
 		return id == null ? 0 : id.hashCode();

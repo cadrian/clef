@@ -84,6 +84,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	private final Map<T, BeanForm<T>> formCache = new WeakHashMap<>();
 
 	private BeanForm<T> currentForm;
+	private String lastTab;
 
 	public DataPane(final ApplicationContext context, final boolean showSave, final Class<T> beanType,
 			final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final BeanFilter<T> beanFilter,
@@ -111,7 +112,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 					LOGGER.debug("value still adjusting");
 					current.setEnabled(false);
 				} else {
-					installBeanForm(list.getSelectedValue());
+					installBeanForm(list.getSelectedValue(), getTab());
 				}
 			}
 		});
@@ -195,11 +196,11 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		if (refresh) {
 			refreshList(version);
 		} else {
-			installBeanForm(version);
+			installBeanForm(version, getTab());
 		}
 	}
 
-	private void installBeanForm(final T selected) {
+	private void installBeanForm(final T selected, final String tab) {
 		current.removeAll();
 		final Action delAction = tools.getAction(ClefTools.Tool.Del);
 		final Action saveAction = tools.getAction(ClefTools.Tool.Save);
@@ -209,6 +210,9 @@ public class DataPane<T extends Bean> extends JSplitPane {
 			if (currentForm == null) {
 				currentForm = new BeanForm<>(context, selected, beanFormModel, tabs);
 				formCache.put(selected, currentForm);
+			}
+			if (tab != null) {
+				currentForm.setTab(tab);
 			}
 			current.add(new JScrollPane(currentForm), BorderLayout.CENTER);
 			currentForm.load();
@@ -292,8 +296,10 @@ public class DataPane<T extends Bean> extends JSplitPane {
 
 	public void saveData() {
 		final T selected = list.getSelectedValue();
+		getTab();
 		try {
 			if (currentForm != null) {
+				formCache.remove(selected);
 				currentForm.save();
 			}
 		} catch (final ModelException e) {
@@ -327,9 +333,22 @@ public class DataPane<T extends Bean> extends JSplitPane {
 				});
 				refreshList(list.getSelectedValue());
 			}
+
 		});
 		beanFilterComponent.setLocation(position);
 		layeredPane.add(beanFilterComponent, JLayeredPane.MODAL_LAYER, 1000);
+	}
+
+	String getTab() {
+		final String result;
+		if (currentForm == null) {
+			result = lastTab;
+		} else {
+			result = currentForm.getTab();
+			lastTab = result;
+		}
+		LOGGER.debug("tab: {}", result);
+		return result;
 	}
 
 	void refreshList(final T selected) {
@@ -367,7 +386,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 				for (final T bean : chunks) {
 					LOGGER.debug("Adding element: {} (selected is {})", bean, selected);
 					final int index = model.add(bean);
-					if (bean.equals(selected)) {
+					if (bean.isVersionOf(selected)) {
 						selectedIndex = index;
 					}
 				}

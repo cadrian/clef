@@ -17,13 +17,17 @@
 package net.cadrian.clef.database.model.bean;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.database.DatabaseException;
 import net.cadrian.clef.database.bean.Piece;
+import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.model.bean.Work;
@@ -153,6 +157,38 @@ public class PieceBean extends AbstractPropertyBean implements net.cadrian.clef.
 		} catch (final DatabaseException e) {
 			throw new ModelException(e);
 		}
+	}
+
+	@Override
+	public boolean isVersionOf(final Bean bean) {
+		// short-cuts to avoid creating a Set in most usual cases
+		if (bean == null) {
+			return false;
+		}
+		if (super.isVersionOf(bean)) {
+			return true;
+		}
+		final Set<net.cadrian.clef.model.bean.Piece> checked = new HashSet<>(Collections.singleton(this));
+		return checkIsVersionOf(bean, checked);
+	}
+
+	private boolean checkIsVersionOf(final Bean bean, final Set<net.cadrian.clef.model.bean.Piece> checked) {
+		if (!checked.add(this)) {
+			if (super.isVersionOf(bean)) {
+				return true;
+			}
+			final net.cadrian.clef.model.bean.Piece previous = getPrevious();
+			if (previous != null && (((PieceBean) previous).checkIsVersionOf(bean, checked)
+					|| ((PieceBean) bean).checkIsVersionOf(previous, checked))) {
+				return true;
+			}
+			final net.cadrian.clef.model.bean.Piece next = getNext();
+			if (next != null && (((PieceBean) next).checkIsVersionOf(bean, checked)
+					|| ((PieceBean) bean).checkIsVersionOf(next, checked))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
