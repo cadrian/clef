@@ -76,13 +76,13 @@ public class Application extends JFrame {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
 		sessionsPanel = new DataPane<>(context, true, Session.class, beans::getSessions, new SessionCreator(context),
-				new SessionFilter(), BeanComparators::compareSessions, new SessionFormModel(Session.class));
-		worksPanel = new DataPane<>(context, true, Work.class, beans::getWorks, new WorkCreator(context), null,
+				new SessionFilter(), null, BeanComparators::compareSessions, new SessionFormModel(Session.class));
+		worksPanel = new DataPane<>(context, true, Work.class, beans::getWorks, new WorkCreator(context), null, null,
 				BeanComparators::compareWorks, new WorkFormModel(Work.class), "Description", "Pieces", "Statistics");
-		authorsPanel = new DataPane<>(context, true, Author.class, beans::getAuthors, beans::createAuthor, null,
+		authorsPanel = new DataPane<>(context, true, Author.class, beans::getAuthors, beans::createAuthor, null, null,
 				BeanComparators::compareAuthors, new AuthorFormModel(Author.class));
 		pricingsPanel = new DataPane<>(context, true, Pricing.class, beans::getPricings, beans::createPricing, null,
-				BeanComparators::comparePricings, new PricingFormModel(Pricing.class));
+				null, BeanComparators::comparePricings, new PricingFormModel(Pricing.class));
 		statisticsPanel = new StatisticsPanel(context);
 		configurationPanel = new ConfigurationPanel(context);
 

@@ -29,6 +29,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.model.bean.Work;
@@ -38,6 +41,8 @@ import net.cadrian.clef.ui.tools.StatisticsComputation;
 import net.cadrian.clef.ui.tools.StatisticsComputation.IterableProvider;
 
 class WorkStatisticsComponent extends JPanel {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WorkStatisticsComponent.class);
 
 	private static final long serialVersionUID = -1755628526357896602L;
 
@@ -207,7 +212,9 @@ class WorkStatisticsComponent extends JPanel {
 	}
 
 	private List<Piece> getPieces(final Work work) {
-		return new ArrayList<>(work.getPieces());
+		final List<Piece> result = new ArrayList<>(work.getPieces());
+		LOGGER.debug(">>> {}", result);
+		return result;
 	}
 
 	private List<Piece> getAllPieces(final Work work) {
@@ -218,6 +225,7 @@ class WorkStatisticsComponent extends JPanel {
 				piece = piece.getPrevious();
 			} while (piece != null);
 		}
+		LOGGER.debug(">>> {}", result);
 		return result;
 	}
 

@@ -60,4 +60,6 @@ public interface Beans {
 
 	Collection<? extends PropertyDescriptor> getPropertyDescriptors(PropertyDescriptor.Entity entity);
 
+	boolean movePiece(Piece piece, Work targetWork);
+
 }

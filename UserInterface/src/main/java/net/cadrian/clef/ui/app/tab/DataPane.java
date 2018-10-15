@@ -55,6 +55,7 @@ import net.cadrian.clef.ui.app.form.BeanFilter;
 import net.cadrian.clef.ui.app.form.BeanForm;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.BeanGetter;
+import net.cadrian.clef.ui.app.form.BeanMover;
 import net.cadrian.clef.ui.app.tab.filter.JBeanFilter;
 import net.cadrian.clef.ui.tools.SortableListModel;
 import net.cadrian.clef.ui.widget.ClefTools;
@@ -77,6 +78,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	private final BeanGetter<T> beanGetter;
 	private final BeanCreator<T> beanCreator;
 	private final BeanFilter<T> beanFilter;
+	private final BeanMover<T> beanMover;
 	private final ApplicationContext context;
 	private final BeanFormModel<T> beanFormModel;
 	private final List<String> tabs;
@@ -88,11 +90,13 @@ public class DataPane<T extends Bean> extends JSplitPane {
 
 	public DataPane(final ApplicationContext context, final boolean showSave, final Class<T> beanType,
 			final BeanGetter<T> beanGetter, final BeanCreator<T> beanCreator, final BeanFilter<T> beanFilter,
-			final Comparator<T> beanComparator, final BeanFormModel<T> beanFormModel, final String... tabs) {
+			final BeanMover<T> beanMover, final Comparator<T> beanComparator, final BeanFormModel<T> beanFormModel,
+			final String... tabs) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
 		this.beanGetter = Objects.requireNonNull(beanGetter);
 		this.beanCreator = Objects.requireNonNull(beanCreator);
 		this.beanFilter = beanFilter;
+		this.beanMover = beanMover;
 		this.context = Objects.requireNonNull(context);
 		this.beanFormModel = Objects.requireNonNull(beanFormModel);
 		this.tabs = tabs.length == 0 ? DEFAULT_TABS : Arrays.asList(tabs);
@@ -117,20 +121,17 @@ public class DataPane<T extends Bean> extends JSplitPane {
 			}
 		});
 
-		if (showSave) {
-			if (beanFilter == null) {
-				tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Save);
-			} else {
-				tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Save,
-						ClefTools.Tool.Filter);
-			}
-		} else {
-			if (beanFilter == null) {
-				tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del);
-			} else {
-				tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Filter);
-			}
+		final List<Tool> toolsList = new ArrayList<>(Arrays.asList(Tool.values()));
+		if (!showSave) {
+			toolsList.remove(Tool.Save);
 		}
+		if (beanFilter == null) {
+			toolsList.remove(Tool.Filter);
+		}
+		if (beanMover == null) {
+			toolsList.remove(Tool.Move);
+		}
+		tools = new ClefTools(context, toolsList.toArray(new Tool[toolsList.size()]));
 		tools.addListener(new ClefTools.Listener() {
 
 			@Override
@@ -145,6 +146,9 @@ public class DataPane<T extends Bean> extends JSplitPane {
 				case Save:
 					saveData();
 					break;
+				case Move:
+					move();
+					break;
 				case Filter:
 					final Point frameLocationOnScreen = context.getPresentation().getApplicationFrame().getLayeredPane()
 							.getLocationOnScreen();
@@ -158,10 +162,13 @@ public class DataPane<T extends Bean> extends JSplitPane {
 				}
 			}
 		});
+		tools.getAction(ClefTools.Tool.Del).setEnabled(false);
 		if (showSave) {
 			tools.getAction(ClefTools.Tool.Save).setEnabled(false);
 		}
-		tools.getAction(ClefTools.Tool.Del).setEnabled(false);
+		if (beanMover != null) {
+			tools.getAction(ClefTools.Tool.Move).setEnabled(false);
+		}
 
 		left.add(tools, BorderLayout.NORTH);
 
@@ -185,10 +192,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	}
 
 	public void refresh() {
-		final T selection = getSelection();
-		if (selection != null) {
-			refreshList(selection);
-		}
+		refreshList(getSelection());
 	}
 
 	public void select(final T version, final boolean refresh) {
@@ -220,6 +224,10 @@ public class DataPane<T extends Bean> extends JSplitPane {
 			if (saveAction != null) {
 				saveAction.setEnabled(true);
 			}
+			if (beanMover != null && beanMover.canMove(selected)) {
+				final Action moveAction = tools.getAction(ClefTools.Tool.Move);
+				moveAction.setEnabled(true);
+			}
 		} else {
 			LOGGER.debug("Selected nothing");
 			currentForm = null;
@@ -227,6 +235,10 @@ public class DataPane<T extends Bean> extends JSplitPane {
 			delAction.setEnabled(false);
 			if (saveAction != null) {
 				saveAction.setEnabled(false);
+			}
+			if (beanMover != null) {
+				final Action moveAction = tools.getAction(ClefTools.Tool.Move);
+				moveAction.setEnabled(false);
 			}
 		}
 		current.setEnabled(true);
@@ -337,6 +349,11 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		});
 		beanFilterComponent.setLocation(position);
 		layeredPane.add(beanFilterComponent, JLayeredPane.MODAL_LAYER, 1000);
+	}
+
+	private void move() {
+		beanMover.move(getSelection());
+		refreshList(null);
 	}
 
 	String getTab() {

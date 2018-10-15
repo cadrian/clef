@@ -38,7 +38,13 @@ public class ClefTools extends JToolBar {
 	private static final long serialVersionUID = 5025926948132545775L;
 
 	public static enum Tool {
-		Add, Save, Del, Filter;
+		Filter(false), Add(true), Del(false), Move(false), Save(true);
+
+		final boolean needsSeparatorBefore;
+
+		Tool(final boolean needsSeparatorBefore) {
+			this.needsSeparatorBefore = needsSeparatorBefore;
+		}
 	}
 
 	public interface Listener {
@@ -55,62 +61,22 @@ public class ClefTools extends JToolBar {
 		setFloatable(false);
 
 		Arrays.sort(tools);
-		boolean needSeparator = false;
+		boolean first = true;
 		for (final Tool tool : tools) {
-			final Action action;
-			switch (tool) {
-			case Add:
-				action = new AbstractAction("Add") {
-					private static final long serialVersionUID = -5722810007033837355L;
-
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						fireToolCalled(Tool.Add);
-					}
-				};
-				break;
-			case Save:
-				if (needSeparator) {
-					addSeparator();
-				}
-				action = new AbstractAction("Save") {
-					private static final long serialVersionUID = -8659808353683696964L;
-
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						fireToolCalled(Tool.Save);
-					}
-				};
-				break;
-			case Del:
-				action = new AbstractAction("Del") {
-					private static final long serialVersionUID = -8206872556606892261L;
-
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						fireToolCalled(Tool.Del);
-					}
-				};
-				break;
-			case Filter:
-				if (needSeparator) {
-					addSeparator();
-				}
-				action = new AbstractAction("Filter") {
-					private static final long serialVersionUID = -8659808353683696964L;
-
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						fireToolCalled(Tool.Filter);
-					}
-				};
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown tool: " + tool);
+			if (!first && tool.needsSeparatorBefore) {
+				addSeparator();
 			}
+			final Action action = new AbstractAction(tool.name()) {
+				private static final long serialVersionUID = -1937859824187249283L;
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					fireToolCalled(tool);
+				}
+			};
 			actions.put(tool, action);
 			buttons.put(tool, add(action));
-			needSeparator = true;
+			first = false;
 		}
 
 		context.getPresentation().awesome(this);

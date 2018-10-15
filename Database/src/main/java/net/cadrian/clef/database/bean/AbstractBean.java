@@ -183,11 +183,10 @@ abstract class AbstractBean<T extends DatabaseBean> implements DatabaseBean {
 			final int index = setSaveValues(ps);
 			if (id != null) {
 				ps.setLong(index, id);
-			}
-			ps.executeUpdate();
-			if (id != null) {
+				ps.executeUpdate();
 				result = id;
 			} else {
+				ps.executeUpdate();
 				try (ResultSet rs = ps.getGeneratedKeys()) {
 					if (rs.next()) {
 						result = rs.getLong(1);

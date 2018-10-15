@@ -82,6 +82,7 @@ public class WorkBean extends AbstractPropertyBean implements net.cadrian.clef.m
 			final net.cadrian.clef.database.bean.Piece template = new net.cadrian.clef.database.bean.Piece();
 			template.setWorkId(getId());
 			final Map<Long, net.cadrian.clef.database.bean.Piece> pieces = db.getPieces().readMany(template, true);
+			LOGGER.debug("{} => {}", getId(), pieces.keySet());
 			result = db.getPieces(pieces.keySet());
 			// filter out older versions
 			final Set<PieceBean> old = new HashSet<>(result.size());

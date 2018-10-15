@@ -287,6 +287,29 @@ public class ModelBeans implements Beans {
 	}
 
 	@Override
+	public boolean movePiece(final Piece piece, final Work targetWork) {
+		PieceBean dbPiece = (PieceBean) piece;
+		final WorkBean dbWork = (WorkBean) targetWork;
+
+		try {
+			while (dbPiece != null) {
+				final net.cadrian.clef.database.bean.Piece bean = new net.cadrian.clef.database.bean.Piece(
+						dbPiece.getId());
+				bean.setWorkId(dbWork.getId());
+				db.getPieces().update(bean);
+				bean.setWorkId(null);
+				final net.cadrian.clef.database.bean.Piece updatedBean = db.getPieces().readOne(bean);
+				piecesCache.put(dbPiece.getId(), new PieceBean(updatedBean, db));
+				dbPiece = (PieceBean) dbPiece.getPrevious();
+			}
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+
+		return true;
+	}
+
+	@Override
 	public Session createSession(final Piece piece) {
 		final SessionBean result;
 		try {

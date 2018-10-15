@@ -35,6 +35,7 @@ abstract class AbstractPropertyBean<T extends DatabasePropertyBean> extends Abst
 	private static final List<Long> EMPTY_LIST = Arrays.asList();
 
 	private Collection<Long> properties = EMPTY_LIST;
+	private boolean propertiesChanged = false;
 
 	AbstractPropertyBean(final Long id) {
 		super(id);
@@ -48,6 +49,7 @@ abstract class AbstractPropertyBean<T extends DatabasePropertyBean> extends Abst
 	@Override
 	public void setProperties(final Collection<Long> properties) {
 		this.properties = properties == null ? EMPTY_LIST : properties;
+		this.propertiesChanged = true;
 	}
 
 	@Override
@@ -72,6 +74,7 @@ abstract class AbstractPropertyBean<T extends DatabasePropertyBean> extends Abst
 					}
 				}
 				propertyBean.setProperties(propertyIds);
+				propertyBean.propertiesChanged = false;
 			}
 		} catch (final SQLException e) {
 			throw new DatabaseException(e);
@@ -83,12 +86,15 @@ abstract class AbstractPropertyBean<T extends DatabasePropertyBean> extends Abst
 	public Long save(final Connection cnx) throws DatabaseException {
 		final Long result = super.save(cnx);
 
-		deleteOldProperties(result, cnx);
+		if (propertiesChanged) {
+			deleteOldProperties(result, cnx);
+		}
 
 		final Collection<Long> propertyIds = getProperties();
-		if (!propertyIds.isEmpty()) {
+		if (propertiesChanged && !propertyIds.isEmpty()) {
 			insertNewProperties(result, propertyIds, cnx);
 		}
+		propertiesChanged = false;
 
 		return result;
 	}
