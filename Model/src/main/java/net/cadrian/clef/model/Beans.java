@@ -24,6 +24,7 @@ import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.Property;
 import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.Session;
+import net.cadrian.clef.model.bean.Activity;
 import net.cadrian.clef.model.bean.Work;
 
 public interface Beans {
@@ -44,7 +45,11 @@ public interface Beans {
 
 	Pricing createPricing();
 
+	Activity createTag();
+
 	Collection<? extends Pricing> getPricings();
+
+	Collection<? extends Activity> getTags();
 
 	Collection<? extends Author> getAuthors();
 

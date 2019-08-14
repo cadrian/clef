@@ -25,6 +25,7 @@ import net.cadrian.clef.database.DatabaseException;
 import net.cadrian.clef.database.bean.Session;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.model.bean.Piece;
+import net.cadrian.clef.model.bean.Activity;
 import net.cadrian.clef.tools.Converters;
 
 public class SessionBean extends AbstractPropertyBean implements net.cadrian.clef.model.bean.Session {
@@ -44,6 +45,17 @@ public class SessionBean extends AbstractPropertyBean implements net.cadrian.cle
 	@Override
 	public void setPiece(final Piece piece) {
 		bean.setPieceId(((PieceBean) piece).getId());
+		update();
+	}
+
+	@Override
+	public Activity getActivity() {
+		return db.getActivity(bean.getActivityId());
+	}
+
+	@Override
+	public void setActivity(final Activity activity) {
+		bean.setActivityId(((ActivityBean) activity).getId());
 		update();
 	}
 

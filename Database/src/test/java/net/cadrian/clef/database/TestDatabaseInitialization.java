@@ -43,7 +43,7 @@ public class TestDatabaseInitialization extends AbstractDatabaseTestHarness {
 		final Long versionPD = readPropertyDescriptor(mgr, "meta", "VERSION");
 		assertNotNull(versionPD);
 
-		readProperties(mgr, versionPD, "1.0.0");
+		readProperties(mgr, versionPD, "1.0.1");
 		incrementVersion(mgr, versionPD);
 		readProperties(mgr, versionPD, "42");
 

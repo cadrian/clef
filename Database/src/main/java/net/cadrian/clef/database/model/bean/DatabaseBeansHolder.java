@@ -25,11 +25,14 @@ import net.cadrian.clef.database.bean.Pricing;
 import net.cadrian.clef.database.bean.Property;
 import net.cadrian.clef.database.bean.PropertyDescriptor;
 import net.cadrian.clef.database.bean.Session;
+import net.cadrian.clef.database.bean.Activity;
 import net.cadrian.clef.database.bean.Work;
 
 public interface DatabaseBeansHolder {
 
 	DatabaseBeans<Pricing> getPricings();
+
+	DatabaseBeans<Activity> getActivities();
 
 	DatabaseBeans<Author> getAuthors();
 
@@ -58,6 +61,10 @@ public interface DatabaseBeansHolder {
 	PieceBean getPiece(Long id);
 
 	Collection<PieceBean> getPieces(Collection<Long> ids);
+
+	ActivityBean getActivity(Long id);
+
+	Collection<ActivityBean> getActivities(Collection<Long> ids);
 
 	SessionBean getSession(Long id);
 

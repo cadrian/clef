@@ -23,11 +23,12 @@ function buildModule() {
 
         cd build/$module
 
+        mvn install > mvn-install.log
         case $module in
             Application)
                 # Special treatment for Application: need to fill the right classpath in the main script
                 (
-                    mvn dependency:build-classpath -Dmdep.outputFile=src/scripts/cp.txt > ../getdep.log
+                    mvn dependency:build-classpath -Dmdep.outputFile=src/scripts/cp.txt > getdep.log
                     cd src/scripts
                     mv clef clef.orig
                     sed "s!%CLASSPATH%!$(<cp.txt)!" clef.orig > clef

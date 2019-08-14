@@ -31,11 +31,13 @@ public class Session extends AbstractPropertyBean<Session> {
 	private static final String TABLE_NAME = "session";
 	private static final List<Field<Session>> FIELDS = Arrays.asList(
 			new LongField<>("piece_id", Session::getPieceId, Session::setPieceId, Condition.EQ),
+			new LongField<>("activity_id", Session::getActivityId, Session::setActivityId, Condition.EQ),
 			new TimestampField<>("start", Session::getStart, Session::setStart, Condition.EQ),
 			new TimestampField<>("stop", Session::getStop, Session::setStop, Condition.EQ),
 			new StringField<>("notes", Session::getNotes, Session::setNotes, Condition.EQ));
 
 	private Long pieceId;
+	private Long activityId;
 	private Timestamp start;
 	private Timestamp stop;
 	private String notes;
@@ -54,6 +56,14 @@ public class Session extends AbstractPropertyBean<Session> {
 
 	public void setPieceId(final Long pieceId) {
 		this.pieceId = pieceId;
+	}
+
+	public Long getActivityId() {
+		return activityId;
+	}
+
+	public void setActivityId(final Long activityId) {
+		this.activityId = activityId;
 	}
 
 	public Timestamp getStart() {

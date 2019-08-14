@@ -40,6 +40,10 @@ public interface Session extends PropertyBean {
 
 	void setStop(Date stop);
 
+	Activity getActivity();
+
+	void setActivity(Activity tag);
+
 	String getNotes();
 
 	void setNotes(String notes);

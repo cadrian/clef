@@ -67,7 +67,7 @@ public class PropertyTest extends AbstractDatabaseTestHarness {
 		Assert.assertEquals(1, propertyBeans.size());
 		final Property version = propertyBeans.values().iterator().next();
 		Assert.assertEquals(versionPropertyDescriptor.getId(), version.getPropertyDescriptorId());
-		Assert.assertEquals("1.0.0", version.getValue());
+		Assert.assertEquals("1.0.1", version.getValue());
 	}
 
 	@Test

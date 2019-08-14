@@ -16,33 +16,22 @@
  */
 package net.cadrian.clef.model.bean;
 
-import net.cadrian.clef.model.Bean;
+import net.cadrian.clef.model.PropertyBean;
+import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 
-public interface PropertyDescriptor extends Bean {
+public interface Activity extends PropertyBean {
 
-	public enum Entity {
-		// keep meta out (low-level management only)
-		pricing, author, work, piece, session, activity;
+	@Override
+	default PropertyDescriptor.Entity getEntity() {
+		return Entity.activity;
 	}
-
-	public enum Type {
-		string, date, path, file;
-	}
-
-	Entity getEntity();
-
-	Type getType();
-
-	void setType(Type type);
 
 	String getName();
 
 	void setName(String name);
 
-	String getDescription();
+	String getNotes();
 
-	void setDescription(String description);
-
-	int countUsages();
+	void setNotes(String notes);
 
 }
