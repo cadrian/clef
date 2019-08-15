@@ -26,26 +26,31 @@ public class Converters {
 		// no instance
 	}
 
-	public static final String formatTime(final long time) {
-		final StringBuilder result = new StringBuilder();
-		long s = time;
-		long m = s / 60L;
-		s -= m * 60L;
-		final long h = m / 60L;
-		m -= h * 60L;
-		if (h < 10L) {
-			result.append("0");
-		}
-		result.append(h).append(":");
-		if (m < 10L) {
-			result.append("0");
-		}
-		result.append(m).append(":");
-		if (s < 10L) {
-			result.append("0");
-		}
-		result.append(s);
-		return result.toString();
+	public static final Object formatTime(final long time) {
+		return new Object() {
+			@Override
+			public String toString() {
+				final StringBuilder result = new StringBuilder();
+				long s = time;
+				long m = s / 60L;
+				s -= m * 60L;
+				final long h = m / 60L;
+				m -= h * 60L;
+				if (h < 10L) {
+					result.append("0");
+				}
+				result.append(h).append(":");
+				if (m < 10L) {
+					result.append("0");
+				}
+				result.append(m).append(":");
+				if (s < 10L) {
+					result.append("0");
+				}
+				result.append(s);
+				return result.toString();
+			}
+		};
 	}
 
 	public static final long parseTime(final String time) {

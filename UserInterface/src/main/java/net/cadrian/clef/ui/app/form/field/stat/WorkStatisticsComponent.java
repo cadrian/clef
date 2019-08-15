@@ -200,12 +200,12 @@ class WorkStatisticsComponent extends JPanel {
 		allWorkTime /= 1000L;
 
 		totalPieces.setText(Integer.toString(pieces.size()));
-		totalDuration.setText(Converters.formatTime(duration));
-		totalWorkTime.setText(Converters.formatTime(workTime));
+		totalDuration.setText(Converters.formatTime(duration).toString());
+		totalWorkTime.setText(Converters.formatTime(workTime).toString());
 
 		totalLostPieces.setText(Integer.toString(allPieces.size() - pieces.size()));
-		lostDuration.setText(Converters.formatTime(allDuration - duration));
-		lostWorkTime.setText(Converters.formatTime(allWorkTime - workTime));
+		lostDuration.setText(Converters.formatTime(allDuration - duration).toString());
+		lostWorkTime.setText(Converters.formatTime(allWorkTime - workTime).toString());
 
 		totalComputation.refresh();
 		lostComputation.refresh();

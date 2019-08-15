@@ -126,16 +126,16 @@ public class StatisticsComputation {
 		final long spL = Math.round(Math.sqrt(sp));
 
 		if (meanPerWork != null) {
-			meanPerWork.setText(Converters.formatTime(mwL));
+			meanPerWork.setText(Converters.formatTime(mwL).toString());
 		}
 		if (stdevPerWork != null) {
-			stdevPerWork.setText(Converters.formatTime(swL));
+			stdevPerWork.setText(Converters.formatTime(swL).toString());
 		}
 		if (meanPerPiece != null) {
-			meanPerPiece.setText(Converters.formatTime(mpL));
+			meanPerPiece.setText(Converters.formatTime(mpL).toString());
 		}
 		if (stdevPerPiece != null) {
-			stdevPerPiece.setText(Converters.formatTime(spL));
+			stdevPerPiece.setText(Converters.formatTime(spL).toString());
 		}
 	}
 

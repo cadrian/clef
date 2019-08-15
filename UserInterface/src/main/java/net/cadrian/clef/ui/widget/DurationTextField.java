@@ -49,7 +49,7 @@ public class DurationTextField extends JFormattedTextField {
 		public String valueToString(final Object value) throws ParseException {
 			if (value != null) {
 				if (value instanceof Long) {
-					final String result = Converters.formatTime((Long) value);
+					final String result = Converters.formatTime((Long) value).toString();
 					LOGGER.debug("{} => {}", value, result);
 					return result;
 				}
