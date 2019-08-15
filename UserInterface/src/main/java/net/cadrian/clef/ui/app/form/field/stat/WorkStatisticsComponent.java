@@ -58,6 +58,11 @@ class WorkStatisticsComponent extends JPanel {
 		public Iterable<Piece> getPieces(final Work work) {
 			return getAllPieces(work);
 		}
+
+		@Override
+		public Iterable<Session> getSessions(Piece piece) {
+			return new ArrayList<>(piece.getSessions());
+		}
 	}
 
 	private final class TotalComputationIterableProvider implements IterableProvider {
@@ -75,6 +80,11 @@ class WorkStatisticsComponent extends JPanel {
 		@Override
 		public Iterable<Piece> getPieces(final Work work) {
 			return WorkStatisticsComponent.this.getPieces(work);
+		}
+
+		@Override
+		public Iterable<Session> getSessions(Piece piece) {
+			return new ArrayList<>(piece.getSessions());
 		}
 	}
 

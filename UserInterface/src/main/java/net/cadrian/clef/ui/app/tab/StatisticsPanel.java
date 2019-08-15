@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.model.bean.Piece;
+import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.tools.StatisticsComputation;
@@ -55,6 +56,11 @@ public class StatisticsPanel extends JPanel {
 		@Override
 		public Iterable<Piece> getPieces(final Work work) {
 			return new ArrayList<>(work.getPieces());
+		}
+
+		@Override
+		public Iterable<Session> getSessions(final Piece piece) {
+			return new ArrayList<>(piece.getSessions());
 		}
 	}
 

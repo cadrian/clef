@@ -34,6 +34,8 @@ public class StatisticsComputation {
 		Iterable<Work> getWorks();
 
 		Iterable<Piece> getPieces(Work work);
+
+		Iterable<Session> getSessions(Piece piece);
 	}
 
 	private final IterableProvider iterableProvider;
@@ -64,7 +66,7 @@ public class StatisticsComputation {
 			double dw0 = 0;
 			for (final Piece piece : iterableProvider.getPieces(work)) {
 				long tps = 0;
-				for (final Session session : piece.getSessions()) {
+				for (final Session session : iterableProvider.getSessions(piece)) {
 					final long t = (session.getStop().getTime() - session.getStart().getTime()) / 1000;
 					LOGGER.debug("work time for session {}: {} ({})", session.toString(), t, Converters.formatTime(t));
 					tps += t;
@@ -103,7 +105,7 @@ public class StatisticsComputation {
 			double dw0 = 0;
 			for (final Piece piece : iterableProvider.getPieces(work)) {
 				long tps = 0;
-				for (final Session session : piece.getSessions()) {
+				for (final Session session : iterableProvider.getSessions(piece)) {
 					final long t = (session.getStop().getTime() - session.getStart().getTime()) / 1000;
 					tps += t;
 				}
