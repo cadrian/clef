@@ -54,6 +54,68 @@ import net.cadrian.clef.ui.app.tab.filter.SessionFilter;
 
 public class Application extends JFrame {
 
+	private final class ApplicationWindowListener extends WindowAdapter {
+		@Override
+		public void windowClosing(final WindowEvent e) {
+			context.setClosing(true);
+			if (sessionsPanel.isDirty() || worksPanel.isDirty() || authorsPanel.isDirty()
+					|| pricingsPanel.isDirty() | configurationPanel.isDirty()) {
+				LOGGER.info("unsaved work on exit: asking confirmation");
+
+				final int response = JOptionPane.showConfirmDialog(Application.this,
+						context.getPresentation().getMessage("ConfirmExitMessage"),
+						context.getPresentation().getMessage("ConfirmExitTitle"), JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.QUESTION_MESSAGE);
+				switch (response) {
+				case JOptionPane.YES_OPTION:
+					LOGGER.info("User asked to save before exit.");
+					sessionsPanel.saveData();
+					worksPanel.saveData();
+					authorsPanel.saveData();
+					pricingsPanel.saveData();
+					configurationPanel.saveData();
+					break;
+				case JOptionPane.NO_OPTION:
+					LOGGER.info("USER CONFIRMED DIRTY EXIT.");
+					break;
+				case JOptionPane.CANCEL_OPTION:
+				case JOptionPane.CLOSED_OPTION:
+					LOGGER.info("User did not confirm, aborting exit");
+					return;
+				}
+			}
+			dispose();
+		}
+	}
+
+	private final class MainPaneRefresher implements ChangeListener {
+		private final JTabbedPane mgtPane;
+		private final JTabbedPane mainPane;
+
+		private MainPaneRefresher(final JTabbedPane mgtPane, final JTabbedPane mainPane) {
+			this.mgtPane = mgtPane;
+			this.mainPane = mainPane;
+		}
+
+		@Override
+		public void stateChanged(final ChangeEvent e) {
+			refreshMainPane(mainPane.getSelectedIndex(), mgtPane.getSelectedIndex());
+		}
+	}
+
+	private final class MgtPaneRefresher implements ChangeListener {
+		private final JTabbedPane mgtPane;
+
+		private MgtPaneRefresher(final JTabbedPane mgtPane) {
+			this.mgtPane = mgtPane;
+		}
+
+		@Override
+		public void stateChanged(final ChangeEvent e) {
+			refreshMgtPane(mgtPane.getSelectedIndex());
+		}
+	}
+
 	private static final long serialVersionUID = 6368233544150671678L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
@@ -130,58 +192,16 @@ public class Application extends JFrame {
 		mgtPane.addTab(context.getPresentation().getMessage("Pricings"), pricingsPanel);
 		mgtPane.addTab(context.getPresentation().getMessage("Activities"), activitiesPanel);
 
-		mgtPane.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(final ChangeEvent e) {
-				refreshMgtPane(mgtPane.getSelectedIndex());
-			}
-		});
+		mgtPane.addChangeListener(new MgtPaneRefresher(mgtPane));
 
 		mainPane.addTab(context.getPresentation().getMessage("Sessions"), sessionsPanel);
 		mainPane.addTab(context.getPresentation().getMessage("Management"), mgtPane);
 		mainPane.addTab(context.getPresentation().getMessage("Statistics"), statisticsPanel);
 		mainPane.addTab(context.getPresentation().getMessage("Configuration"), configurationPanel);
 
-		mainPane.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(final ChangeEvent e) {
-				refreshMainPane(mainPane.getSelectedIndex(), mgtPane.getSelectedIndex());
-			}
-		});
+		mainPane.addChangeListener(new MainPaneRefresher(mgtPane, mainPane));
 
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(final WindowEvent e) {
-				context.setClosing(true);
-				if (sessionsPanel.isDirty() || worksPanel.isDirty() || authorsPanel.isDirty()
-						|| pricingsPanel.isDirty() | configurationPanel.isDirty()) {
-					LOGGER.info("unsaved work on exit: asking confirmation");
-
-					final int response = JOptionPane.showConfirmDialog(Application.this,
-							context.getPresentation().getMessage("ConfirmExitMessage"),
-							context.getPresentation().getMessage("ConfirmExitTitle"), JOptionPane.YES_NO_CANCEL_OPTION,
-							JOptionPane.QUESTION_MESSAGE);
-					switch (response) {
-					case JOptionPane.YES_OPTION:
-						LOGGER.info("User asked to save before exit.");
-						sessionsPanel.saveData();
-						worksPanel.saveData();
-						authorsPanel.saveData();
-						pricingsPanel.saveData();
-						configurationPanel.saveData();
-						break;
-					case JOptionPane.NO_OPTION:
-						LOGGER.info("USER CONFIRMED DIRTY EXIT.");
-						break;
-					case JOptionPane.CANCEL_OPTION:
-					case JOptionPane.CLOSED_OPTION:
-						LOGGER.info("User did not confirm, aborting exit");
-						return;
-					}
-				}
-				dispose();
-			}
-		});
+		addWindowListener(new ApplicationWindowListener());
 	}
 
 	private void refreshMgtPane(final int selectedMgtIndex) {

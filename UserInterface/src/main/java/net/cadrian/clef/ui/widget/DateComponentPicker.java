@@ -39,7 +39,7 @@ class DateComponentPicker extends JDialog {
 		private final ZoneId zone;
 		private final DateTimePicker picker;
 
-		private ClefToolsListenerImpl(ZoneId zone, DateTimePicker picker) {
+		private ClefToolsListenerImpl(final ZoneId zone, final DateTimePicker picker) {
 			this.zone = zone;
 			this.picker = picker;
 		}
@@ -49,8 +49,8 @@ class DateComponentPicker extends JDialog {
 			switch (tool) {
 			case Save:
 				final LocalDateTime ldt = picker.getDateTimeStrict();
-				DateComponentPicker.this.date = Date.from(ldt.atZone(zone).toInstant());
-				DateComponentPicker.this.setVisible(false);
+				date = Date.from(ldt.atZone(zone).toInstant());
+				setVisible(false);
 				break;
 			default:
 			}

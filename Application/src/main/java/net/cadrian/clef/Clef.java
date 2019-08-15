@@ -37,6 +37,41 @@ import net.cadrian.clef.ui.app.Application;
 
 public class Clef {
 
+	private static final class ClefRunner implements Runnable {
+		private final class ClefWindowListener extends WindowAdapter {
+			@Override
+			public void windowClosing(final WindowEvent ev) {
+				try {
+					ds.close();
+				} catch (final SQLException e) {
+					LOGGER.error("Error while closing datasource", e);
+				} finally {
+					LOGGER.info("Bye!");
+				}
+			}
+		}
+
+		private final BasicDataSource ds;
+		private final DatabaseManager manager;
+
+		private ClefRunner(final BasicDataSource ds, final DatabaseManager manager) {
+			this.ds = ds;
+			this.manager = manager;
+		}
+
+		@Override
+		public void run() {
+			final Application app = new Application(new ModelBeans(manager));
+			LOGGER.info("Starting Clef.");
+
+			app.addWindowListener(new ClefWindowListener());
+
+			app.setSize(800, 600);
+			app.setLocationRelativeTo(null);
+			app.setVisible(true);
+		}
+	}
+
 	private static final String PROPERTY_DB_PASSWORD = "db.password";
 	private static final String PROPEERTY_DB_USERNAME = "db.username";
 	private static final String PROPERTY_DB_PATH = "db.path";
@@ -49,30 +84,7 @@ public class Clef {
 		final BasicDataSource ds = createDataSource();
 		final DatabaseManager manager = new DatabaseManager(ds);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				final Application app = new Application(new ModelBeans(manager));
-				LOGGER.info("Starting Clef.");
-
-				app.addWindowListener(new WindowAdapter() {
-					@Override
-					public void windowClosing(final WindowEvent ev) {
-						try {
-							ds.close();
-						} catch (final SQLException e) {
-							LOGGER.error("Error while closing datasource", e);
-						} finally {
-							LOGGER.info("Bye!");
-						}
-					}
-				});
-
-				app.setSize(800, 600);
-				app.setLocationRelativeTo(null);
-				app.setVisible(true);
-			}
-		});
+		SwingUtilities.invokeLater(new ClefRunner(ds, manager));
 	}
 
 	private static BasicDataSource createDataSource() {

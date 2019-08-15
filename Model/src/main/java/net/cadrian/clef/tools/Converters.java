@@ -20,6 +20,37 @@ import java.nio.charset.Charset;
 
 public class Converters {
 
+	private static final class TimeFormatter {
+		private final long time;
+
+		private TimeFormatter(final long time) {
+			this.time = time;
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder result = new StringBuilder();
+			long s = time;
+			long m = s / 60L;
+			s -= m * 60L;
+			final long h = m / 60L;
+			m -= h * 60L;
+			if (h < 10L) {
+				result.append("0");
+			}
+			result.append(h).append(":");
+			if (m < 10L) {
+				result.append("0");
+			}
+			result.append(m).append(":");
+			if (s < 10L) {
+				result.append("0");
+			}
+			result.append(s);
+			return result.toString();
+		}
+	}
+
 	public static final Charset CHARSET = Charset.forName("UTF-8");
 
 	private Converters() {
@@ -27,30 +58,7 @@ public class Converters {
 	}
 
 	public static final Object formatTime(final long time) {
-		return new Object() {
-			@Override
-			public String toString() {
-				final StringBuilder result = new StringBuilder();
-				long s = time;
-				long m = s / 60L;
-				s -= m * 60L;
-				final long h = m / 60L;
-				m -= h * 60L;
-				if (h < 10L) {
-					result.append("0");
-				}
-				result.append(h).append(":");
-				if (m < 10L) {
-					result.append("0");
-				}
-				result.append(m).append(":");
-				if (s < 10L) {
-					result.append("0");
-				}
-				result.append(s);
-				return result.toString();
-			}
-		};
+		return new TimeFormatter(time);
 	}
 
 	public static final long parseTime(final String time) {

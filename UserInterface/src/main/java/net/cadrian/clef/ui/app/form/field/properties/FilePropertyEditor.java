@@ -49,7 +49,7 @@ class FilePropertyEditor extends AbstractFilePropertyEditor {
 
 		try (ByteArrayInputStream in = new ByteArrayInputStream(value.getBytes(Converters.CHARSET));
 				InputStream b64 = BASE64_DECODER.wrap(in);
-				SpecialByteArrayOutputStream pathout = new SpecialByteArrayOutputStream()) {
+				SpecialByteArrayOutputStream pathout = new SpecialByteArrayOutputStream();) {
 			String path = null;
 			while (true) {
 				final int b = b64.read();

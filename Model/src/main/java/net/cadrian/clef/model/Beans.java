@@ -18,13 +18,13 @@ package net.cadrian.clef.model;
 
 import java.util.Collection;
 
+import net.cadrian.clef.model.bean.Activity;
 import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.Property;
 import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.Session;
-import net.cadrian.clef.model.bean.Activity;
 import net.cadrian.clef.model.bean.Work;
 
 public interface Beans {

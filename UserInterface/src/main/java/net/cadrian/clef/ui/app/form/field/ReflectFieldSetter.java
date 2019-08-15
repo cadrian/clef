@@ -63,7 +63,7 @@ public class ReflectFieldSetter<T extends Bean, D> implements FieldSetter<T, D> 
 				setter.invoke(bean, data);
 			} catch (IllegalAccessException | IllegalArgumentException e) {
 				throw new ModelException(e);
-			} catch (InvocationTargetException e) {
+			} catch (final InvocationTargetException e) {
 				throw new ModelException(e.getCause());
 			}
 		}

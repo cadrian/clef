@@ -39,6 +39,62 @@ import net.cadrian.clef.ui.Presentation;
 
 public class FileSelector extends JPanel {
 
+	private final class BrowseAction extends AbstractAction {
+		private final ApplicationContext context;
+		private static final long serialVersionUID = -3091414439330672834L;
+
+		private BrowseAction(final ApplicationContext context) {
+			super("Browse");
+			this.context = context;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final JFileChooser chooser = new JFileChooser();
+			if (lastDirectory != null) {
+				chooser.setCurrentDirectory(lastDirectory);
+			}
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			chooser.setMultiSelectionEnabled(false);
+			if (file != null) {
+				chooser.setSelectedFile(file);
+			}
+			final int returnVal = chooser.showOpenDialog(context.getPresentation().getApplicationFrame());
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				lastDirectory = chooser.getCurrentDirectory();
+				file = chooser.getSelectedFile();
+				display.setText(file.getAbsolutePath());
+				dirty = true;
+			}
+		}
+	}
+
+	private final class DownloadAction extends AbstractAction {
+		private final ApplicationContext context;
+		private final DownloadFilter downloadFilter;
+		private static final long serialVersionUID = 1306117769999262324L;
+
+		private DownloadAction(final ApplicationContext context, final DownloadFilter downloadFilter) {
+			super("Download");
+			this.context = context;
+			this.downloadFilter = downloadFilter;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			try {
+				final File filteredFile = downloadFilter.download(file);
+				Desktop.getDesktop().open(filteredFile);
+			} catch (final IOException x) {
+				LOGGER.error("Error while opening file: {}", file, x);
+				final Presentation presentation = context.getPresentation();
+				JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
+						presentation.getMessage("FileOpenFailedMessage", file.getPath()),
+						presentation.getMessage("FileOpenFailedTitle"), JOptionPane.WARNING_MESSAGE);
+			}
+		}
+	}
+
 	private static final long serialVersionUID = -606371277654849846L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileSelector.class);
@@ -58,47 +114,8 @@ public class FileSelector extends JPanel {
 		display = new JTextField();
 		display.setEditable(writable);
 
-		download = new AbstractAction("Download") {
-			private static final long serialVersionUID = 1306117769999262324L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				try {
-					final File filteredFile = downloadFilter.download(file);
-					Desktop.getDesktop().open(filteredFile);
-				} catch (final IOException x) {
-					LOGGER.error("Error while opening file: {}", file, x);
-					final Presentation presentation = context.getPresentation();
-					JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
-							presentation.getMessage("FileOpenFailedMessage", file.getPath()),
-							presentation.getMessage("FileOpenFailedTitle"), JOptionPane.WARNING_MESSAGE);
-				}
-			}
-		};
-
-		browse = new AbstractAction("Browse") {
-			private static final long serialVersionUID = -3091414439330672834L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final JFileChooser chooser = new JFileChooser();
-				if (lastDirectory != null) {
-					chooser.setCurrentDirectory(lastDirectory);
-				}
-				chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				chooser.setMultiSelectionEnabled(false);
-				if (file != null) {
-					chooser.setSelectedFile(file);
-				}
-				final int returnVal = chooser.showOpenDialog(context.getPresentation().getApplicationFrame());
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					lastDirectory = chooser.getCurrentDirectory();
-					file = chooser.getSelectedFile();
-					display.setText(file.getAbsolutePath());
-					dirty = true;
-				}
-			}
-		};
+		download = new DownloadAction(context, downloadFilter);
+		browse = new BrowseAction(context);
 
 		download.setEnabled(true);
 		browse.setEnabled(writable);

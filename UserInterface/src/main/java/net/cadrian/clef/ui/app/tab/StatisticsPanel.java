@@ -40,6 +40,31 @@ import net.cadrian.clef.ui.tools.StatisticsComputation;
 
 public class StatisticsPanel extends JPanel {
 
+	private final class AllPiecesIterableProvider implements StatisticsComputation.IterableProvider {
+		private final ApplicationContext context;
+
+		private AllPiecesIterableProvider(final ApplicationContext context) {
+			this.context = context;
+		}
+
+		@Override
+		public Iterable<Work> getWorks() {
+			return new ArrayList<>(context.getBeans().getWorks());
+		}
+
+		@Override
+		public Iterable<Piece> getPieces(final Work work) {
+			return new ArrayList<>(work.getPieces());
+		}
+	}
+
+	private final class RefreshComponentListener extends ComponentAdapter {
+		@Override
+		public void componentShown(final ComponentEvent e) {
+			computation.refresh();
+		}
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsPanel.class);
 
 	private static final long serialVersionUID = -2023860576290261246L;
@@ -73,26 +98,10 @@ public class StatisticsPanel extends JPanel {
 		constraints.fill = GridBagConstraints.BOTH;
 		add(titledPanel, constraints);
 
-		addComponentListener(new ComponentAdapter() {
-			@Override
-			public void componentShown(final ComponentEvent e) {
-				computation.refresh();
-			}
-		});
+		addComponentListener(new RefreshComponentListener());
 
-		computation = new StatisticsComputation(new StatisticsComputation.IterableProvider() {
-
-			@Override
-			public Iterable<Work> getWorks() {
-				return new ArrayList<>(context.getBeans().getWorks());
-			}
-
-			@Override
-			public Iterable<Piece> getPieces(final Work work) {
-				return new ArrayList<>(work.getPieces());
-			}
-
-		}, meanPerWork, stdevPerWork, meanPerPiece, stdevPerPiece);
+		computation = new StatisticsComputation(new AllPiecesIterableProvider(context), meanPerWork, stdevPerWork,
+				meanPerPiece, stdevPerPiece);
 
 		computation.refresh();
 	}

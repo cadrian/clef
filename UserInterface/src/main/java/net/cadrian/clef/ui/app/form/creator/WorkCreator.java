@@ -48,14 +48,62 @@ import net.cadrian.clef.ui.widget.ClefTools;
 
 public class WorkCreator implements BeanCreator<Work> {
 
+	private final class PricingsListSelectionListener implements ListSelectionListener {
+		private final ClefTools tools;
+		private final AtomicBoolean added;
+		private final AtomicBoolean pricingsSelected;
+		private final AtomicBoolean authorsSelected;
+
+		private PricingsListSelectionListener(final ClefTools tools, final AtomicBoolean added,
+				final AtomicBoolean pricingsSelected, final AtomicBoolean authorsSelected) {
+			this.tools = tools;
+			this.added = added;
+			this.pricingsSelected = pricingsSelected;
+			this.authorsSelected = authorsSelected;
+		}
+
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				pricingsSelected.set(true);
+				tools.getAction(ClefTools.Tool.Add).setEnabled(authorsSelected.get());
+				added.set(false);
+			}
+		}
+	}
+
+	private final class AuthorsListSelectionListener implements ListSelectionListener {
+		private final ClefTools tools;
+		private final AtomicBoolean pricingsSelected;
+		private final AtomicBoolean added;
+		private final AtomicBoolean authorsSelected;
+
+		private AuthorsListSelectionListener(final ClefTools tools, final AtomicBoolean pricingsSelected,
+				final AtomicBoolean added, final AtomicBoolean authorsSelected) {
+			this.tools = tools;
+			this.pricingsSelected = pricingsSelected;
+			this.added = added;
+			this.authorsSelected = authorsSelected;
+		}
+
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				authorsSelected.set(true);
+				tools.getAction(ClefTools.Tool.Add).setEnabled(pricingsSelected.get());
+				added.set(false);
+			}
+		}
+	}
+
 	private final class ClefToolsListenerImpl implements ClefTools.Listener {
 		private final JList<Pricing> pricings;
 		private final JDialog params;
 		private final AtomicBoolean added;
 		private final JList<Author> authors;
 
-		private ClefToolsListenerImpl(JList<Pricing> pricings, JDialog params, AtomicBoolean added,
-				JList<Author> authors) {
+		private ClefToolsListenerImpl(final JList<Pricing> pricings, final JDialog params, final AtomicBoolean added,
+				final JList<Author> authors) {
 			this.pricings = pricings;
 			this.params = params;
 			this.added = added;
@@ -149,26 +197,10 @@ public class WorkCreator implements BeanCreator<Work> {
 
 		tools.getAction(ClefTools.Tool.Add).setEnabled(false);
 
-		authors.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					authorsSelected.set(true);
-					tools.getAction(ClefTools.Tool.Add).setEnabled(pricingsSelected.get());
-					added.set(false);
-				}
-			}
-		});
-		pricings.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					pricingsSelected.set(true);
-					tools.getAction(ClefTools.Tool.Add).setEnabled(authorsSelected.get());
-					added.set(false);
-				}
-			}
-		});
+		authors.addListSelectionListener(
+				new AuthorsListSelectionListener(tools, pricingsSelected, added, authorsSelected));
+		pricings.addListSelectionListener(
+				new PricingsListSelectionListener(tools, added, pricingsSelected, authorsSelected));
 
 		paramsContent.add(tools, BorderLayout.NORTH);
 

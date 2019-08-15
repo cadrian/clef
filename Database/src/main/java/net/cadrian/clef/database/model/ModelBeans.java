@@ -51,6 +51,152 @@ import net.cadrian.clef.model.bean.Work;
 
 public class ModelBeans implements Beans {
 
+	private final class DatabaseModelBeans implements DatabaseBeansHolder {
+		@Override
+		public DatabaseBeans<net.cadrian.clef.database.bean.Pricing> getPricings() {
+			return pricingsDatabase;
+		}
+
+		@Override
+		public DatabaseBeans<net.cadrian.clef.database.bean.Activity> getActivities() {
+			return activitiesDatabase;
+		}
+
+		@Override
+		public DatabaseBeans<net.cadrian.clef.database.bean.Author> getAuthors() {
+			return authorsDatabase;
+		}
+
+		@Override
+		public DatabaseBeans<net.cadrian.clef.database.bean.Work> getWorks() {
+			return worksDatabase;
+		}
+
+		@Override
+		public DatabaseBeans<net.cadrian.clef.database.bean.Piece> getPieces() {
+			return piecesDatabase;
+		}
+
+		@Override
+		public DatabaseBeans<net.cadrian.clef.database.bean.Session> getSessions() {
+			return sessionsDatabase;
+		}
+
+		@Override
+		public DatabaseBeans<net.cadrian.clef.database.bean.Property> getProperties() {
+			return propertiesDatabase;
+		}
+
+		@Override
+		public DatabaseBeans<net.cadrian.clef.database.bean.PropertyDescriptor> getPropertyDescriptors() {
+			return propertyDescriptorsDatabase;
+		}
+
+		@Override
+		public PricingBean getPricing(final Long id) {
+			if (id == null) {
+				return null;
+			}
+			return ModelBeans.this.getPricings(Collections.singleton(id)).get(0);
+		}
+
+		@Override
+		public ActivityBean getActivity(final Long id) {
+			if (id == null) {
+				return null;
+			}
+			return ModelBeans.this.getActivities(Collections.singleton(id)).get(0);
+		}
+
+		@Override
+		public AuthorBean getAuthor(final Long id) {
+			if (id == null) {
+				return null;
+			}
+			return ModelBeans.this.getAuthors(Collections.singleton(id)).get(0);
+		}
+
+		@Override
+		public WorkBean getWork(final Long id) {
+			if (id == null) {
+				return null;
+			}
+			return ModelBeans.this.getWorks(Collections.singleton(id)).get(0);
+		}
+
+		@Override
+		public PieceBean getPiece(final Long id) {
+			if (id == null) {
+				return null;
+			}
+			return ModelBeans.this.getPieces(Collections.singleton(id)).get(0);
+		}
+
+		@Override
+		public SessionBean getSession(final Long id) {
+			if (id == null) {
+				return null;
+			}
+			return ModelBeans.this.getSessions(Collections.singleton(id)).get(0);
+		}
+
+		@Override
+		public PropertyBean getProperty(final Long id) {
+			if (id == null) {
+				return null;
+			}
+			return ModelBeans.this.getProperties(Collections.singleton(id)).get(0);
+		}
+
+		@Override
+		public PropertyDescriptorBean getPropertyDescriptor(final Long id) {
+			if (id == null) {
+				return null;
+			}
+			return ModelBeans.this.getPropertyDescriptors(Collections.singleton(id)).get(0);
+		}
+
+		@Override
+		public Collection<PricingBean> getPricings(final Collection<Long> ids) {
+			return ModelBeans.this.getPricings(ids);
+		}
+
+		@Override
+		public Collection<ActivityBean> getActivities(final Collection<Long> ids) {
+			return ModelBeans.this.getActivities(ids);
+		}
+
+		@Override
+		public Collection<AuthorBean> getAuthors(final Collection<Long> ids) {
+			return ModelBeans.this.getAuthors(ids);
+		}
+
+		@Override
+		public Collection<WorkBean> getWorks(final Collection<Long> ids) {
+			return ModelBeans.this.getWorks(ids);
+		}
+
+		@Override
+		public Collection<PieceBean> getPieces(final Collection<Long> ids) {
+			return ModelBeans.this.getPieces(ids);
+		}
+
+		@Override
+		public Collection<SessionBean> getSessions(final Collection<Long> ids) {
+			return ModelBeans.this.getSessions(ids);
+		}
+
+		@Override
+		public Collection<PropertyBean> getProperties(final Collection<Long> ids) {
+			return ModelBeans.this.getProperties(ids);
+		}
+
+		@Override
+		public Collection<PropertyDescriptorBean> getPropertyDescriptors(final Collection<Long> ids) {
+			return ModelBeans.this.getPropertyDescriptors(ids);
+		}
+	}
+
 	private final DatabaseBeansHolder db;
 
 	private final DatabaseBeans<net.cadrian.clef.database.bean.Author> authorsDatabase;
@@ -86,152 +232,7 @@ public class ModelBeans implements Beans {
 			throw new ModelException(e);
 		}
 
-		db = new DatabaseBeansHolder() {
-
-			@Override
-			public DatabaseBeans<net.cadrian.clef.database.bean.Pricing> getPricings() {
-				return pricingsDatabase;
-			}
-
-			@Override
-			public DatabaseBeans<net.cadrian.clef.database.bean.Activity> getActivities() {
-				return activitiesDatabase;
-			}
-
-			@Override
-			public DatabaseBeans<net.cadrian.clef.database.bean.Author> getAuthors() {
-				return authorsDatabase;
-			}
-
-			@Override
-			public DatabaseBeans<net.cadrian.clef.database.bean.Work> getWorks() {
-				return worksDatabase;
-			}
-
-			@Override
-			public DatabaseBeans<net.cadrian.clef.database.bean.Piece> getPieces() {
-				return piecesDatabase;
-			}
-
-			@Override
-			public DatabaseBeans<net.cadrian.clef.database.bean.Session> getSessions() {
-				return sessionsDatabase;
-			}
-
-			@Override
-			public DatabaseBeans<net.cadrian.clef.database.bean.Property> getProperties() {
-				return propertiesDatabase;
-			}
-
-			@Override
-			public DatabaseBeans<net.cadrian.clef.database.bean.PropertyDescriptor> getPropertyDescriptors() {
-				return propertyDescriptorsDatabase;
-			}
-
-			@Override
-			public PricingBean getPricing(final Long id) {
-				if (id == null) {
-					return null;
-				}
-				return ModelBeans.this.getPricings(Collections.singleton(id)).get(0);
-			}
-
-			@Override
-			public ActivityBean getActivity(final Long id) {
-				if (id == null) {
-					return null;
-				}
-				return ModelBeans.this.getActivities(Collections.singleton(id)).get(0);
-			}
-
-			@Override
-			public AuthorBean getAuthor(final Long id) {
-				if (id == null) {
-					return null;
-				}
-				return ModelBeans.this.getAuthors(Collections.singleton(id)).get(0);
-			}
-
-			@Override
-			public WorkBean getWork(final Long id) {
-				if (id == null) {
-					return null;
-				}
-				return ModelBeans.this.getWorks(Collections.singleton(id)).get(0);
-			}
-
-			@Override
-			public PieceBean getPiece(final Long id) {
-				if (id == null) {
-					return null;
-				}
-				return ModelBeans.this.getPieces(Collections.singleton(id)).get(0);
-			}
-
-			@Override
-			public SessionBean getSession(final Long id) {
-				if (id == null) {
-					return null;
-				}
-				return ModelBeans.this.getSessions(Collections.singleton(id)).get(0);
-			}
-
-			@Override
-			public PropertyBean getProperty(final Long id) {
-				if (id == null) {
-					return null;
-				}
-				return ModelBeans.this.getProperties(Collections.singleton(id)).get(0);
-			}
-
-			@Override
-			public PropertyDescriptorBean getPropertyDescriptor(final Long id) {
-				if (id == null) {
-					return null;
-				}
-				return ModelBeans.this.getPropertyDescriptors(Collections.singleton(id)).get(0);
-			}
-
-			@Override
-			public Collection<PricingBean> getPricings(final Collection<Long> ids) {
-				return ModelBeans.this.getPricings(ids);
-			}
-
-			@Override
-			public Collection<ActivityBean> getActivities(final Collection<Long> ids) {
-				return ModelBeans.this.getActivities(ids);
-			}
-
-			@Override
-			public Collection<AuthorBean> getAuthors(final Collection<Long> ids) {
-				return ModelBeans.this.getAuthors(ids);
-			}
-
-			@Override
-			public Collection<WorkBean> getWorks(final Collection<Long> ids) {
-				return ModelBeans.this.getWorks(ids);
-			}
-
-			@Override
-			public Collection<PieceBean> getPieces(final Collection<Long> ids) {
-				return ModelBeans.this.getPieces(ids);
-			}
-
-			@Override
-			public Collection<SessionBean> getSessions(final Collection<Long> ids) {
-				return ModelBeans.this.getSessions(ids);
-			}
-
-			@Override
-			public Collection<PropertyBean> getProperties(final Collection<Long> ids) {
-				return ModelBeans.this.getProperties(ids);
-			}
-
-			@Override
-			public Collection<PropertyDescriptorBean> getPropertyDescriptors(final Collection<Long> ids) {
-				return ModelBeans.this.getPropertyDescriptors(ids);
-			}
-		};
+		db = new DatabaseModelBeans();
 	}
 
 	@Override

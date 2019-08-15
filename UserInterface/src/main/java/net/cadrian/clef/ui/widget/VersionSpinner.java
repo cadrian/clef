@@ -38,6 +38,64 @@ public class VersionSpinner extends JPanel {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(VersionSpinner.class);
 
+	private final class LeftAction extends AbstractAction {
+		private final Controller controller;
+		private static final long serialVersionUID = -7912301007428815095L;
+
+		private LeftAction(final Controller controller) {
+			super("SpinLeft");
+			this.controller = controller;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			controller.previous();
+			refreshNow();
+		}
+	}
+
+	private final class RightAction extends AbstractAction {
+		private final Controller controller;
+		private static final long serialVersionUID = -7135069953331039207L;
+
+		private RightAction(final Controller controller) {
+			super("SpinRight");
+			this.controller = controller;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			controller.next();
+			refreshNow();
+		}
+	}
+
+	private final class CreateAction extends AbstractAction {
+		private final Controller controller;
+		private static final long serialVersionUID = 7246511819586352379L;
+
+		private CreateAction(final Controller controller) {
+			super("Add");
+			this.controller = controller;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			controller.create();
+			if (controller.hasNext()) {
+				controller.next();
+			}
+			refreshNow();
+		}
+	}
+
+	private final class Refresher implements Runnable {
+		@Override
+		public void run() {
+			refreshNow();
+		}
+	}
+
 	public interface Controller {
 		boolean hasPrevious();
 
@@ -66,38 +124,9 @@ public class VersionSpinner extends JPanel {
 		LOGGER.debug("version: {}", versionString);
 		version = new JLabel(versionString, SwingConstants.CENTER);
 
-		leftAction = new AbstractAction("SpinLeft") {
-			private static final long serialVersionUID = -7912301007428815095L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				controller.previous();
-				refreshNow();
-			}
-		};
-
-		rightAction = new AbstractAction("SpinRight") {
-			private static final long serialVersionUID = -7135069953331039207L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				controller.next();
-				refreshNow();
-			}
-		};
-
-		createAction = new AbstractAction("Add") {
-			private static final long serialVersionUID = 7246511819586352379L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				controller.create();
-				if (controller.hasNext()) {
-					controller.next();
-				}
-				refreshNow();
-			}
-		};
+		leftAction = new LeftAction(controller);
+		rightAction = new RightAction(controller);
+		createAction = new CreateAction(controller);
 
 		final JToolBar leftButtons = new JToolBar(SwingConstants.HORIZONTAL);
 		leftButtons.setFloatable(false);
@@ -124,13 +153,7 @@ public class VersionSpinner extends JPanel {
 	}
 
 	public void refresh() {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				refreshNow();
-			}
-		});
+		SwingUtilities.invokeLater(new Refresher());
 	}
 
 }

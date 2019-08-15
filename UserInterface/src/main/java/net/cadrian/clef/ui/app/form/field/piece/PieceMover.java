@@ -33,12 +33,34 @@ import net.cadrian.clef.ui.widget.ClefTools;
 
 class PieceMover implements BeanMover<Piece> {
 
+	private final class WorksListSelectionListener implements ListSelectionListener {
+		private final AtomicBoolean added;
+		private final ClefTools tools;
+		private final AtomicBoolean worksSelected;
+
+		private WorksListSelectionListener(final AtomicBoolean added, final ClefTools tools,
+				final AtomicBoolean worksSelected) {
+			this.added = added;
+			this.tools = tools;
+			this.worksSelected = worksSelected;
+		}
+
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				worksSelected.set(true);
+				tools.getAction(ClefTools.Tool.Move).setEnabled(true);
+				added.set(false);
+			}
+		}
+	}
+
 	private final class ClefToolsListenerImpl implements ClefTools.Listener {
 		private final JDialog params;
 		private final AtomicBoolean added;
 		private final JList<Work> works;
 
-		private ClefToolsListenerImpl(JDialog params, AtomicBoolean added, JList<Work> works) {
+		private ClefToolsListenerImpl(final JDialog params, final AtomicBoolean added, final JList<Work> works) {
 			this.params = params;
 			this.added = added;
 			this.works = works;
@@ -112,16 +134,7 @@ class PieceMover implements BeanMover<Piece> {
 
 		tools.getAction(ClefTools.Tool.Move).setEnabled(false);
 
-		works.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					worksSelected.set(true);
-					tools.getAction(ClefTools.Tool.Move).setEnabled(true);
-					added.set(false);
-				}
-			}
-		});
+		works.addListSelectionListener(new WorksListSelectionListener(added, tools, worksSelected));
 
 		paramsContent.add(tools, BorderLayout.NORTH);
 

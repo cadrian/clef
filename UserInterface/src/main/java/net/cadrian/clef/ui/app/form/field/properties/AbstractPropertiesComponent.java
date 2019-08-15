@@ -49,6 +49,46 @@ import net.cadrian.clef.ui.widget.ClefTools;
 
 abstract class AbstractPropertiesComponent implements FieldComponent<Collection<? extends Property>, JSplitPane> {
 
+	private final class DataSetter implements Runnable {
+		private final Collection<? extends Property> data;
+
+		private DataSetter(final Collection<? extends Property> data) {
+			this.data = data;
+		}
+
+		@Override
+		public void run() {
+			final List<EditableProperty> properties = new ArrayList<>();
+			for (final Property property : data) {
+				properties.add(new EditableProperty(property));
+			}
+			model.replaceAll(properties);
+		}
+	}
+
+	private final class PropertiesListSelectionListener implements ListSelectionListener {
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				saveProperty();
+				loadProperty(list.getSelectedValue());
+			}
+		}
+	}
+
+	private final class PropertiesWritableListSelectionListener implements ListSelectionListener {
+		private final ClefTools tools;
+
+		private PropertiesWritableListSelectionListener(final ClefTools tools) {
+			this.tools = tools;
+		}
+
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			tools.getAction(ClefTools.Tool.Del).setEnabled(!list.isSelectionEmpty());
+		}
+	}
+
 	private final class ClefToolsListenerImpl implements ClefTools.Listener {
 		@Override
 		public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
@@ -103,13 +143,7 @@ abstract class AbstractPropertiesComponent implements FieldComponent<Collection<
 
 			left.add(tools, BorderLayout.NORTH);
 
-			list.addListSelectionListener(new ListSelectionListener() {
-
-				@Override
-				public void valueChanged(final ListSelectionEvent e) {
-					tools.getAction(ClefTools.Tool.Del).setEnabled(!list.isSelectionEmpty());
-				}
-			});
+			list.addListSelectionListener(new PropertiesWritableListSelectionListener(tools));
 
 			tools.getAction(ClefTools.Tool.Add).setEnabled(!getAddableDescriptors().isEmpty());
 			tools.getAction(ClefTools.Tool.Del).setEnabled(false);
@@ -117,16 +151,7 @@ abstract class AbstractPropertiesComponent implements FieldComponent<Collection<
 
 		component.setLeftComponent(left);
 		component.setRightComponent(new JPanel());
-		list.addListSelectionListener(new ListSelectionListener() {
-
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					saveProperty();
-					loadProperty(list.getSelectedValue());
-				}
-			}
-		});
+		list.addListSelectionListener(new PropertiesListSelectionListener());
 
 	}
 
@@ -174,16 +199,7 @@ abstract class AbstractPropertiesComponent implements FieldComponent<Collection<
 
 	@Override
 	public void setData(final Collection<? extends Property> data) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				final List<EditableProperty> properties = new ArrayList<>();
-				for (final Property property : data) {
-					properties.add(new EditableProperty(property));
-				}
-				model.replaceAll(properties);
-			}
-		});
+		SwingUtilities.invokeLater(new DataSetter(data));
 	}
 
 	@Override

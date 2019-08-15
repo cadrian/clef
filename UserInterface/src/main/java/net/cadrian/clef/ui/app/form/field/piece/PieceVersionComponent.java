@@ -24,6 +24,52 @@ import net.cadrian.clef.ui.widget.VersionSpinner.Controller;
 
 class PieceVersionComponent implements FieldComponent<Long, VersionSpinner> {
 
+	private final class VersionSpinnerController implements Controller {
+		private final Piece piece;
+		private final ApplicationContext context;
+
+		private VersionSpinnerController(final Piece piece, final ApplicationContext context) {
+			this.piece = piece;
+			this.context = context;
+		}
+
+		@Override
+		public boolean hasPrevious() {
+			return previous != null;
+		}
+
+		@Override
+		public void previous() {
+			if (piecesComponent != null) {
+				piecesComponent.component.select(previous.piece, false);
+			}
+		}
+
+		@Override
+		public boolean hasNext() {
+			return next != null;
+		}
+
+		@Override
+		public void next() {
+			if (piecesComponent != null) {
+				piecesComponent.component.select(next.piece, false);
+			}
+		}
+
+		@Override
+		public int getCurrent() {
+			return count;
+		}
+
+		@Override
+		public void create() {
+			if (piecesComponent != null) {
+				piecesComponent.component.select(context.getBeans().createPieceVersion(piece), true);
+			}
+		}
+	}
+
 	private final VersionSpinner component;
 	private final Piece piece;
 
@@ -37,44 +83,7 @@ class PieceVersionComponent implements FieldComponent<Long, VersionSpinner> {
 
 		count = count(piece);
 
-		component = new VersionSpinner(context, new Controller() {
-
-			@Override
-			public boolean hasPrevious() {
-				return previous != null;
-			}
-
-			@Override
-			public void previous() {
-				if (piecesComponent != null) {
-					piecesComponent.component.select(previous.piece, false);
-				}
-			}
-
-			@Override
-			public boolean hasNext() {
-				return next != null;
-			}
-
-			@Override
-			public void next() {
-				if (piecesComponent != null) {
-					piecesComponent.component.select(next.piece, false);
-				}
-			}
-
-			@Override
-			public int getCurrent() {
-				return count;
-			}
-
-			@Override
-			public void create() {
-				if (piecesComponent != null) {
-					piecesComponent.component.select(context.getBeans().createPieceVersion(piece), true);
-				}
-			}
-		});
+		component = new VersionSpinner(context, new VersionSpinnerController(piece, context));
 	}
 
 	private int count(final Piece piece) {

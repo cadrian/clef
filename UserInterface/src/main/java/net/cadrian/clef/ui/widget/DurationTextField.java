@@ -27,12 +27,7 @@ import net.cadrian.clef.tools.Converters;
 
 public class DurationTextField extends JFormattedTextField {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DurationTextField.class);
-
-	private static final long serialVersionUID = 9181768552406022378L;
-
-	private static final AbstractFormatter FORMAT = new AbstractFormatter() {
-
+	private static final class Formatter extends AbstractFormatter {
 		private static final long serialVersionUID = -4277802724363308031L;
 
 		@Override
@@ -57,7 +52,13 @@ public class DurationTextField extends JFormattedTextField {
 			}
 			return "";
 		}
-	};
+	}
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DurationTextField.class);
+
+	private static final long serialVersionUID = 9181768552406022378L;
+
+	private static final AbstractFormatter FORMAT = new Formatter();
 
 	public DurationTextField() {
 		super(FORMAT);

@@ -38,7 +38,7 @@ class AddPropertyChooser extends JDialog {
 	private final class ClefToolsListenerImpl implements ClefTools.Listener {
 		private final JList<PropertyDescriptor> list;
 
-		private ClefToolsListenerImpl(JList<PropertyDescriptor> list) {
+		private ClefToolsListenerImpl(final JList<PropertyDescriptor> list) {
 			this.list = list;
 		}
 

@@ -74,11 +74,44 @@ public class ConfigurationPanel extends JTabbedPane {
 
 	private static final Class<?>[] COLUMN_TYPES = { String.class, LocalizedType.class, String.class };
 
+	private final class OfflineModeChangeListener implements ChangeListener {
+		private final JToggleButton offlineModeButton;
+		private final ApplicationContext context;
+
+		private OfflineModeChangeListener(final JToggleButton offlineModeButton, final ApplicationContext context) {
+			this.offlineModeButton = offlineModeButton;
+			this.context = context;
+		}
+
+		@Override
+		public void stateChanged(final ChangeEvent e) {
+			context.setValue(AdvancedConfigurationEntry.offlineMode, offlineModeButton.isSelected());
+		}
+	}
+
+	private final class TableSelectionListener implements ListSelectionListener {
+		private final PropertyDescriptorTableModel model;
+		private final ClefTools tools;
+		private final JTable table;
+
+		private TableSelectionListener(final PropertyDescriptorTableModel model, final ClefTools tools,
+				final JTable table) {
+			this.model = model;
+			this.tools = tools;
+			this.table = table;
+		}
+
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			tools.getAction(ClefTools.Tool.Del).setEnabled(model.canDelRow(table.getSelectedRow()));
+		}
+	}
+
 	private final class ClefToolsListenerImpl implements ClefTools.Listener {
 		private final JTable table;
 		private final PropertyDescriptorTableModel model;
 
-		private ClefToolsListenerImpl(JTable table, PropertyDescriptorTableModel model) {
+		private ClefToolsListenerImpl(final JTable table, final PropertyDescriptorTableModel model) {
 			this.table = table;
 			this.model = model;
 		}
@@ -188,13 +221,7 @@ public class ConfigurationPanel extends JTabbedPane {
 
 		result.add(tools, BorderLayout.NORTH);
 
-		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				tools.getAction(ClefTools.Tool.Del).setEnabled(model.canDelRow(table.getSelectedRow()));
-			}
-		});
+		table.getSelectionModel().addListSelectionListener(new TableSelectionListener(model, tools, table));
 
 		return result;
 	}
@@ -211,13 +238,7 @@ public class ConfigurationPanel extends JTabbedPane {
 		content.add(offlineModeButton);
 		content.add(offlineModeLabel);
 
-		offlineModeButton.addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(final ChangeEvent e) {
-				context.setValue(AdvancedConfigurationEntry.offlineMode, offlineModeButton.isSelected());
-			}
-		});
+		offlineModeButton.addChangeListener(new OfflineModeChangeListener(offlineModeButton, context));
 
 		result.add(content, BorderLayout.CENTER);
 

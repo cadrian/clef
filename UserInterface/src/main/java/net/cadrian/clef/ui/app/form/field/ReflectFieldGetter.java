@@ -49,7 +49,7 @@ public class ReflectFieldGetter<T extends Bean, D> implements FieldGetter<T, D> 
 			return (D) getter.invoke(bean);
 		} catch (IllegalAccessException | IllegalArgumentException e) {
 			throw new ModelException(e);
-		} catch (InvocationTargetException e) {
+		} catch (final InvocationTargetException e) {
 			throw new ModelException(e.getCause());
 		}
 	}

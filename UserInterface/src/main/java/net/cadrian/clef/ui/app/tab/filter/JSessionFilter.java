@@ -51,7 +51,8 @@ public class JSessionFilter extends JBeanFilter<Session> {
 		private final ApplicationContext context;
 		private final SortableListModel<Piece> piecesModel;
 
-		private WorksListSelectionListener(ApplicationContext context, SortableListModel<Piece> piecesModel) {
+		private WorksListSelectionListener(final ApplicationContext context,
+				final SortableListModel<Piece> piecesModel) {
 			this.context = context;
 			this.piecesModel = piecesModel;
 		}
@@ -85,8 +86,8 @@ public class JSessionFilter extends JBeanFilter<Session> {
 		private final Collection<? extends Work> allWorks;
 		private final ApplicationContext context;
 
-		private AuthorsListSelectionListener(SortableListModel<Work> worksModel, Collection<? extends Work> allWorks,
-				ApplicationContext context) {
+		private AuthorsListSelectionListener(final SortableListModel<Work> worksModel,
+				final Collection<? extends Work> allWorks, final ApplicationContext context) {
 			this.worksModel = worksModel;
 			this.allWorks = allWorks;
 			this.context = context;

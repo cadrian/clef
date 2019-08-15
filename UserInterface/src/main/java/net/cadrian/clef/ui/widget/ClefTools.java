@@ -37,7 +37,22 @@ public class ClefTools extends JToolBar {
 
 	private static final long serialVersionUID = 5025926948132545775L;
 
-	public static enum Tool {
+	private final class ToolAction extends AbstractAction {
+		private final Tool tool;
+		private static final long serialVersionUID = -1937859824187249283L;
+
+		private ToolAction(final String name, final Tool tool) {
+			super(name);
+			this.tool = tool;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			fireToolCalled(tool);
+		}
+	}
+
+	public enum Tool {
 		Filter(false), Add(true), Del(false), Move(false), Save(true);
 
 		final boolean needsSeparatorBefore;
@@ -66,14 +81,7 @@ public class ClefTools extends JToolBar {
 			if (!first && tool.needsSeparatorBefore) {
 				addSeparator();
 			}
-			final Action action = new AbstractAction(tool.name()) {
-				private static final long serialVersionUID = -1937859824187249283L;
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					fireToolCalled(tool);
-				}
-			};
+			final Action action = new ToolAction(tool.name(), tool);
 			actions.put(tool, action);
 			buttons.put(tool, add(action));
 			first = false;

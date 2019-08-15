@@ -42,6 +42,42 @@ import net.cadrian.clef.ui.tools.StatisticsComputation.IterableProvider;
 
 class WorkStatisticsComponent extends JPanel {
 
+	private final class LostComputationIterableProvider implements IterableProvider {
+		private final Work bean;
+
+		private LostComputationIterableProvider(final Work bean) {
+			this.bean = bean;
+		}
+
+		@Override
+		public Iterable<Work> getWorks() {
+			return Arrays.asList(bean);
+		}
+
+		@Override
+		public Iterable<Piece> getPieces(final Work work) {
+			return getAllPieces(work);
+		}
+	}
+
+	private final class TotalComputationIterableProvider implements IterableProvider {
+		private final Work bean;
+
+		private TotalComputationIterableProvider(final Work bean) {
+			this.bean = bean;
+		}
+
+		@Override
+		public Iterable<Work> getWorks() {
+			return Arrays.asList(bean);
+		}
+
+		@Override
+		public Iterable<Piece> getPieces(final Work work) {
+			return WorkStatisticsComponent.this.getPieces(work);
+		}
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkStatisticsComponent.class);
 
 	private static final long serialVersionUID = -1755628526357896602L;
@@ -97,31 +133,11 @@ class WorkStatisticsComponent extends JPanel {
 		addLabel(context, gridy++, "MeanWorkPerMinuteWithLost", meanWorkPerMinuteWithLost, lostPieces);
 		addLabel(context, gridy++, "StdDeviationPerMinuteWithLost", stdevWorkPerMinuteWithLost, lostPieces);
 
-		totalComputation = new StatisticsComputation(new IterableProvider() {
+		totalComputation = new StatisticsComputation(new TotalComputationIterableProvider(bean), null, null,
+				meanWorkPerMinute, stdevWorkPerMinute);
 
-			@Override
-			public Iterable<Work> getWorks() {
-				return Arrays.asList(bean);
-			}
-
-			@Override
-			public Iterable<Piece> getPieces(final Work work) {
-				return WorkStatisticsComponent.this.getPieces(work);
-			}
-		}, null, null, meanWorkPerMinute, stdevWorkPerMinute);
-
-		lostComputation = new StatisticsComputation(new IterableProvider() {
-
-			@Override
-			public Iterable<Work> getWorks() {
-				return Arrays.asList(bean);
-			}
-
-			@Override
-			public Iterable<Piece> getPieces(final Work work) {
-				return getAllPieces(work);
-			}
-		}, null, null, meanWorkPerMinuteWithLost, stdevWorkPerMinuteWithLost);
+		lostComputation = new StatisticsComputation(new LostComputationIterableProvider(bean), null, null,
+				meanWorkPerMinuteWithLost, stdevWorkPerMinuteWithLost);
 
 		refresh();
 	}

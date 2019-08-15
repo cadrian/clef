@@ -38,6 +38,76 @@ import net.cadrian.clef.ui.ApplicationContext;
 
 public class DateSelector extends JPanel {
 
+	private final class SetDateAction extends AbstractAction {
+		private final ApplicationContext context;
+		private static final long serialVersionUID = 7862670744497256762L;
+
+		private SetDateAction(final ApplicationContext context) {
+			super("Calendar");
+			this.context = context;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final DateComponentPicker picker = new DateComponentPicker(context, date);
+			picker.setVisible(true);
+			date = picker.getDate();
+			LOGGER.debug("picked date: {}", date);
+			if (lowerBound != null) {
+				final Date lowerDate = lowerBound.getDate();
+				if (lowerDate != null && lowerDate.after(date)) {
+					LOGGER.debug("lower bound is {}", lowerDate);
+					date = lowerDate;
+				}
+			}
+			if (upperBound != null) {
+				final Date upperDate = upperBound.getDate();
+				if (upperDate == null || upperDate.before(date)) {
+					LOGGER.debug("bouncing upper bound");
+					upperBound.setDate(date, true);
+				}
+			}
+			display.setText(df.format(date));
+			dirty = true;
+		}
+	}
+
+	private final class RefreshAction extends AbstractAction {
+		private static final long serialVersionUID = -3091414439330672834L;
+
+		private RefreshAction() {
+			super("Refresh");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			date = new Date();
+			LOGGER.debug("Setting date to now: {}", date);
+			if (upperBound != null) {
+				final Date upperDate = upperBound.getDate();
+				if (upperDate == null || upperDate.before(date)) {
+					LOGGER.debug("bouncing upper bound");
+					upperBound.setDate(date, true);
+				}
+			}
+			display.setText(df.format(date));
+			dirty = true;
+		}
+	}
+
+	private final class DateSetter implements Runnable {
+		private final Date date;
+
+		private DateSetter(final Date date) {
+			this.date = date;
+		}
+
+		@Override
+		public void run() {
+			display.setText(date == null ? "" : df.format(date));
+		}
+	}
+
 	private static final long serialVersionUID = 5669423531441161006L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DateSelector.class);
@@ -58,54 +128,9 @@ public class DateSelector extends JPanel {
 		display = new JTextField();
 		display.setEditable(false);
 
-		refresh = new AbstractAction("Refresh") {
-			private static final long serialVersionUID = -3091414439330672834L;
+		refresh = new RefreshAction();
 
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				date = new Date();
-				LOGGER.debug("Setting date to now: {}", date);
-				if (upperBound != null) {
-					final Date upperDate = upperBound.getDate();
-					if (upperDate == null || upperDate.before(date)) {
-						LOGGER.debug("bouncing upper bound");
-						upperBound.setDate(date, true);
-					}
-				}
-				display.setText(df.format(date));
-				dirty = true;
-			}
-
-		};
-
-		setDate = new AbstractAction("Calendar") {
-			private static final long serialVersionUID = 7862670744497256762L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final DateComponentPicker picker = new DateComponentPicker(context, date);
-				picker.setVisible(true);
-				date = picker.getDate();
-				LOGGER.debug("picked date: {}", date);
-				if (lowerBound != null) {
-					final Date lowerDate = lowerBound.getDate();
-					if (lowerDate != null && lowerDate.after(date)) {
-						LOGGER.debug("lower bound is {}", lowerDate);
-						date = lowerDate;
-					}
-				}
-				if (upperBound != null) {
-					final Date upperDate = upperBound.getDate();
-					if (upperDate == null || upperDate.before(date)) {
-						LOGGER.debug("bouncing upper bound");
-						upperBound.setDate(date, true);
-					}
-				}
-				display.setText(df.format(date));
-				dirty = true;
-			}
-
-		};
+		setDate = new SetDateAction(context);
 
 		refresh.setEnabled(writable);
 		setDate.setEnabled(writable);
@@ -144,13 +169,7 @@ public class DateSelector extends JPanel {
 		LOGGER.debug("set date to {}", date);
 		this.date = date;
 		this.dirty = dirty;
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				display.setText(date == null ? "" : df.format(date));
-			}
-		});
+		SwingUtilities.invokeLater(new DateSetter(date));
 	}
 
 	public void setDate(final Date date) {

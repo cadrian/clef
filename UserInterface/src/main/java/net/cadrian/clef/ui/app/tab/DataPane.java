@@ -63,6 +63,83 @@ import net.cadrian.clef.ui.widget.ClefTools.Tool;
 
 public class DataPane<T extends Bean> extends JSplitPane {
 
+	private final class BeanFilterActionListener implements ActionListener {
+		private final class PaneRefresher implements Runnable {
+			@Override
+			public void run() {
+				layeredPane.repaint();
+				filterAction.setEnabled(true);
+			}
+		}
+
+		private final JBeanFilter<T> beanFilterComponent;
+		private final JLayeredPane layeredPane;
+		private final Action filterAction;
+
+		private BeanFilterActionListener(final JBeanFilter<T> beanFilterComponent, final JLayeredPane layeredPane,
+				final Action filterAction) {
+			this.beanFilterComponent = beanFilterComponent;
+			this.layeredPane = layeredPane;
+			this.filterAction = filterAction;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			layeredPane.remove(beanFilterComponent);
+			SwingUtilities.invokeLater(new PaneRefresher());
+			refreshList(list.getSelectedValue());
+		}
+	}
+
+	private final class DataAdder extends SwingWorker<Void, T> {
+		private int index = -1;
+
+		@Override
+		protected Void doInBackground() throws Exception {
+			try {
+				final T newBean = beanCreator.createBean();
+				if (newBean == null) {
+					LOGGER.info("null bean, aborting creation");
+				} else {
+					publish(newBean);
+				}
+			} catch (final ModelException e) {
+				LOGGER.error("Error while adding data", e);
+				final Presentation presentation = context.getPresentation();
+				JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
+						presentation.getMessage("CreateFailedMessage"), presentation.getMessage("CreateFailedTitle"),
+						JOptionPane.WARNING_MESSAGE);
+			}
+			return null;
+		}
+
+		@Override
+		protected void process(final java.util.List<T> chunks) {
+			for (final T bean : chunks) {
+				LOGGER.debug("Adding element: {}", bean);
+				index = model.add(bean);
+			}
+		}
+
+		@Override
+		protected void done() {
+			LOGGER.debug("Selecting last element");
+			list.setSelectedIndex(index);
+		}
+	}
+
+	private final class BeanFormInstaller implements ListSelectionListener {
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			if (e.getValueIsAdjusting()) {
+				LOGGER.debug("value still adjusting");
+				current.setEnabled(false);
+			} else {
+				installBeanForm(list.getSelectedValue(), getTab());
+			}
+		}
+	}
+
 	private final class ClefToolsListenerImpl implements ClefTools.Listener {
 		private final ApplicationContext context;
 
@@ -211,17 +288,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		left.add(new JScrollPane(list), BorderLayout.CENTER);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				if (e.getValueIsAdjusting()) {
-					LOGGER.debug("value still adjusting");
-					current.setEnabled(false);
-				} else {
-					installBeanForm(list.getSelectedValue(), getTab());
-				}
-			}
-		});
+		list.getSelectionModel().addListSelectionListener(new BeanFormInstaller());
 
 		final List<Tool> toolsList = new ArrayList<>(Arrays.asList(Tool.values()));
 		if (!showSave) {
@@ -319,44 +386,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	}
 
 	void addData() {
-		final SwingWorker<Void, T> worker = new SwingWorker<Void, T>() {
-
-			private int index = -1;
-
-			@Override
-			protected Void doInBackground() throws Exception {
-				try {
-					final T newBean = beanCreator.createBean();
-					if (newBean == null) {
-						LOGGER.info("null bean, aborting creation");
-					} else {
-						publish(newBean);
-					}
-				} catch (final ModelException e) {
-					LOGGER.error("Error while adding data", e);
-					final Presentation presentation = context.getPresentation();
-					JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
-							presentation.getMessage("CreateFailedMessage"),
-							presentation.getMessage("CreateFailedTitle"), JOptionPane.WARNING_MESSAGE);
-				}
-				return null;
-			}
-
-			@Override
-			protected void process(final java.util.List<T> chunks) {
-				for (final T bean : chunks) {
-					LOGGER.debug("Adding element: {}", bean);
-					index = model.add(bean);
-				}
-			};
-
-			@Override
-			protected void done() {
-				LOGGER.debug("Selecting last element");
-				list.setSelectedIndex(index);
-			}
-		};
-
+		final SwingWorker<Void, T> worker = new DataAdder();
 		worker.execute();
 	}
 
@@ -403,23 +433,8 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		filterAction.setEnabled(false);
 		final JLayeredPane layeredPane = context.getPresentation().getApplicationFrame().getLayeredPane();
 		final JBeanFilter<T> beanFilterComponent = beanFilter.getFilterComponent(context);
-		beanFilterComponent.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				layeredPane.remove(beanFilterComponent);
-				SwingUtilities.invokeLater(new Runnable() {
-
-					@Override
-					public void run() {
-						layeredPane.repaint();
-						filterAction.setEnabled(true);
-					}
-				});
-				refreshList(list.getSelectedValue());
-			}
-
-		});
+		beanFilterComponent
+				.addActionListener(new BeanFilterActionListener(beanFilterComponent, layeredPane, filterAction));
 		beanFilterComponent.setLocation(position);
 		layeredPane.add(beanFilterComponent, JLayeredPane.MODAL_LAYER, 1000);
 	}

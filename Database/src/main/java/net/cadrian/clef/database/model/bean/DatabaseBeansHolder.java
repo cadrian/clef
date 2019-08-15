@@ -19,13 +19,13 @@ package net.cadrian.clef.database.model.bean;
 import java.util.Collection;
 
 import net.cadrian.clef.database.DatabaseBeans;
+import net.cadrian.clef.database.bean.Activity;
 import net.cadrian.clef.database.bean.Author;
 import net.cadrian.clef.database.bean.Piece;
 import net.cadrian.clef.database.bean.Pricing;
 import net.cadrian.clef.database.bean.Property;
 import net.cadrian.clef.database.bean.PropertyDescriptor;
 import net.cadrian.clef.database.bean.Session;
-import net.cadrian.clef.database.bean.Activity;
 import net.cadrian.clef.database.bean.Work;
 
 public interface DatabaseBeansHolder {

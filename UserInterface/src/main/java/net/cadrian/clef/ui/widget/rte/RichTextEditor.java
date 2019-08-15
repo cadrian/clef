@@ -56,9 +56,151 @@ import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.Presentation;
 
 public class RichTextEditor extends JPanel {
+	private final class DocumentUndoableEditListener implements UndoableEditListener {
+		@Override
+		public void undoableEditHappened(final UndoableEditEvent e) {
+			undoManager.addEdit(e.getEdit());
+			dirty++;
+		}
+	}
+
+	private final class RedoAction extends AbstractAction {
+		private static final long serialVersionUID = -2878268317676372393L;
+
+		private RedoAction() {
+			super("RTE.Redo");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			if (undoManager.canRedo()) {
+				undoManager.redo();
+				dirty--;
+			} else {
+				editor.requestFocusInWindow();
+			}
+		}
+	}
+
+	private final class UndoAction extends AbstractAction {
+		private static final long serialVersionUID = 1606783148768829015L;
+
+		private UndoAction() {
+			super("RTE.Undo");
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			if (undoManager.canUndo()) {
+				undoManager.undo();
+				dirty++;
+			} else {
+				editor.requestFocusInWindow();
+			}
+		}
+	}
+
+	private final class EditButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			editor.requestFocusInWindow();
+		}
+	}
+
+	private final class UndoRedoDocumentListener implements DocumentListener {
+		private final Action undoAction;
+		private final Action redoAction;
+
+		private UndoRedoDocumentListener(final Action undoAction, final Action redoAction) {
+			this.undoAction = undoAction;
+			this.redoAction = redoAction;
+		}
+
+		@Override
+		public void removeUpdate(final DocumentEvent e) {
+			undoAction.setEnabled(undoManager.canUndo());
+			redoAction.setEnabled(undoManager.canRedo());
+		}
+
+		@Override
+		public void insertUpdate(final DocumentEvent e) {
+			undoAction.setEnabled(undoManager.canUndo());
+			redoAction.setEnabled(undoManager.canRedo());
+		}
+
+		@Override
+		public void changedUpdate(final DocumentEvent e) {
+			undoAction.setEnabled(undoManager.canUndo());
+			redoAction.setEnabled(undoManager.canRedo());
+		}
+	}
+
 	// Developed using as examples:
 	// - http://www.javaquizplayer.com/examples/text-editor-using-java-example.html
 	// - https://www.artima.com/forums/flat.jsp?forum=1&thread=1276
+
+	private final class EditorKeyListener extends KeyAdapter {
+		private final JButton italicButton;
+		private final JButton underlineButton;
+		private final JButton undoButton;
+		private final JButton redoButton;
+		private final Action redoAction;
+		private final Action undoAction;
+		private final JButton boldButton;
+
+		private EditorKeyListener(final JButton italicButton, final JButton underlineButton, final JButton undoButton,
+				final JButton redoButton, final Action redoAction, final Action undoAction, final JButton boldButton) {
+			this.italicButton = italicButton;
+			this.underlineButton = underlineButton;
+			this.undoButton = undoButton;
+			this.redoButton = redoButton;
+			this.redoAction = redoAction;
+			this.undoAction = undoAction;
+			this.boldButton = boldButton;
+		}
+
+		@Override
+		public void keyPressed(final KeyEvent e) {
+			if ((e.getModifiers() & InputEvent.CTRL_MASK) == 0) {
+				return;
+			}
+			switch (e.getKeyCode()) {
+			// Don't put Ctrl-C,X,V -- already taken into account by the editor itself
+			case KeyEvent.VK_Y:
+				redoButton.doClick(0);
+				break;
+			case KeyEvent.VK_Z:
+				undoButton.doClick(0);
+				break;
+			case KeyEvent.VK_B:
+				boldButton.doClick(0);
+				break;
+			case KeyEvent.VK_I:
+				italicButton.doClick(0);
+				break;
+			case KeyEvent.VK_U:
+				underlineButton.doClick(0);
+				break;
+			}
+			SwingUtilities.invokeLater(new UndoRedoEnabler(redoAction, undoAction));
+		}
+	}
+
+	private final class UndoRedoEnabler implements Runnable {
+		private final Action redoAction;
+		private final Action undoAction;
+
+		private UndoRedoEnabler(final Action redoAction, final Action undoAction) {
+			this.redoAction = redoAction;
+			this.undoAction = undoAction;
+		}
+
+		@Override
+		public void run() {
+			undoAction.setEnabled(undoManager.canUndo());
+			redoAction.setEnabled(undoManager.canRedo());
+		}
+	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RichTextEditor.class);
 
@@ -91,48 +233,12 @@ public class RichTextEditor extends JPanel {
 		final JToolBar tools = new JToolBar(SwingConstants.HORIZONTAL);
 		tools.setFloatable(false);
 
-		document.addUndoableEditListener(new UndoableEditListener() {
-			@Override
-			public void undoableEditHappened(final UndoableEditEvent e) {
-				undoManager.addEdit(e.getEdit());
-				dirty++;
-			}
-		});
+		document.addUndoableEditListener(new DocumentUndoableEditListener());
 
-		final ActionListener editButtonActionListener = new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				editor.requestFocusInWindow();
-			}
-		};
+		final ActionListener editButtonActionListener = new EditButtonActionListener();
 
-		final Action undoAction = new AbstractAction("RTE.Undo") {
-			private static final long serialVersionUID = 1606783148768829015L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				if (undoManager.canUndo()) {
-					undoManager.undo();
-					dirty++;
-				} else {
-					editor.requestFocusInWindow();
-				}
-			}
-		};
-
-		final Action redoAction = new AbstractAction("RTE.Redo") {
-			private static final long serialVersionUID = -2878268317676372393L;
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				if (undoManager.canRedo()) {
-					undoManager.redo();
-					dirty--;
-				} else {
-					editor.requestFocusInWindow();
-				}
-			}
-		};
+		final Action undoAction = new UndoAction();
+		final Action redoAction = new RedoAction();
 
 		// CLIPBOARD ACTIONS
 		final Action cutAction = new DefaultEditorKit.CutAction();
@@ -169,59 +275,9 @@ public class RichTextEditor extends JPanel {
 		undoAction.setEnabled(false);
 		redoAction.setEnabled(false);
 
-		document.addDocumentListener(new DocumentListener() {
-			@Override
-			public void removeUpdate(final DocumentEvent e) {
-				undoAction.setEnabled(undoManager.canUndo());
-				redoAction.setEnabled(undoManager.canRedo());
-			}
-
-			@Override
-			public void insertUpdate(final DocumentEvent e) {
-				undoAction.setEnabled(undoManager.canUndo());
-				redoAction.setEnabled(undoManager.canRedo());
-			}
-
-			@Override
-			public void changedUpdate(final DocumentEvent e) {
-				undoAction.setEnabled(undoManager.canUndo());
-				redoAction.setEnabled(undoManager.canRedo());
-			}
-		});
-
-		editor.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(final KeyEvent e) {
-				if ((e.getModifiers() & InputEvent.CTRL_MASK) == 0) {
-					return;
-				}
-				switch (e.getKeyCode()) {
-				// Don't put Ctrl-C,X,V -- already taken into account by the editor itself
-				case KeyEvent.VK_Y:
-					redoButton.doClick(0);
-					break;
-				case KeyEvent.VK_Z:
-					undoButton.doClick(0);
-					break;
-				case KeyEvent.VK_B:
-					boldButton.doClick(0);
-					break;
-				case KeyEvent.VK_I:
-					italicButton.doClick(0);
-					break;
-				case KeyEvent.VK_U:
-					underlineButton.doClick(0);
-					break;
-				}
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						undoAction.setEnabled(undoManager.canUndo());
-						redoAction.setEnabled(undoManager.canRedo());
-					}
-				});
-			}
-		});
+		document.addDocumentListener(new UndoRedoDocumentListener(undoAction, redoAction));
+		editor.addKeyListener(new EditorKeyListener(italicButton, underlineButton, undoButton, redoButton, redoAction,
+				undoAction, boldButton));
 
 		add(presentation.awesome(tools), BorderLayout.NORTH);
 	}

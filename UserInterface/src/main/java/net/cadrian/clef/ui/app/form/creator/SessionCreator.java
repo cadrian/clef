@@ -46,13 +46,90 @@ import net.cadrian.clef.ui.widget.ClefTools;
 
 public class SessionCreator implements BeanCreator<Session> {
 
+	private final class WorksListSelectionListener implements ListSelectionListener {
+		private final AtomicBoolean worksSelected;
+		private final AtomicBoolean added;
+		private final ClefTools tools;
+		private final AtomicBoolean piecesSelected;
+
+		private WorksListSelectionListener(final AtomicBoolean worksSelected, final AtomicBoolean added,
+				final ClefTools tools, final AtomicBoolean piecesSelected) {
+			this.worksSelected = worksSelected;
+			this.added = added;
+			this.tools = tools;
+			this.piecesSelected = piecesSelected;
+		}
+
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				worksSelected.set(true);
+				tools.getAction(ClefTools.Tool.Add).setEnabled(piecesSelected.get());
+				added.set(false);
+			}
+		}
+	}
+
+	private final class PiecesListSelectionListener implements ListSelectionListener {
+		private final AtomicBoolean worksSelected;
+		private final AtomicBoolean piecesSelected;
+		private final AtomicBoolean added;
+		private final ClefTools tools;
+
+		private PiecesListSelectionListener(final AtomicBoolean worksSelected, final AtomicBoolean piecesSelected,
+				final AtomicBoolean added, final ClefTools tools) {
+			this.worksSelected = worksSelected;
+			this.piecesSelected = piecesSelected;
+			this.added = added;
+			this.tools = tools;
+		}
+
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				piecesSelected.set(true);
+				tools.getAction(ClefTools.Tool.Add).setEnabled(worksSelected.get());
+				added.set(false);
+			}
+		}
+	}
+
+	private final class PieceLoaderListSelectionListener implements ListSelectionListener {
+		private final SortableListModel<Piece> piecesModel;
+		private final JList<Work> works;
+
+		private PieceLoaderListSelectionListener(final SortableListModel<Piece> piecesModel, final JList<Work> works) {
+			this.piecesModel = piecesModel;
+			this.works = works;
+		}
+
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				// TODO swing niceties using an async worker
+				piecesModel.removeAll();
+				for (final Piece piece : works.getSelectedValue().getPieces()) {
+					piecesModel.add(piece);
+					if (context.<Boolean>getValue(ApplicationContext.AdvancedConfigurationEntry.offlineMode)) {
+						Piece p = piece.getPrevious();
+						while (p != null) {
+							piecesModel.add(p);
+							p = p.getPrevious();
+						}
+					}
+				}
+			}
+		}
+	}
+
 	private final class ClefToolsListenerImpl implements ClefTools.Listener {
 		private final JList<Piece> pieces;
 		private final JDialog params;
 		private final AtomicBoolean added;
 		private final JList<Work> works;
 
-		private ClefToolsListenerImpl(JList<Piece> pieces, JDialog params, AtomicBoolean added, JList<Work> works) {
+		private ClefToolsListenerImpl(final JList<Piece> pieces, final JDialog params, final AtomicBoolean added,
+				final JList<Work> works) {
 			this.pieces = pieces;
 			this.params = params;
 			this.added = added;
@@ -125,26 +202,7 @@ public class SessionCreator implements BeanCreator<Session> {
 						.bold(new JLabel(presentation.getMessage("SessionCreatorWorksTitle"), SwingConstants.CENTER)),
 				BorderLayout.NORTH);
 		worksPanel.add(new JScrollPane(works), BorderLayout.CENTER);
-		works.addListSelectionListener(new ListSelectionListener() {
-
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					// TODO swing niceties using an async worker
-					piecesModel.removeAll();
-					for (final Piece piece : works.getSelectedValue().getPieces()) {
-						piecesModel.add(piece);
-						if (context.<Boolean>getValue(ApplicationContext.AdvancedConfigurationEntry.offlineMode)) {
-							Piece p = piece.getPrevious();
-							while (p != null) {
-								piecesModel.add(p);
-								p = p.getPrevious();
-							}
-						}
-					}
-				}
-			}
-		});
+		works.addListSelectionListener(new PieceLoaderListSelectionListener(piecesModel, works));
 
 		final JList<Piece> pieces = new JList<>(piecesModel);
 		final JPanel piecesPanel = new JPanel(new BorderLayout());
@@ -170,26 +228,8 @@ public class SessionCreator implements BeanCreator<Session> {
 		tools.addListener(new ClefToolsListenerImpl(pieces, params, added, works));
 		tools.getAction(ClefTools.Tool.Add).setEnabled(false);
 
-		works.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					worksSelected.set(true);
-					tools.getAction(ClefTools.Tool.Add).setEnabled(piecesSelected.get());
-					added.set(false);
-				}
-			}
-		});
-		pieces.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					piecesSelected.set(true);
-					tools.getAction(ClefTools.Tool.Add).setEnabled(worksSelected.get());
-					added.set(false);
-				}
-			}
-		});
+		works.addListSelectionListener(new WorksListSelectionListener(worksSelected, added, tools, piecesSelected));
+		pieces.addListSelectionListener(new PiecesListSelectionListener(worksSelected, piecesSelected, added, tools));
 
 		paramsContent.add(tools, BorderLayout.NORTH);
 
