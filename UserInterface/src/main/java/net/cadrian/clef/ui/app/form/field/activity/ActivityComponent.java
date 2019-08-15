@@ -16,16 +16,9 @@
  */
 package net.cadrian.clef.ui.app.form.field.activity;
 
-import java.awt.Component;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListModel;
 
 import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.bean.Activity;
@@ -36,42 +29,9 @@ class ActivityComponent implements FieldComponent<Activity, JComboBox<Activity>>
 	private final JComboBox<Activity> component;
 	private Activity savedData;
 
-	private static class CellRenderer implements ListCellRenderer<Activity> {
-
-		private final DefaultListCellRenderer def = new DefaultListCellRenderer();
-		private JList<? extends Activity> listCache;
-		private JList<String> stringsCache;
-
-		@Override
-		public Component getListCellRendererComponent(final JList<? extends Activity> list, final Activity value,
-				final int index, final boolean isSelected, final boolean cellHasFocus) {
-			final JList<String> strings;
-			if (list == listCache) {
-				strings = stringsCache;
-			} else {
-				final ListModel<? extends Activity> model = list.getModel();
-				final int n = model.getSize();
-				final String[] values = new String[n];
-				for (int i = 0; i < n; i++) {
-					final Activity element = list.getModel().getElementAt(i);
-					values[i] = element == null ? "" : element.getName();
-				}
-				strings = new JList<>(values);
-				listCache = list;
-				stringsCache = strings;
-			}
-			return def.getListCellRendererComponent(strings, value == null ? "" : value.getName(), index, isSelected,
-					cellHasFocus);
-		}
-	}
-
 	ActivityComponent(final boolean writable, final Beans beans) {
 		final Collection<? extends Activity> activities = beans.getActivities();
-		final List<? extends Activity> activitiesWithNull = activities == null ? new ArrayList<>()
-				: new ArrayList<>(activities);
-		activitiesWithNull.add(0, null);
-		component = new JComboBox<>(activitiesWithNull.toArray(new Activity[activitiesWithNull.size()]));
-		component.setRenderer(new CellRenderer());
+		component = new JComboBox<>(activities.toArray(new Activity[activities.size()]));
 		component.setEditable(false);
 		component.setEnabled(writable);
 	}

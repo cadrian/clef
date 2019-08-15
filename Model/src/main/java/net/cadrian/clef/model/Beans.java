@@ -45,7 +45,7 @@ public interface Beans {
 
 	Pricing createPricing();
 
-	Activity createTag();
+	Activity createActivity();
 
 	Collection<? extends Pricing> getPricings();
 

@@ -47,6 +47,70 @@ import net.cadrian.clef.ui.widget.ClefTools;
 
 public class JSessionFilter extends JBeanFilter<Session> {
 
+	private final class WorksListSelectionListener implements ListSelectionListener {
+		private final ApplicationContext context;
+		private final SortableListModel<Piece> piecesModel;
+
+		private WorksListSelectionListener(ApplicationContext context, SortableListModel<Piece> piecesModel) {
+			this.context = context;
+			this.piecesModel = piecesModel;
+		}
+
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				final Work work = works.getSelectedValue();
+				if (work == null) {
+					piecesModel.removeAll();
+				} else {
+					if (context.<Boolean>getValue(AdvancedConfigurationEntry.offlineMode)) {
+						final List<Piece> workPieces = new ArrayList<>();
+						for (Piece piece : work.getPieces()) {
+							do {
+								workPieces.add(piece);
+								piece = piece.getPrevious();
+							} while (piece != null);
+						}
+						piecesModel.replaceAll(workPieces);
+					} else {
+						piecesModel.replaceAll(work.getPieces());
+					}
+				}
+			}
+		}
+	}
+
+	private final class AuthorsListSelectionListener implements ListSelectionListener {
+		private final SortableListModel<Work> worksModel;
+		private final Collection<? extends Work> allWorks;
+		private final ApplicationContext context;
+
+		private AuthorsListSelectionListener(SortableListModel<Work> worksModel, Collection<? extends Work> allWorks,
+				ApplicationContext context) {
+			this.worksModel = worksModel;
+			this.allWorks = allWorks;
+			this.context = context;
+		}
+
+		@Override
+		public void valueChanged(final ListSelectionEvent e) {
+			if (!e.getValueIsAdjusting()) {
+				final Author author = authors.getSelectedValue();
+				if (author == null) {
+					worksModel.replaceAll(allWorks);
+				} else {
+					final List<Work> authorWorks = new ArrayList<>();
+					for (final Work work : context.getBeans().getWorks()) {
+						if (author.equals(work.getAuthor())) {
+							authorWorks.add(work);
+						}
+					}
+					worksModel.replaceAll(authorWorks);
+				}
+			}
+		}
+	}
+
 	private final class ClefToolsListenerImpl implements ClefTools.Listener {
 		@Override
 		public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
@@ -109,52 +173,8 @@ public class JSessionFilter extends JBeanFilter<Session> {
 				BorderLayout.NORTH);
 		piecesPanel.add(new JScrollPane(pieces), BorderLayout.CENTER);
 
-		authors.addListSelectionListener(new ListSelectionListener() {
-
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					final Author author = authors.getSelectedValue();
-					if (author == null) {
-						worksModel.replaceAll(allWorks);
-					} else {
-						final List<Work> authorWorks = new ArrayList<>();
-						for (final Work work : context.getBeans().getWorks()) {
-							if (author.equals(work.getAuthor())) {
-								authorWorks.add(work);
-							}
-						}
-						worksModel.replaceAll(authorWorks);
-					}
-				}
-			}
-		});
-
-		works.addListSelectionListener(new ListSelectionListener() {
-
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					final Work work = works.getSelectedValue();
-					if (work == null) {
-						piecesModel.removeAll();
-					} else {
-						if (context.<Boolean>getValue(AdvancedConfigurationEntry.offlineMode)) {
-							final List<Piece> workPieces = new ArrayList<>();
-							for (Piece piece : work.getPieces()) {
-								do {
-									workPieces.add(piece);
-									piece = piece.getPrevious();
-								} while (piece != null);
-							}
-							piecesModel.replaceAll(workPieces);
-						} else {
-							piecesModel.replaceAll(work.getPieces());
-						}
-					}
-				}
-			}
-		});
+		authors.addListSelectionListener(new AuthorsListSelectionListener(worksModel, allWorks, context));
+		works.addListSelectionListener(new WorksListSelectionListener(context, piecesModel));
 
 		final JPanel lists = new JPanel();
 		lists.setLayout(new BoxLayout(lists, BoxLayout.X_AXIS));

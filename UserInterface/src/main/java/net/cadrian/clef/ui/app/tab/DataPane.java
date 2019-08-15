@@ -66,7 +66,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	private final class ClefToolsListenerImpl implements ClefTools.Listener {
 		private final ApplicationContext context;
 
-		private ClefToolsListenerImpl(ApplicationContext context) {
+		private ClefToolsListenerImpl(final ApplicationContext context) {
 			this.context = context;
 		}
 
@@ -126,6 +126,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		@Override
 		protected Void doInBackground() throws Exception {
 			try {
+				LOGGER.info("Refreshing data...");
 				if (beanFilter == null) {
 					for (final T bean : beanGetter.getAllBeans()) {
 						publish(bean);
@@ -448,6 +449,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 				selected);
 		LOGGER.debug("Removing all elements");
 		model.removeAll();
+		LOGGER.debug("Adding elements using getter: {} and filter: {}", beanGetter, beanFilter);
 		worker.execute();
 	}
 

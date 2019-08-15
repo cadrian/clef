@@ -28,6 +28,7 @@ import java.util.Map;
 import net.cadrian.clef.database.DatabaseBeans;
 import net.cadrian.clef.database.DatabaseException;
 import net.cadrian.clef.database.DatabaseManager;
+import net.cadrian.clef.database.model.bean.ActivityBean;
 import net.cadrian.clef.database.model.bean.AuthorBean;
 import net.cadrian.clef.database.model.bean.DatabaseBeansHolder;
 import net.cadrian.clef.database.model.bean.PieceBean;
@@ -35,10 +36,10 @@ import net.cadrian.clef.database.model.bean.PricingBean;
 import net.cadrian.clef.database.model.bean.PropertyBean;
 import net.cadrian.clef.database.model.bean.PropertyDescriptorBean;
 import net.cadrian.clef.database.model.bean.SessionBean;
-import net.cadrian.clef.database.model.bean.ActivityBean;
 import net.cadrian.clef.database.model.bean.WorkBean;
 import net.cadrian.clef.model.Beans;
 import net.cadrian.clef.model.ModelException;
+import net.cadrian.clef.model.bean.Activity;
 import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Pricing;
@@ -46,7 +47,6 @@ import net.cadrian.clef.model.bean.Property;
 import net.cadrian.clef.model.bean.PropertyDescriptor;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.model.bean.Session;
-import net.cadrian.clef.model.bean.Activity;
 import net.cadrian.clef.model.bean.Work;
 
 public class ModelBeans implements Beans {
@@ -58,7 +58,7 @@ public class ModelBeans implements Beans {
 	private final DatabaseBeans<net.cadrian.clef.database.bean.Piece> piecesDatabase;
 	private final DatabaseBeans<net.cadrian.clef.database.bean.Session> sessionsDatabase;
 	private final DatabaseBeans<net.cadrian.clef.database.bean.Pricing> pricingsDatabase;
-	private final DatabaseBeans<net.cadrian.clef.database.bean.Activity> tagsDatabase;
+	private final DatabaseBeans<net.cadrian.clef.database.bean.Activity> activitiesDatabase;
 	private final DatabaseBeans<net.cadrian.clef.database.bean.Property> propertiesDatabase;
 	private final DatabaseBeans<net.cadrian.clef.database.bean.PropertyDescriptor> propertyDescriptorsDatabase;
 
@@ -67,7 +67,7 @@ public class ModelBeans implements Beans {
 	private final Map<Long, PieceBean> piecesCache = new HashMap<>();
 	private final Map<Long, SessionBean> sessionsCache = new HashMap<>();
 	private final Map<Long, PricingBean> pricingsCache = new HashMap<>();
-	private final Map<Long, ActivityBean> tagsCache = new HashMap<>();
+	private final Map<Long, ActivityBean> activitiesCache = new HashMap<>();
 	private final Map<Long, PropertyBean> propertiesCache = new HashMap<>();
 	private final Map<Long, PropertyDescriptorBean> propertyDescriptorsCache = new HashMap<>();
 
@@ -78,7 +78,7 @@ public class ModelBeans implements Beans {
 			piecesDatabase = manager.getDatabaseBeans(net.cadrian.clef.database.bean.Piece.class);
 			sessionsDatabase = manager.getDatabaseBeans(net.cadrian.clef.database.bean.Session.class);
 			pricingsDatabase = manager.getDatabaseBeans(net.cadrian.clef.database.bean.Pricing.class);
-			tagsDatabase = manager.getDatabaseBeans(net.cadrian.clef.database.bean.Activity.class);
+			activitiesDatabase = manager.getDatabaseBeans(net.cadrian.clef.database.bean.Activity.class);
 			propertiesDatabase = manager.getDatabaseBeans(net.cadrian.clef.database.bean.Property.class);
 			propertyDescriptorsDatabase = manager
 					.getDatabaseBeans(net.cadrian.clef.database.bean.PropertyDescriptor.class);
@@ -95,7 +95,7 @@ public class ModelBeans implements Beans {
 
 			@Override
 			public DatabaseBeans<net.cadrian.clef.database.bean.Activity> getActivities() {
-				return tagsDatabase;
+				return activitiesDatabase;
 			}
 
 			@Override
@@ -141,7 +141,7 @@ public class ModelBeans implements Beans {
 				if (id == null) {
 					return null;
 				}
-				return ModelBeans.this.getTags(Collections.singleton(id)).get(0);
+				return ModelBeans.this.getActivities(Collections.singleton(id)).get(0);
 			}
 
 			@Override
@@ -199,7 +199,7 @@ public class ModelBeans implements Beans {
 
 			@Override
 			public Collection<ActivityBean> getActivities(final Collection<Long> ids) {
-				return ModelBeans.this.getTags(ids);
+				return ModelBeans.this.getActivities(ids);
 			}
 
 			@Override
@@ -249,13 +249,13 @@ public class ModelBeans implements Beans {
 	}
 
 	@Override
-	public Activity createTag() {
+	public Activity createActivity() {
 		final ActivityBean result;
 		try {
 			final net.cadrian.clef.database.bean.Activity template = new net.cadrian.clef.database.bean.Activity();
 			final net.cadrian.clef.database.bean.Activity bean = db.getActivities().insert(template);
 			result = new ActivityBean(bean, db);
-			tagsCache.put(bean.getId(), result);
+			activitiesCache.put(bean.getId(), result);
 		} catch (final DatabaseException e) {
 			throw new ModelException(e);
 		}
@@ -411,6 +411,20 @@ public class ModelBeans implements Beans {
 	}
 
 	@Override
+	public Collection<? extends Activity> getActivities() {
+		final Collection<? extends Activity> result;
+		try {
+			final net.cadrian.clef.database.bean.Activity template = new net.cadrian.clef.database.bean.Activity();
+			final Map<Long, net.cadrian.clef.database.bean.Activity> activities = db.getActivities().readMany(template,
+					true);
+			result = db.getActivities(activities.keySet());
+		} catch (final DatabaseException e) {
+			throw new ModelException(e);
+		}
+		return result;
+	}
+
+	@Override
 	public Collection<? extends Author> getAuthors() {
 		final Collection<? extends Author> result;
 		try {
@@ -527,23 +541,24 @@ public class ModelBeans implements Beans {
 		return result;
 	}
 
-	List<ActivityBean> getTags(final Collection<Long> ids) {
+	List<ActivityBean> getActivities(final Collection<Long> ids) {
 		final List<ActivityBean> result = new ArrayList<>();
 		for (final Long id : ids) {
-			ActivityBean tag = tagsCache.get(id);
-			if (tag == null) {
-				final net.cadrian.clef.database.bean.Activity template = new net.cadrian.clef.database.bean.Activity(id);
+			ActivityBean activity = activitiesCache.get(id);
+			if (activity == null) {
+				final net.cadrian.clef.database.bean.Activity template = new net.cadrian.clef.database.bean.Activity(
+						id);
 				try {
-					final net.cadrian.clef.database.bean.Activity bean = tagsDatabase.readOne(template);
+					final net.cadrian.clef.database.bean.Activity bean = activitiesDatabase.readOne(template);
 					if (bean == null) {
 						return Arrays.asList((ActivityBean) null);
 					}
-					tag = new ActivityBean(bean, db);
+					activity = new ActivityBean(bean, db);
 				} catch (final DatabaseException e) {
 					throw new ModelException(e);
 				}
 			}
-			result.add(tag);
+			result.add(activity);
 		}
 		return result;
 	}
@@ -675,12 +690,6 @@ public class ModelBeans implements Beans {
 			result.add(propertyDescriptor);
 		}
 		return result;
-	}
-
-	@Override
-	public Collection<? extends Activity> getActivities() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

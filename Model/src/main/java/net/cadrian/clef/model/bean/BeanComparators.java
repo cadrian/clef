@@ -30,6 +30,12 @@ public class BeanComparators {
 		return (name1 == null ? "" : name1).compareTo(name2 == null ? "" : name2);
 	}
 
+	public static int compareActivities(final Activity a1, final Activity a2) {
+		final String name1 = a1.getName();
+		final String name2 = a2.getName();
+		return (name1 == null ? "" : name1).compareTo(name2 == null ? "" : name2);
+	}
+
 	public static int compareAuthors(final Author a1, final Author a2) {
 		final String name1 = a1.getName();
 		final String name2 = a2.getName();

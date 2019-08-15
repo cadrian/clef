@@ -15,8 +15,11 @@ CREATE TABLE activity_property (
 	FOREIGN KEY(activity_id) REFERENCES activity(id)
 );
 
+INSERT INTO activity (id, name)
+	VALUES (0, '/');
+
 ALTER TABLE session ADD
-	activity_id BIGINT NULL;
+	activity_id BIGINT NOT NULL DEFAULT 0;
 
 ALTER TABLE session ADD FOREIGN KEY (piece_id)
 	REFERENCES piece(id);

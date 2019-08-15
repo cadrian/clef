@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.cadrian.clef.model.Beans;
+import net.cadrian.clef.model.bean.Activity;
 import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.BeanComparators;
 import net.cadrian.clef.model.bean.Pricing;
@@ -41,6 +42,7 @@ import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
 import net.cadrian.clef.ui.app.form.creator.SessionCreator;
 import net.cadrian.clef.ui.app.form.creator.WorkCreator;
+import net.cadrian.clef.ui.app.form.model.ActivityFormModel;
 import net.cadrian.clef.ui.app.form.model.AuthorFormModel;
 import net.cadrian.clef.ui.app.form.model.PricingFormModel;
 import net.cadrian.clef.ui.app.form.model.SessionFormModel;
@@ -62,6 +64,7 @@ public class Application extends JFrame {
 	private final DataPane<Work> worksPanel;
 	private final DataPane<Author> authorsPanel;
 	private final DataPane<Pricing> pricingsPanel;
+	private final DataPane<Activity> activitiesPanel;
 	private final StatisticsPanel statisticsPanel;
 	private final ConfigurationPanel configurationPanel;
 
@@ -83,6 +86,8 @@ public class Application extends JFrame {
 				BeanComparators::compareAuthors, new AuthorFormModel(Author.class));
 		pricingsPanel = new DataPane<>(context, true, Pricing.class, beans::getPricings, beans::createPricing, null,
 				null, BeanComparators::comparePricings, new PricingFormModel(Pricing.class));
+		activitiesPanel = new DataPane<>(context, true, Activity.class, beans::getActivities, beans::createActivity,
+				null, null, BeanComparators::compareActivities, new ActivityFormModel(Activity.class));
 		statisticsPanel = new StatisticsPanel(context);
 		configurationPanel = new ConfigurationPanel(context);
 
@@ -123,6 +128,7 @@ public class Application extends JFrame {
 		mgtPane.addTab(context.getPresentation().getMessage("Works"), worksPanel);
 		mgtPane.addTab(context.getPresentation().getMessage("Authors"), authorsPanel);
 		mgtPane.addTab(context.getPresentation().getMessage("Pricings"), pricingsPanel);
+		mgtPane.addTab(context.getPresentation().getMessage("Activities"), activitiesPanel);
 
 		mgtPane.addChangeListener(new ChangeListener() {
 			@Override
@@ -189,6 +195,9 @@ public class Application extends JFrame {
 			break;
 		case 2:
 			pricingsPanel.refresh();
+			break;
+		case 3:
+			activitiesPanel.refresh();
 			break;
 		default:
 			LOGGER.debug("ignored strange management index {}", selectedMgtIndex);
