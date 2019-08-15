@@ -35,6 +35,28 @@ import net.cadrian.clef.ui.ApplicationContext;
 
 class DateComponentPicker extends JDialog {
 
+	private final class ClefToolsListenerImpl implements ClefTools.Listener {
+		private final ZoneId zone;
+		private final DateTimePicker picker;
+
+		private ClefToolsListenerImpl(ZoneId zone, DateTimePicker picker) {
+			this.zone = zone;
+			this.picker = picker;
+		}
+
+		@Override
+		public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
+			switch (tool) {
+			case Save:
+				final LocalDateTime ldt = picker.getDateTimeStrict();
+				DateComponentPicker.this.date = Date.from(ldt.atZone(zone).toInstant());
+				DateComponentPicker.this.setVisible(false);
+				break;
+			default:
+			}
+		}
+	}
+
 	private static final long serialVersionUID = 2728030026625833925L;
 
 	private Date date;
@@ -74,20 +96,7 @@ class DateComponentPicker extends JDialog {
 		pickerPanel.add(picker, BorderLayout.CENTER);
 
 		final ClefTools tools = new ClefTools(context, ClefTools.Tool.Save);
-		tools.addListener(new ClefTools.Listener() {
-
-			@Override
-			public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
-				switch (tool) {
-				case Save:
-					final LocalDateTime ldt = picker.getDateTimeStrict();
-					DateComponentPicker.this.date = Date.from(ldt.atZone(zone).toInstant());
-					DateComponentPicker.this.setVisible(false);
-					break;
-				default:
-				}
-			}
-		});
+		tools.addListener(new ClefToolsListenerImpl(zone, picker));
 
 		pickerPanel.add(tools, BorderLayout.SOUTH);
 

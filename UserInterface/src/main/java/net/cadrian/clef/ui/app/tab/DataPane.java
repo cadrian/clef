@@ -63,6 +63,107 @@ import net.cadrian.clef.ui.widget.ClefTools.Tool;
 
 public class DataPane<T extends Bean> extends JSplitPane {
 
+	private final class ClefToolsListenerImpl implements ClefTools.Listener {
+		private final ApplicationContext context;
+
+		private ClefToolsListenerImpl(ApplicationContext context) {
+			this.context = context;
+		}
+
+		@Override
+		public void toolCalled(final ClefTools tools, final Tool tool) {
+			switch (tool) {
+			case Add:
+				addData();
+				break;
+			case Del:
+				delData();
+				break;
+			case Save:
+				saveData();
+				break;
+			case Move:
+				move();
+				break;
+			case Filter:
+				final Point frameLocationOnScreen = context.getPresentation().getApplicationFrame().getLayeredPane()
+						.getLocationOnScreen();
+				final Point toolLocationOnScreen = tools.getLocationOnScreen(tool);
+				final Dimension toolSize = tools.getSize(tool);
+				final int x = toolLocationOnScreen.x - frameLocationOnScreen.x + toolSize.width / 2;
+				final int y = toolLocationOnScreen.y - frameLocationOnScreen.y + toolSize.height / 2;
+				final Point position = new Point(x, y);
+				showFilter(position, tools.getAction(tool));
+				break;
+			}
+		}
+	}
+
+	private static final class RefreshListWorker<T extends Bean> extends SwingWorker<Void, T> {
+		private static final Logger LOGGER = LoggerFactory.getLogger(RefreshListWorker.class);
+
+		private final BeanGetter<T> beanGetter;
+		private final BeanFilter<T> beanFilter;
+		private final ApplicationContext context;
+
+		private final SortableListModel<T> model;
+		private final JList<T> list;
+
+		private final T selected;
+		private int selectedIndex = -1;
+
+		private RefreshListWorker(final ApplicationContext context, final BeanGetter<T> beanGetter,
+				final BeanFilter<T> beanFilter, final SortableListModel<T> model, final JList<T> list,
+				final T selected) {
+			this.context = context;
+			this.beanGetter = beanGetter;
+			this.beanFilter = beanFilter;
+			this.model = model;
+			this.list = list;
+			this.selected = selected;
+		}
+
+		@Override
+		protected Void doInBackground() throws Exception {
+			try {
+				if (beanFilter == null) {
+					for (final T bean : beanGetter.getAllBeans()) {
+						publish(bean);
+					}
+				} else {
+					for (final T bean : beanGetter.getAllBeans()) {
+						if (beanFilter.isVisible(bean)) {
+							publish(bean);
+						}
+					}
+				}
+			} catch (final ModelException e) {
+				LOGGER.error("Error while refreshing data", e);
+				JOptionPane.showMessageDialog(context.getPresentation().getApplicationFrame(),
+						context.getPresentation().getMessage("RefreshFailedMessage"),
+						context.getPresentation().getMessage("RefreshFailedTitle"), JOptionPane.WARNING_MESSAGE);
+			}
+			return null;
+		}
+
+		@Override
+		protected void process(final java.util.List<T> chunks) {
+			for (final T bean : chunks) {
+				LOGGER.debug("Adding element: {} (selected is {})", bean, selected);
+				final int index = model.add(bean);
+				if (bean.isVersionOf(selected)) {
+					selectedIndex = index;
+				}
+			}
+		}
+
+		@Override
+		protected void done() {
+			LOGGER.debug("Selecting element #{}", selectedIndex);
+			list.setSelectedIndex(selectedIndex);
+		}
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(DataPane.class);
 
 	public static final String DEFAULT_TAB = "Description";
@@ -132,36 +233,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 			toolsList.remove(Tool.Move);
 		}
 		tools = new ClefTools(context, toolsList.toArray(new Tool[toolsList.size()]));
-		tools.addListener(new ClefTools.Listener() {
-
-			@Override
-			public void toolCalled(final ClefTools tools, final Tool tool) {
-				switch (tool) {
-				case Add:
-					addData();
-					break;
-				case Del:
-					delData();
-					break;
-				case Save:
-					saveData();
-					break;
-				case Move:
-					move();
-					break;
-				case Filter:
-					final Point frameLocationOnScreen = context.getPresentation().getApplicationFrame().getLayeredPane()
-							.getLocationOnScreen();
-					final Point toolLocationOnScreen = tools.getLocationOnScreen(tool);
-					final Dimension toolSize = tools.getSize(tool);
-					final int x = toolLocationOnScreen.x - frameLocationOnScreen.x + toolSize.width / 2;
-					final int y = toolLocationOnScreen.y - frameLocationOnScreen.y + toolSize.height / 2;
-					final Point position = new Point(x, y);
-					showFilter(position, tools.getAction(tool));
-					break;
-				}
-			}
-		});
+		tools.addListener(new ClefToolsListenerImpl(context));
 		tools.getAction(ClefTools.Tool.Del).setEnabled(false);
 		if (showSave) {
 			tools.getAction(ClefTools.Tool.Save).setEnabled(false);
@@ -372,50 +444,8 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		if (context.applicationIsClosing()) {
 			return;
 		}
-		final SwingWorker<Void, T> worker = new SwingWorker<Void, T>() {
-			private int selectedIndex = -1;
-
-			@Override
-			protected Void doInBackground() throws Exception {
-				try {
-					if (beanFilter == null) {
-						for (final T bean : beanGetter.getAllBeans()) {
-							publish(bean);
-						}
-					} else {
-						for (final T bean : beanGetter.getAllBeans()) {
-							if (beanFilter.isVisible(bean)) {
-								publish(bean);
-							}
-						}
-					}
-				} catch (final ModelException e) {
-					LOGGER.error("Error while refreshing data", e);
-					JOptionPane.showMessageDialog(context.getPresentation().getApplicationFrame(),
-							context.getPresentation().getMessage("RefreshFailedMessage"),
-							context.getPresentation().getMessage("RefreshFailedTitle"), JOptionPane.WARNING_MESSAGE);
-				}
-				return null;
-			}
-
-			@Override
-			protected void process(final java.util.List<T> chunks) {
-				for (final T bean : chunks) {
-					LOGGER.debug("Adding element: {} (selected is {})", bean, selected);
-					final int index = model.add(bean);
-					if (bean.isVersionOf(selected)) {
-						selectedIndex = index;
-					}
-				}
-			};
-
-			@Override
-			protected void done() {
-				LOGGER.debug("Selecting element #{}", selectedIndex);
-				list.setSelectedIndex(selectedIndex);
-			}
-		};
-
+		final SwingWorker<Void, T> worker = new RefreshListWorker<>(context, beanGetter, beanFilter, model, list,
+				selected);
 		LOGGER.debug("Removing all elements");
 		model.removeAll();
 		worker.execute();

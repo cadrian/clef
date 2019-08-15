@@ -74,6 +74,32 @@ public class ConfigurationPanel extends JTabbedPane {
 
 	private static final Class<?>[] COLUMN_TYPES = { String.class, LocalizedType.class, String.class };
 
+	private final class ClefToolsListenerImpl implements ClefTools.Listener {
+		private final JTable table;
+		private final PropertyDescriptorTableModel model;
+
+		private ClefToolsListenerImpl(JTable table, PropertyDescriptorTableModel model) {
+			this.table = table;
+			this.model = model;
+		}
+
+		@Override
+		public void toolCalled(final ClefTools tools, final Tool tool) {
+			switch (tool) {
+			case Add:
+				model.addRow(table.getSelectedRow());
+				break;
+			case Del:
+				model.delRow(table.getSelectedRow());
+				break;
+			case Save:
+				model.save();
+				break;
+			default:
+			}
+		}
+	}
+
 	private static class ConfigurableBeanDescription {
 		final Entity entity;
 		final String name;
@@ -156,25 +182,7 @@ public class ConfigurationPanel extends JTabbedPane {
 		result.add(new JScrollPane(table), BorderLayout.CENTER);
 
 		final ClefTools tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del, ClefTools.Tool.Save);
-		tools.addListener(new ClefTools.Listener() {
-
-			@Override
-			public void toolCalled(final ClefTools tools, final Tool tool) {
-				switch (tool) {
-				case Add:
-					model.addRow(table.getSelectedRow());
-					break;
-				case Del:
-					model.delRow(table.getSelectedRow());
-					break;
-				case Save:
-					model.save();
-					break;
-				default:
-				}
-			}
-
-		});
+		tools.addListener(new ClefToolsListenerImpl(table, model));
 		tools.getAction(ClefTools.Tool.Save).setEnabled(false);
 		tools.getAction(ClefTools.Tool.Del).setEnabled(false);
 

@@ -25,6 +25,7 @@ import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.activity.ActivityComponentFactory;
 import net.cadrian.clef.ui.app.form.field.date.DateComponentFactory;
 import net.cadrian.clef.ui.app.form.field.properties.PropertiesComponentFactory;
 import net.cadrian.clef.ui.app.form.field.text.TextAreaComponentFactory;
@@ -37,7 +38,7 @@ public class SessionFormModel extends BeanFormModel<Session> {
 		final DateComponentFactory<Session> stopFactory = new DateComponentFactory<>(Session.class, "Stop", true);
 		startFactory.setUpperBound(stopFactory);
 		stopFactory.setLowerBound(startFactory);
-		COMPONENT_FACTORIES = Arrays.asList(startFactory, stopFactory,
+		COMPONENT_FACTORIES = Arrays.asList(startFactory, stopFactory, new ActivityComponentFactory("Activity", true),
 				new TextAreaComponentFactory<>(Session.class, "Notes", true),
 				new PropertiesComponentFactory<>(Session.class, "Properties", Entity.session, true));
 	}

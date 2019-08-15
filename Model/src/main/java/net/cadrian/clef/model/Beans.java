@@ -49,7 +49,7 @@ public interface Beans {
 
 	Collection<? extends Pricing> getPricings();
 
-	Collection<? extends Activity> getTags();
+	Collection<? extends Activity> getActivities();
 
 	Collection<? extends Author> getAuthors();
 

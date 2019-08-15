@@ -1,6 +1,6 @@
 #/usr/bin/env bash
 
-rm -rf pkg
+rm -rf pkg $HOME/.m2/repository/net/cadrian/clef
 mkdir -p pkg/build pkg/debs
 cd pkg
 

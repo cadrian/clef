@@ -678,7 +678,7 @@ public class ModelBeans implements Beans {
 	}
 
 	@Override
-	public Collection<? extends Activity> getTags() {
+	public Collection<? extends Activity> getActivities() {
 		// TODO Auto-generated method stub
 		return null;
 	}

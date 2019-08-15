@@ -33,6 +33,32 @@ import net.cadrian.clef.ui.widget.ClefTools;
 
 class PieceMover implements BeanMover<Piece> {
 
+	private final class ClefToolsListenerImpl implements ClefTools.Listener {
+		private final JDialog params;
+		private final AtomicBoolean added;
+		private final JList<Work> works;
+
+		private ClefToolsListenerImpl(JDialog params, AtomicBoolean added, JList<Work> works) {
+			this.params = params;
+			this.added = added;
+			this.works = works;
+		}
+
+		@Override
+		public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
+			switch (tool) {
+			case Move:
+				final Work work = works.getSelectedValue();
+				if (work != null) {
+					added.set(true);
+					params.setVisible(false);
+				}
+				break;
+			default:
+			}
+		}
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(PieceMover.class);
 
 	private final ApplicationContext context;
@@ -82,22 +108,7 @@ class PieceMover implements BeanMover<Piece> {
 		final AtomicBoolean added = new AtomicBoolean(false);
 		final AtomicBoolean worksSelected = new AtomicBoolean(false);
 
-		tools.addListener(new ClefTools.Listener() {
-
-			@Override
-			public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
-				switch (tool) {
-				case Move:
-					final Work work = works.getSelectedValue();
-					if (work != null) {
-						added.set(true);
-						params.setVisible(false);
-					}
-					break;
-				default:
-				}
-			}
-		});
+		tools.addListener(new ClefToolsListenerImpl(params, added, works));
 
 		tools.getAction(ClefTools.Tool.Move).setEnabled(false);
 

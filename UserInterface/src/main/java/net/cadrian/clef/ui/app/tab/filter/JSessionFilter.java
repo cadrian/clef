@@ -47,6 +47,24 @@ import net.cadrian.clef.ui.widget.ClefTools;
 
 public class JSessionFilter extends JBeanFilter<Session> {
 
+	private final class ClefToolsListenerImpl implements ClefTools.Listener {
+		@Override
+		public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
+			switch (tool) {
+			case Del:
+				pieces.clearSelection();
+				works.clearSelection();
+				authors.clearSelection();
+				break;
+			case Filter:
+				final ActionEvent e = new ActionEvent(JSessionFilter.this, ActionEvent.ACTION_PERFORMED, tool.name());
+				fireActionPerformed(e);
+				break;
+			default:
+			}
+		}
+	}
+
 	private static final long serialVersionUID = 6199756832553677405L;
 
 	private final JList<Author> authors;
@@ -145,25 +163,7 @@ public class JSessionFilter extends JBeanFilter<Session> {
 		lists.add(piecesPanel);
 
 		final ClefTools tools = new ClefTools(context, ClefTools.Tool.Del, ClefTools.Tool.Filter);
-		tools.addListener(new ClefTools.Listener() {
-
-			@Override
-			public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
-				switch (tool) {
-				case Del:
-					pieces.clearSelection();
-					works.clearSelection();
-					authors.clearSelection();
-					break;
-				case Filter:
-					final ActionEvent e = new ActionEvent(JSessionFilter.this, ActionEvent.ACTION_PERFORMED,
-							tool.name());
-					fireActionPerformed(e);
-					break;
-				default:
-				}
-			}
-		});
+		tools.addListener(new ClefToolsListenerImpl());
 
 		add(lists, BorderLayout.CENTER);
 		add(tools, BorderLayout.NORTH);

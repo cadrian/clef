@@ -48,6 +48,36 @@ import net.cadrian.clef.ui.widget.ClefTools;
 
 public class WorkCreator implements BeanCreator<Work> {
 
+	private final class ClefToolsListenerImpl implements ClefTools.Listener {
+		private final JList<Pricing> pricings;
+		private final JDialog params;
+		private final AtomicBoolean added;
+		private final JList<Author> authors;
+
+		private ClefToolsListenerImpl(JList<Pricing> pricings, JDialog params, AtomicBoolean added,
+				JList<Author> authors) {
+			this.pricings = pricings;
+			this.params = params;
+			this.added = added;
+			this.authors = authors;
+		}
+
+		@Override
+		public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
+			switch (tool) {
+			case Add:
+				final Author author = authors.getSelectedValue();
+				final Pricing pricing = pricings.getSelectedValue();
+				if (author != null && pricing != null) {
+					added.set(true);
+					params.setVisible(false);
+				}
+				break;
+			default:
+			}
+		}
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkCreator.class);
 
 	private final ApplicationContext context;
@@ -115,23 +145,7 @@ public class WorkCreator implements BeanCreator<Work> {
 		final AtomicBoolean authorsSelected = new AtomicBoolean(false);
 		final AtomicBoolean pricingsSelected = new AtomicBoolean(false);
 
-		tools.addListener(new ClefTools.Listener() {
-
-			@Override
-			public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
-				switch (tool) {
-				case Add:
-					final Author author = authors.getSelectedValue();
-					final Pricing pricing = pricings.getSelectedValue();
-					if (author != null && pricing != null) {
-						added.set(true);
-						params.setVisible(false);
-					}
-					break;
-				default:
-				}
-			}
-		});
+		tools.addListener(new ClefToolsListenerImpl(pricings, params, added, authors));
 
 		tools.getAction(ClefTools.Tool.Add).setEnabled(false);
 

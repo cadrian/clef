@@ -46,6 +46,35 @@ import net.cadrian.clef.ui.widget.ClefTools;
 
 public class SessionCreator implements BeanCreator<Session> {
 
+	private final class ClefToolsListenerImpl implements ClefTools.Listener {
+		private final JList<Piece> pieces;
+		private final JDialog params;
+		private final AtomicBoolean added;
+		private final JList<Work> works;
+
+		private ClefToolsListenerImpl(JList<Piece> pieces, JDialog params, AtomicBoolean added, JList<Work> works) {
+			this.pieces = pieces;
+			this.params = params;
+			this.added = added;
+			this.works = works;
+		}
+
+		@Override
+		public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
+			switch (tool) {
+			case Add:
+				final Work work = works.getSelectedValue();
+				final Piece piece = pieces.getSelectedValue();
+				if (work != null && piece != null) {
+					added.set(true);
+					params.setVisible(false);
+				}
+				break;
+			default:
+			}
+		}
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(SessionCreator.class);
 
 	private final ApplicationContext context;
@@ -138,23 +167,7 @@ public class SessionCreator implements BeanCreator<Session> {
 		final AtomicBoolean worksSelected = new AtomicBoolean(false);
 		final AtomicBoolean piecesSelected = new AtomicBoolean(false);
 
-		tools.addListener(new ClefTools.Listener() {
-
-			@Override
-			public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
-				switch (tool) {
-				case Add:
-					final Work work = works.getSelectedValue();
-					final Piece piece = pieces.getSelectedValue();
-					if (work != null && piece != null) {
-						added.set(true);
-						params.setVisible(false);
-					}
-					break;
-				default:
-				}
-			}
-		});
+		tools.addListener(new ClefToolsListenerImpl(pieces, params, added, works));
 		tools.getAction(ClefTools.Tool.Add).setEnabled(false);
 
 		works.addListSelectionListener(new ListSelectionListener() {

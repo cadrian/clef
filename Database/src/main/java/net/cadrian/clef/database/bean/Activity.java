@@ -25,7 +25,7 @@ import net.cadrian.clef.database.io.StringField;
 
 public class Activity extends AbstractPropertyBean<Activity> {
 
-	private static final String TABLE_NAME = "tag";
+	private static final String TABLE_NAME = "activity";
 	private static final List<Field<Activity>> FIELDS = Arrays.asList(
 			new StringField<>("name", Activity::getName, Activity::setName, Condition.EQ),
 			new StringField<>("notes", Activity::getNotes, Activity::setNotes, Condition.EQ));

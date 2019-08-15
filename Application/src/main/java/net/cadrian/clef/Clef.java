@@ -20,6 +20,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -42,6 +43,9 @@ public class Clef {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Clef.class);
 
 	public static void main(final String[] args) throws DatabaseException {
+		System.setOut(new PrintStream(new OutLogger()));
+		System.setErr(new PrintStream(new ErrLogger()));
+
 		final BasicDataSource ds = createDataSource();
 		final DatabaseManager manager = new DatabaseManager(ds);
 

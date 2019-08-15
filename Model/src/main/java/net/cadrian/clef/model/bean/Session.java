@@ -42,7 +42,7 @@ public interface Session extends PropertyBean {
 
 	Activity getActivity();
 
-	void setActivity(Activity tag);
+	void setActivity(Activity activity);
 
 	String getNotes();
 

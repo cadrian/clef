@@ -49,6 +49,26 @@ import net.cadrian.clef.ui.widget.ClefTools;
 
 abstract class AbstractPropertiesComponent implements FieldComponent<Collection<? extends Property>, JSplitPane> {
 
+	private final class ClefToolsListenerImpl implements ClefTools.Listener {
+		@Override
+		public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
+			switch (tool) {
+			case Add:
+				final int index = addData();
+				if (index >= 0) {
+					list.setSelectedIndex(index);
+				}
+				tools.getAction(ClefTools.Tool.Add).setEnabled(!getAddableDescriptors().isEmpty());
+				break;
+			case Del:
+				delData(list.getSelectedIndex());
+				tools.getAction(ClefTools.Tool.Add).setEnabled(true);
+				break;
+			default:
+			}
+		}
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPropertiesComponent.class);
 
 	protected final ApplicationContext context;
@@ -79,26 +99,7 @@ abstract class AbstractPropertiesComponent implements FieldComponent<Collection<
 
 		if (writable) {
 			final ClefTools tools = new ClefTools(context, ClefTools.Tool.Add, ClefTools.Tool.Del);
-			tools.addListener(new ClefTools.Listener() {
-
-				@Override
-				public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
-					switch (tool) {
-					case Add:
-						final int index = addData();
-						if (index >= 0) {
-							list.setSelectedIndex(index);
-						}
-						tools.getAction(ClefTools.Tool.Add).setEnabled(!getAddableDescriptors().isEmpty());
-						break;
-					case Del:
-						delData(list.getSelectedIndex());
-						tools.getAction(ClefTools.Tool.Add).setEnabled(true);
-						break;
-					default:
-					}
-				}
-			});
+			tools.addListener(new ClefToolsListenerImpl());
 
 			left.add(tools, BorderLayout.NORTH);
 

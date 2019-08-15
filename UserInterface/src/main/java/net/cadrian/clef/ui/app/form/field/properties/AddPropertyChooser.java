@@ -35,6 +35,25 @@ import net.cadrian.clef.ui.widget.ClefTools;
 
 class AddPropertyChooser extends JDialog {
 
+	private final class ClefToolsListenerImpl implements ClefTools.Listener {
+		private final JList<PropertyDescriptor> list;
+
+		private ClefToolsListenerImpl(JList<PropertyDescriptor> list) {
+			this.list = list;
+		}
+
+		@Override
+		public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
+			switch (tool) {
+			case Add:
+				selected = list.getSelectedValue();
+				setVisible(false);
+				break;
+			default:
+			}
+		}
+	}
+
 	private static final long serialVersionUID = 2515326043268533422L;
 
 	private PropertyDescriptor selected;
@@ -60,19 +79,7 @@ class AddPropertyChooser extends JDialog {
 		panel.add(new JScrollPane(list), BorderLayout.CENTER);
 
 		final ClefTools tools = new ClefTools(context, ClefTools.Tool.Add);
-		tools.addListener(new ClefTools.Listener() {
-
-			@Override
-			public void toolCalled(final ClefTools tools, final ClefTools.Tool tool) {
-				switch (tool) {
-				case Add:
-					selected = list.getSelectedValue();
-					setVisible(false);
-					break;
-				default:
-				}
-			}
-		});
+		tools.addListener(new ClefToolsListenerImpl(list));
 
 		panel.add(tools, BorderLayout.SOUTH);
 
