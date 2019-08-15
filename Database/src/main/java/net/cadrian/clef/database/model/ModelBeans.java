@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -418,7 +419,14 @@ public class ModelBeans implements Beans {
 			final net.cadrian.clef.database.bean.Activity template = new net.cadrian.clef.database.bean.Activity();
 			final Map<Long, net.cadrian.clef.database.bean.Activity> activities = db.getActivities().readMany(template,
 					true);
-			result = db.getActivities(activities.keySet());
+			final List<ActivityBean> activitiesList = new ArrayList<>(db.getActivities(activities.keySet()));
+			Collections.sort(activitiesList, new Comparator<ActivityBean>() {
+				@Override
+				public int compare(final ActivityBean a1, final ActivityBean a2) {
+					return a1.getName().compareTo(a2.getName());
+				}
+			});
+			result = activitiesList;
 		} catch (final DatabaseException e) {
 			throw new ModelException(e);
 		}

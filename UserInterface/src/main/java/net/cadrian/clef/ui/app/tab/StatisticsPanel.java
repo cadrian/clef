@@ -20,19 +20,27 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.ListDataListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.cadrian.clef.model.bean.Activity;
 import net.cadrian.clef.model.bean.Piece;
 import net.cadrian.clef.model.bean.Session;
 import net.cadrian.clef.model.bean.Work;
@@ -41,11 +49,30 @@ import net.cadrian.clef.ui.tools.StatisticsComputation;
 
 public class StatisticsPanel extends JPanel {
 
-	private final class AllPiecesIterableProvider implements StatisticsComputation.IterableProvider {
-		private final ApplicationContext context;
+	private final class ActivitiesActionListener implements ActionListener {
+		private final ActivitiesComboBoxModel model;
 
-		private AllPiecesIterableProvider(final ApplicationContext context) {
+		private ActivitiesActionListener(final ActivitiesComboBoxModel model) {
+			this.model = model;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent event) {
+			iterableProvider.setActivity(model.getSelectedActivity());
+			computation.refresh();
+		}
+	}
+
+	private final class ActivityIterableProvider implements StatisticsComputation.IterableProvider {
+		private final ApplicationContext context;
+		private Activity activity;
+
+		private ActivityIterableProvider(final ApplicationContext context) {
 			this.context = context;
+		}
+
+		public void setActivity(final Activity activity) {
+			this.activity = activity;
 		}
 
 		@Override
@@ -60,7 +87,15 @@ public class StatisticsPanel extends JPanel {
 
 		@Override
 		public Iterable<Session> getSessions(final Piece piece) {
-			return new ArrayList<>(piece.getSessions());
+			final Collection<? extends Session> sessions = piece.getSessions();
+			final List<Session> result = new ArrayList<>(sessions.size());
+			for (final Session session : sessions) {
+				final Activity sessionActivity = session.getActivity();
+				if (activity == null || activity.equals(sessionActivity)) {
+					result.add(session);
+				}
+			}
+			return result;
 		}
 	}
 
@@ -71,17 +106,83 @@ public class StatisticsPanel extends JPanel {
 		}
 	}
 
+	private static final class ActivitiesComboBoxModel implements ComboBoxModel<String> {
+
+		private final List<ListDataListener> listeners = new ArrayList<>();
+
+		private final List<Activity> activities;
+		private final List<String> activityNames;
+
+		private Object selectedItem;
+		private Activity selectedActivity;
+
+		ActivitiesComboBoxModel(final ApplicationContext context) {
+			activities = new ArrayList<>(context.getBeans().getActivities());
+			activityNames = new ArrayList<>();
+			activityNames.add(context.getPresentation().getMessage("AllActivities"));
+			for (final Activity activity : activities) {
+				activityNames.add(activity.getName());
+			}
+		}
+
+		@Override
+		public void addListDataListener(final ListDataListener listener) {
+			listeners.add(listener);
+		}
+
+		@Override
+		public String getElementAt(final int index) {
+			return activityNames.get(index);
+		}
+
+		@Override
+		public int getSize() {
+			return activityNames.size();
+		}
+
+		@Override
+		public void removeListDataListener(final ListDataListener listener) {
+			listeners.remove(listener);
+		}
+
+		@Override
+		public Object getSelectedItem() {
+			return selectedItem;
+		}
+
+		@Override
+		public void setSelectedItem(final Object item) {
+			selectedItem = item;
+			final int i = activityNames.indexOf(item);
+			if (i == 0) {
+				selectedActivity = null;
+			} else {
+				selectedActivity = activities.get(i - 1);
+			}
+		}
+
+		public Activity getSelectedActivity() {
+			return selectedActivity;
+		}
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsPanel.class);
 
 	private static final long serialVersionUID = -2023860576290261246L;
 
+	private final ActivityIterableProvider iterableProvider;
 	private final StatisticsComputation computation;
 
 	public StatisticsPanel(final ApplicationContext context) {
 		super(new GridBagLayout());
 
 		final JPanel titledPanel = new JPanel(new BorderLayout());
+		final JPanel titlePanel = new JPanel(new BorderLayout());
 		final JPanel panel = new JPanel(new GridBagLayout());
+
+		final ActivitiesComboBoxModel model = new ActivitiesComboBoxModel(context);
+		final JComboBox<String> activitiesCombo = new JComboBox<>(model);
+		activitiesCombo.addActionListener(new ActivitiesActionListener(model));
 
 		final JLabel meanPerWork = new JLabel();
 		final JLabel stdevPerWork = new JLabel();
@@ -96,7 +197,10 @@ public class StatisticsPanel extends JPanel {
 
 		panel.setBorder(BorderFactory.createEtchedBorder());
 
-		titledPanel.add(new JLabel(context.getPresentation().getMessage("StatisticsMessage")), BorderLayout.NORTH);
+		titlePanel.add(new JLabel(context.getPresentation().getMessage("StatisticsMessage")), BorderLayout.NORTH);
+		titlePanel.add(activitiesCombo, BorderLayout.SOUTH);
+
+		titledPanel.add(titlePanel, BorderLayout.NORTH);
 		titledPanel.add(panel, BorderLayout.CENTER);
 
 		final GridBagConstraints constraints = new GridBagConstraints();
@@ -106,10 +210,12 @@ public class StatisticsPanel extends JPanel {
 
 		addComponentListener(new RefreshComponentListener());
 
-		computation = new StatisticsComputation(new AllPiecesIterableProvider(context), meanPerWork, stdevPerWork,
-				meanPerPiece, stdevPerPiece);
+		iterableProvider = new ActivityIterableProvider(context);
+		computation = new StatisticsComputation(iterableProvider, meanPerWork, stdevPerWork, meanPerPiece,
+				stdevPerPiece);
 
 		computation.refresh();
+		activitiesCombo.setSelectedIndex(0);
 	}
 
 	private void addLabels(final ApplicationContext context, final Map<String, JLabel> labels, final JPanel panel) {
