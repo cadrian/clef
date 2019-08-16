@@ -60,7 +60,7 @@ class WorkStatisticsComponent extends JPanel {
 		}
 
 		@Override
-		public Iterable<Session> getSessions(Piece piece) {
+		public Iterable<Session> getSessions(final Piece piece) {
 			return new ArrayList<>(piece.getSessions());
 		}
 	}
@@ -83,7 +83,7 @@ class WorkStatisticsComponent extends JPanel {
 		}
 
 		@Override
-		public Iterable<Session> getSessions(Piece piece) {
+		public Iterable<Session> getSessions(final Piece piece) {
 			return new ArrayList<>(piece.getSessions());
 		}
 	}
@@ -143,10 +143,10 @@ class WorkStatisticsComponent extends JPanel {
 		addLabel(context, gridy++, "MeanWorkPerMinuteWithLost", meanWorkPerMinuteWithLost, lostPieces);
 		addLabel(context, gridy++, "StdDeviationPerMinuteWithLost", stdevWorkPerMinuteWithLost, lostPieces);
 
-		totalComputation = new StatisticsComputation(new TotalComputationIterableProvider(bean), null, null,
+		totalComputation = new StatisticsComputation(new TotalComputationIterableProvider(bean), null, null, null, null,
 				meanWorkPerMinute, stdevWorkPerMinute);
 
-		lostComputation = new StatisticsComputation(new LostComputationIterableProvider(bean), null, null,
+		lostComputation = new StatisticsComputation(new LostComputationIterableProvider(bean), null, null, null, null,
 				meanWorkPerMinuteWithLost, stdevWorkPerMinuteWithLost);
 
 		refresh();

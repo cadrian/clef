@@ -33,12 +33,19 @@ public class Converters {
 			long s = time;
 			long m = s / 60L;
 			s -= m * 60L;
-			final long h = m / 60L;
+			long h = m / 60L;
 			m -= h * 60L;
-			if (h < 10L) {
-				result.append("0");
+			final long d = h / 24;
+			h -= d * 24L;
+			if (d > 0) {
+				result.append(d).append("d ");
 			}
-			result.append(h).append(":");
+			if (h > 0) {
+				if (h < 10) {
+					result.append("0");
+				}
+				result.append(h).append(":");
+			}
 			if (m < 10L) {
 				result.append("0");
 			}

@@ -184,11 +184,15 @@ public class StatisticsPanel extends JPanel {
 		final JComboBox<String> activitiesCombo = new JComboBox<>(model);
 		activitiesCombo.addActionListener(new ActivitiesActionListener(model));
 
+		final JLabel totalDuration = new JLabel();
+		final JLabel totalWorkTime = new JLabel();
 		final JLabel meanPerWork = new JLabel();
 		final JLabel stdevPerWork = new JLabel();
 		final JLabel meanPerPiece = new JLabel();
 		final JLabel stdevPerPiece = new JLabel();
 		final Map<String, JLabel> labels = new LinkedHashMap<>();
+		labels.put("TotalDuration", totalDuration);
+		labels.put("TotalWorkTime", totalWorkTime);
 		labels.put("MeanPerWork", meanPerWork);
 		labels.put("StdDeviationPerWork", stdevPerWork);
 		labels.put("MeanPerPiece", meanPerPiece);
@@ -211,8 +215,8 @@ public class StatisticsPanel extends JPanel {
 		addComponentListener(new RefreshComponentListener());
 
 		iterableProvider = new ActivityIterableProvider(context);
-		computation = new StatisticsComputation(iterableProvider, meanPerWork, stdevPerWork, meanPerPiece,
-				stdevPerPiece);
+		computation = new StatisticsComputation(iterableProvider, totalDuration, totalWorkTime, meanPerWork,
+				stdevPerWork, meanPerPiece, stdevPerPiece);
 
 		computation.refresh();
 		activitiesCombo.setSelectedIndex(0);

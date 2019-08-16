@@ -40,15 +40,20 @@ public class StatisticsComputation {
 
 	private final IterableProvider iterableProvider;
 
+	private final JLabel totalDuration;
+	private final JLabel totalWorkTime;
 	private final JLabel meanPerWork;
 	private final JLabel stdevPerWork;
 	private final JLabel meanPerPiece;
 	private final JLabel stdevPerPiece;
 
-	public StatisticsComputation(final IterableProvider iterableProvider, final JLabel meanPerWork,
-			final JLabel stdevPerWork, final JLabel meanPerPiece, final JLabel stdevPerPiece) {
+	public StatisticsComputation(final IterableProvider iterableProvider, final JLabel totalDuration,
+			final JLabel totalWorkTime, final JLabel meanPerWork, final JLabel stdevPerWork, final JLabel meanPerPiece,
+			final JLabel stdevPerPiece) {
 		this.iterableProvider = iterableProvider;
 
+		this.totalDuration = totalDuration;
+		this.totalWorkTime = totalWorkTime;
 		this.meanPerWork = meanPerWork;
 		this.stdevPerWork = stdevPerWork;
 		this.meanPerPiece = meanPerPiece;
@@ -56,9 +61,9 @@ public class StatisticsComputation {
 	}
 
 	public void refresh() {
-		double dw = 0; // duration of works (in minutes)
+		double dw = 0; // duration of works (in seconds)
 		long tw = 0; // work time for works
-		double dp = 0; // duration of pieces (in minutes)
+		double dp = 0; // duration of pieces (in seconds)
 		long tp = 0; // work time for pieces
 
 		for (final Work work : iterableProvider.getWorks()) {
@@ -76,7 +81,7 @@ public class StatisticsComputation {
 				tws += tps;
 				final Long dpL = piece.getDuration();
 				if (dpL != null && dpL > 0) {
-					final double dp0 = dpL.doubleValue() / 60;
+					final double dp0 = dpL.doubleValue();
 					dw0 += dp0;
 					dp += dp0;
 				}
@@ -88,14 +93,14 @@ public class StatisticsComputation {
 
 		LOGGER.debug("total work time for pieces: {} ({})", tp, Converters.formatTime(tp));
 		LOGGER.debug("total work time for works:  {} ({})", tw, Converters.formatTime(tw));
-		LOGGER.debug("total duration for pieces: {} ({})", dp, Converters.formatTime((long) (dp * 60)));
-		LOGGER.debug("total duration for works:  {} ({})", dw, Converters.formatTime((long) (dw * 60)));
+		LOGGER.debug("total duration for pieces: {} ({})", dp, Converters.formatTime(Math.round(dp)));
+		LOGGER.debug("total duration for works:  {} ({})", dw, Converters.formatTime(Math.round(dw)));
 
 		final double mw = dw == 0 ? 0 : tw / dw; // mean work per minute for works
 		final double mp = dp == 0 ? 0 : tp / dp; // mean work per minute for pieces
 
-		LOGGER.debug("mean work time for pieces: {} ({})", mw, Converters.formatTime((long) mp));
-		LOGGER.debug("mean work time for works:  {} ({})", mw, Converters.formatTime((long) mw));
+		LOGGER.debug("mean work time for pieces: {} ({})", mw, Converters.formatTime(Math.round(mp)));
+		LOGGER.debug("mean work time for works:  {} ({})", mw, Converters.formatTime(Math.round(mw)));
 
 		double sw = 0; // std deviation of work per minute for works
 		double sp = 0; // std deviation of work per minute for pieces
@@ -112,21 +117,28 @@ public class StatisticsComputation {
 				tws += tps;
 				final Long dpL = piece.getDuration();
 				if (dpL != null && dpL > 0) {
-					final double dp0 = dpL.doubleValue() / 60;
+					final double dp0 = dpL.doubleValue();
 					dw0 += dp0;
-					final double ddp = mp - tps / dp0;
+					final double ddp = mp - tps * 60 / dp0;
 					sp += ddp * ddp;
 				}
 			}
-			final double ddw = mw - tws / dw0;
+			final double ddw = mw - tws * 60 / dw0;
 			sw += ddw * ddw;
 		}
 
+		final long dwL = Math.round(dw);
 		final long mwL = Math.round(mw);
 		final long mpL = Math.round(mp);
 		final long swL = Math.round(Math.sqrt(sw));
 		final long spL = Math.round(Math.sqrt(sp));
 
+		if (totalDuration != null) {
+			totalDuration.setText(Converters.formatTime(dwL).toString());
+		}
+		if (totalWorkTime != null) {
+			totalWorkTime.setText(Converters.formatTime(tw).toString());
+		}
 		if (meanPerWork != null) {
 			meanPerWork.setText(Converters.formatTime(mwL).toString());
 		}
