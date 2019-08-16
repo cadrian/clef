@@ -60,7 +60,7 @@ class ActivityComponent implements FieldComponent<Activity, JComboBox<Activity>>
 
 	@Override
 	public boolean isDirty() {
-		return savedData != component.getSelectedItem();
+		return !component.getSelectedItem().equals(savedData);
 	}
 
 }
