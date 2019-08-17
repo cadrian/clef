@@ -17,6 +17,8 @@
 package net.cadrian.clef.ui.app.tab;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -26,12 +28,15 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -65,10 +70,14 @@ public class StatisticsPanel extends JPanel {
 
 	private final class ActivityIterableProvider implements StatisticsComputation.IterableProvider {
 		private final ApplicationContext context;
-		private Activity activity;
+		private final Work work;
 
-		private ActivityIterableProvider(final ApplicationContext context) {
+		private Activity activity;
+		private boolean withLostPieces;
+
+		private ActivityIterableProvider(final ApplicationContext context, final Work work) {
 			this.context = context;
+			this.work = work;
 		}
 
 		public void setActivity(final Activity activity) {
@@ -77,12 +86,29 @@ public class StatisticsPanel extends JPanel {
 
 		@Override
 		public Iterable<Work> getWorks() {
+			if (work != null) {
+				return Collections.singleton(work);
+			}
 			return new ArrayList<>(context.getBeans().getWorks());
 		}
 
 		@Override
 		public Iterable<Piece> getPieces(final Work work) {
-			return new ArrayList<>(work.getPieces());
+			final List<Piece> result;
+			final Collection<? extends Piece> pieces = work.getPieces();
+			if (withLostPieces) {
+				result = new ArrayList<>(pieces.size() * 2);
+				for (Piece piece : pieces) {
+					do {
+						result.add(piece);
+						piece = piece.getPrevious();
+					} while (piece != null);
+				}
+			} else {
+				result = new ArrayList<>(pieces);
+			}
+			return result;
+
 		}
 
 		@Override
@@ -96,6 +122,10 @@ public class StatisticsPanel extends JPanel {
 				}
 			}
 			return result;
+		}
+
+		public void setWithLostPieces(final boolean enabled) {
+			withLostPieces = enabled;
 		}
 	}
 
@@ -174,15 +204,32 @@ public class StatisticsPanel extends JPanel {
 	private final StatisticsComputation computation;
 
 	public StatisticsPanel(final ApplicationContext context) {
+		this(context, null);
+	}
+
+	protected StatisticsPanel(final ApplicationContext context, final Work work) {
 		super(new GridBagLayout());
 
 		final JPanel titledPanel = new JPanel(new BorderLayout());
-		final JPanel titlePanel = new JPanel(new BorderLayout());
+		final JPanel titlePanel = new JPanel();
+		titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
 		final JPanel panel = new JPanel(new GridBagLayout());
 
 		final ActivitiesComboBoxModel model = new ActivitiesComboBoxModel(context);
 		final JComboBox<String> activitiesCombo = new JComboBox<>(model);
 		activitiesCombo.addActionListener(new ActivitiesActionListener(model));
+
+		final JCheckBox withLostPieces = new JCheckBox(
+				context.getPresentation().getMessage("Statistics.WithLostPieces"));
+		withLostPieces.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent event) {
+				iterableProvider.setWithLostPieces(withLostPieces.isSelected());
+				computation.refresh();
+			}
+
+		});
 
 		final JLabel totalDuration = new JLabel();
 		final JLabel totalWorkTime = new JLabel();
@@ -193,16 +240,26 @@ public class StatisticsPanel extends JPanel {
 		final Map<String, JLabel> labels = new LinkedHashMap<>();
 		labels.put("TotalDuration", totalDuration);
 		labels.put("TotalWorkTime", totalWorkTime);
-		labels.put("MeanPerWork", meanPerWork);
-		labels.put("StdDeviationPerWork", stdevPerWork);
+		if (work == null) {
+			labels.put("MeanPerWork", meanPerWork);
+			labels.put("StdDeviationPerWork", stdevPerWork);
+		}
 		labels.put("MeanPerPiece", meanPerPiece);
 		labels.put("StdDeviationPerPiece", stdevPerPiece);
 		addLabels(context, labels, panel);
 
 		panel.setBorder(BorderFactory.createEtchedBorder());
 
-		titlePanel.add(new JLabel(context.getPresentation().getMessage("StatisticsMessage")), BorderLayout.NORTH);
-		titlePanel.add(activitiesCombo, BorderLayout.SOUTH);
+		final JLabel message = new JLabel(context.getPresentation().getMessage("StatisticsMessage"));
+		final Font f = message.getFont();
+		message.setFont(f.deriveFont(f.getStyle() | Font.BOLD));
+
+		message.setAlignmentX(Component.LEFT_ALIGNMENT);
+		titlePanel.add(message);
+		activitiesCombo.setAlignmentX(Component.LEFT_ALIGNMENT);
+		titlePanel.add(activitiesCombo);
+		withLostPieces.setAlignmentX(Component.LEFT_ALIGNMENT);
+		titlePanel.add(withLostPieces);
 
 		titledPanel.add(titlePanel, BorderLayout.NORTH);
 		titledPanel.add(panel, BorderLayout.CENTER);
@@ -214,7 +271,7 @@ public class StatisticsPanel extends JPanel {
 
 		addComponentListener(new RefreshComponentListener());
 
-		iterableProvider = new ActivityIterableProvider(context);
+		iterableProvider = new ActivityIterableProvider(context, work);
 		computation = new StatisticsComputation(iterableProvider, totalDuration, totalWorkTime, meanPerWork,
 				stdevPerWork, meanPerPiece, stdevPerPiece);
 

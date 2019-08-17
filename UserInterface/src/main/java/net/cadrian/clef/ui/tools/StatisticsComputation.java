@@ -96,8 +96,8 @@ public class StatisticsComputation {
 		LOGGER.debug("total duration for pieces: {} ({})", dp, Converters.formatTime(Math.round(dp)));
 		LOGGER.debug("total duration for works:  {} ({})", dw, Converters.formatTime(Math.round(dw)));
 
-		final double mw = dw == 0 ? 0 : tw / dw; // mean work per minute for works
-		final double mp = dp == 0 ? 0 : tp / dp; // mean work per minute for pieces
+		final double mw = dw == 0 ? 0 : tw * 60 / dw; // mean work per minute for works
+		final double mp = dp == 0 ? 0 : tp * 60 / dp; // mean work per minute for pieces
 
 		LOGGER.debug("mean work time for pieces: {} ({})", mw, Converters.formatTime(Math.round(mp)));
 		LOGGER.debug("mean work time for works:  {} ({})", mw, Converters.formatTime(Math.round(mw)));
