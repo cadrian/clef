@@ -14,6 +14,8 @@ BEGIN  { state=0 }
         {
             cat - $f~ <<EOF
 /*
+ * Copyright (C) 2018-2019 Cyril Adrian <cyril.adrian@gmail.com>
+ *
  * This file is part of Clef.
  *
  * Clef is free software: you can redistribute it and/or modify
@@ -27,7 +29,6 @@ BEGIN  { state=0 }
  *
  * You should have received a copy of the GNU General Public License
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 EOF
         } > $f

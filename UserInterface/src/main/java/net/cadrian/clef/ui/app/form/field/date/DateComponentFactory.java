@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2018-2019 Cyril Adrian <cyril.adrian@gmail.com>
+ *
  * This file is part of Clef.
  *
  * Clef is free software: you can redistribute it and/or modify
@@ -12,7 +14,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Clef.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package net.cadrian.clef.ui.app.form.field.date;
 
