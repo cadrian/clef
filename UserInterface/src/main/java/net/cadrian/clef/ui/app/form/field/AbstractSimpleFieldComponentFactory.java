@@ -23,6 +23,9 @@ import javax.swing.JComponent;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
+import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
+import net.cadrian.clef.ui.ApplicationContext.ApplicationContextListener;
 import net.cadrian.clef.ui.app.tab.DataPane;
 
 public abstract class AbstractSimpleFieldComponentFactory<T extends Bean, D, J extends JComponent>
@@ -32,10 +35,30 @@ public abstract class AbstractSimpleFieldComponentFactory<T extends Bean, D, J e
 
 	protected static <T extends Bean, D, J extends JComponent> FieldModel<T, D, J> getCachedModel(
 			final Class<T> beanType, final String fieldName) throws ModelException {
-		final Map<String, FieldModel<?, ?, ?>> cache = CACHE.get(beanType);
-		@SuppressWarnings("unchecked")
-		final FieldModel<T, D, J> result = cache == null ? null : (FieldModel<T, D, J>) cache.get(fieldName);
-		return result;
+		synchronized (CACHE) {
+			final Map<String, FieldModel<?, ?, ?>> cache = CACHE.get(beanType);
+			@SuppressWarnings("unchecked")
+			final FieldModel<T, D, J> result = cache == null ? null : (FieldModel<T, D, J>) cache.get(fieldName);
+			return result;
+		}
+	}
+
+	public static void installCacheListener(final ApplicationContext context) {
+		context.addApplicationContextListener(AdvancedConfigurationEntry.offlineMode,
+				new ApplicationContextListener<Boolean>() {
+					@Override
+					public void onAdvancedConfigurationChange(final AdvancedConfigurationEntry entry,
+							final Boolean value) {
+						synchronized (CACHE) {
+							for (Map<String, FieldModel<?, ?, ?>> cache : CACHE.values()) {
+								for (FieldModel<?, ?, ?> model : cache.values()) {
+									model.removed();
+								}
+							}
+							CACHE.clear();
+						}
+					}
+				});
 	}
 
 	protected final Class<T> beanType;
@@ -95,12 +118,14 @@ public abstract class AbstractSimpleFieldComponentFactory<T extends Bean, D, J e
 	}
 
 	private void setCachedModel(final FieldModel<T, D, J> result) {
-		Map<String, FieldModel<?, ?, ?>> cache = CACHE.get(beanType);
-		if (cache == null) {
-			cache = new HashMap<>();
-			CACHE.put(beanType, cache);
+		synchronized (CACHE) {
+			Map<String, FieldModel<?, ?, ?>> cache = CACHE.get(beanType);
+			if (cache == null) {
+				cache = new HashMap<>();
+				CACHE.put(beanType, cache);
+			}
+			cache.put(fieldName, result);
 		}
-		cache.put(fieldName, result);
 	}
 
 }

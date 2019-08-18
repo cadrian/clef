@@ -29,4 +29,8 @@ public interface FieldComponent<D, J extends JComponent> {
 
 	boolean isDirty();
 
+	default void removed() {
+		// default does nothing
+	}
+
 }

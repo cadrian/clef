@@ -63,4 +63,9 @@ class PiecesComponent implements FieldComponent<Collection<Piece>, DataPane<Piec
 		return component.isDirty();
 	}
 
+	@Override
+	public void removed() {
+		component.removed();
+	}
+
 }

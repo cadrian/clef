@@ -42,6 +42,8 @@ import net.cadrian.clef.model.bean.Work;
 import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
 import net.cadrian.clef.ui.app.form.creator.SessionCreator;
 import net.cadrian.clef.ui.app.form.creator.WorkCreator;
+import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
+import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.model.ActivityFormModel;
 import net.cadrian.clef.ui.app.form.model.AuthorFormModel;
 import net.cadrian.clef.ui.app.form.model.PricingFormModel;
@@ -139,6 +141,9 @@ public class Application extends JFrame {
 		setTitle(presentation.getMessage("ClefTitle"));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+		AbstractSimpleFieldComponentFactory.installCacheListener(context);
+		AbstractSimpleFieldModel.installCacheListener(context);
 
 		sessionsPanel = new DataPane<>(context, true, Session.class, beans::getSessions, new SessionCreator(context),
 				new SessionFilter(), null, BeanComparators::compareSessions, new SessionFormModel(Session.class));

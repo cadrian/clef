@@ -26,10 +26,10 @@ import net.cadrian.clef.ui.widget.DateSelector;
 
 class DateComponent implements FieldComponent<Date, DateSelector> {
 
-	private final class DateComponentApplicationContextListener implements ApplicationContextListener<Boolean> {
+	private final class ApplicationContextListenerImpl implements ApplicationContextListener<Boolean> {
 		private final boolean writable;
 
-		private DateComponentApplicationContextListener(final boolean writable) {
+		private ApplicationContextListenerImpl(final boolean writable) {
 			this.writable = writable;
 		}
 
@@ -40,15 +40,23 @@ class DateComponent implements FieldComponent<Date, DateSelector> {
 		}
 	}
 
+	private final ApplicationContext context;
 	private final DateSelector component;
+	private final ApplicationContextListener<Boolean> applicationContextListener;
 
 	DateComponent(final ApplicationContext context, final boolean writable) {
 		final boolean w = context.getValue(AdvancedConfigurationEntry.offlineMode);
 
+		this.context = context;
 		component = new DateSelector(context, writable || w);
 
-		context.addApplicationContextListener(AdvancedConfigurationEntry.offlineMode,
-				new DateComponentApplicationContextListener(writable));
+		applicationContextListener = new ApplicationContextListenerImpl(writable);
+		context.addApplicationContextListener(AdvancedConfigurationEntry.offlineMode, applicationContextListener);
+	}
+
+	@Override
+	public void removed() {
+		context.removeApplicationContextListener(AdvancedConfigurationEntry.offlineMode, applicationContextListener);
 	}
 
 	@Override

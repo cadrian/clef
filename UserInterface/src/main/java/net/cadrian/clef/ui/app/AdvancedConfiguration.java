@@ -19,10 +19,16 @@ package net.cadrian.clef.ui.app;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
 import net.cadrian.clef.ui.ApplicationContext.ApplicationContextListener;
 
 class AdvancedConfiguration<T> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AdvancedConfiguration.class);
+
 	private final AdvancedConfigurationEntry entry;
 	private T value;
 	private final List<ApplicationContextListener<T>> listeners = new ArrayList<>();
@@ -32,10 +38,12 @@ class AdvancedConfiguration<T> {
 	}
 
 	void addApplicationContextListener(final ApplicationContextListener<T> listener) {
+		LOGGER.debug(">>> {}", listener);
 		listeners.add(listener);
 	}
 
 	void removeApplicationContextListener(final ApplicationContextListener<T> listener) {
+		LOGGER.debug(">>> {}", listener);
 		listeners.remove(listener);
 	}
 
@@ -44,12 +52,14 @@ class AdvancedConfiguration<T> {
 	}
 
 	public void setValue(final T value) {
+		LOGGER.debug(">>> {}", value);
 		this.value = value;
 		fireAdvancedConfigurationChanged();
 	}
 
 	private void fireAdvancedConfigurationChanged() {
-		for (final ApplicationContextListener<T> listener : listeners) {
+		for (final ApplicationContextListener<T> listener : new ArrayList<>(listeners)) {
+			LOGGER.debug(">>> {}", listener);
 			listener.onAdvancedConfigurationChange(entry, value);
 		}
 	}

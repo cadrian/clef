@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
@@ -47,7 +48,8 @@ class BeanFieldModel<T extends Bean, D extends Bean> extends AbstractSimpleField
 			throws ModelException {
 		LOGGER.debug("<-- {}", contextBean);
 		final FieldComponent<D, JComponent> result;
-		final boolean writable = componentFactory.isWritable();
+		final boolean writable = componentFactory.isWritable()
+				&& (Boolean) context.getValue(AdvancedConfigurationEntry.offlineMode);
 		LOGGER.debug("writable: {}", writable);
 		final ListGetter<D> listGetter = ((BeanComponentFactory<T, D>) componentFactory).getListGetter();
 		LOGGER.debug("listGetter: {}", listGetter);

@@ -1,6 +1,7 @@
 #/usr/bin/env bash
 
 rm -rf pkg $HOME/.m2/repository/net/cadrian/clef
+sudo dpkg -P libclef-application-java libclef-database-java libclef-model-java libclef-root-java libclef-user-interface-java
 mkdir -p pkg/build pkg/debs
 cd pkg
 
@@ -39,7 +40,10 @@ function buildModule() {
                 ;;
         esac
 
-        debuild -b -us -uc > build.log || exit 1
+        debuild -b -us -uc > build.log || {
+            echo "less -R pkg/$module/build.log"
+            exit 1
+        }
         cd ..
         sudo dpkg -i *.deb || exit 1
     ) || exit 1

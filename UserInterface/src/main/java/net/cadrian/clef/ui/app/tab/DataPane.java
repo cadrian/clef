@@ -50,6 +50,8 @@ import org.slf4j.LoggerFactory;
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
+import net.cadrian.clef.ui.ApplicationContext.ApplicationContextListener;
 import net.cadrian.clef.ui.Presentation;
 import net.cadrian.clef.ui.app.form.BeanCreator;
 import net.cadrian.clef.ui.app.form.BeanFilter;
@@ -63,6 +65,28 @@ import net.cadrian.clef.ui.widget.ClefTools;
 import net.cadrian.clef.ui.widget.ClefTools.Tool;
 
 public class DataPane<T extends Bean> extends JSplitPane {
+
+	private final class ApplicationContextListenerImpl implements ApplicationContextListener<Boolean> {
+
+		private ApplicationContextListenerImpl() {
+		}
+
+		@Override
+		public void onAdvancedConfigurationChange(final AdvancedConfigurationEntry entry, final Boolean value) {
+			try {
+				LOGGER.debug("Will refresh configuration: offineMode={}", value);
+				SwingUtilities.invokeLater(() -> saveData(false));
+			} catch (final RuntimeException e) {
+				LOGGER.error("Error during configuration refresh", e);
+				throw e;
+			}
+		}
+
+		@Override
+		public String toString() {
+			return "ApplicationContextListenerImpl: " + beanType.getName();
+		}
+	}
 
 	private final class BeanFilterActionListener implements ActionListener {
 		private final class PaneRefresher implements Runnable {
@@ -255,6 +279,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	private final JPanel current = new JPanel(new BorderLayout());
 	private final ClefTools tools;
 
+	private final Class<T> beanType;
 	private final BeanGetter<T> beanGetter;
 	private final BeanCreator<T> beanCreator;
 	private final BeanFilter<T> beanFilter;
@@ -265,6 +290,8 @@ public class DataPane<T extends Bean> extends JSplitPane {
 
 	private final Map<T, BeanForm<T>> formCache = new WeakHashMap<>();
 
+	private final ApplicationContextListener<Boolean> applicationContextListener;
+
 	private BeanForm<T> currentForm;
 	private String lastTab;
 
@@ -273,6 +300,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 			final BeanMover<T> beanMover, final Comparator<T> beanComparator, final BeanFormModel<T> beanFormModel,
 			final String... tabs) {
 		super(JSplitPane.HORIZONTAL_SPLIT);
+		this.beanType = beanType;
 		this.beanGetter = Objects.requireNonNull(beanGetter);
 		this.beanCreator = Objects.requireNonNull(beanCreator);
 		this.beanFilter = beanFilter;
@@ -319,6 +347,9 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		setLeftComponent(left);
 		setRightComponent(current);
 
+		applicationContextListener = new ApplicationContextListenerImpl();
+		context.addApplicationContextListener(AdvancedConfigurationEntry.offlineMode, applicationContextListener);
+
 		refreshList(null);
 	}
 
@@ -339,12 +370,12 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		refreshList(getSelection());
 	}
 
-	public void select(final T version, final boolean refresh) {
-		LOGGER.debug("Select version: {}", version);
+	public void select(final T pieceVersion, final boolean refresh) {
+		LOGGER.debug("Select piece version: {}", pieceVersion);
 		if (refresh) {
-			refreshList(version);
+			refreshList(pieceVersion);
 		} else {
-			installBeanForm(version, getTab());
+			installBeanForm(pieceVersion, getTab());
 		}
 	}
 
@@ -414,22 +445,41 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	}
 
 	public void saveData() {
+		saveData(true);
+	}
+
+	private void saveData(final boolean refresh) {
+		LOGGER.debug("{}: <-- {}", beanType.getName(), refresh);
 		final T selected = list.getSelectedValue();
-		getTab();
+		LOGGER.debug("selected={}", selected);
+		final String tab = getTab();
 		try {
+			formCache.remove(selected);
 			if (currentForm != null) {
-				formCache.remove(selected);
-				currentForm.save();
+				if (currentForm.isDirty()) {
+					LOGGER.debug("{}: Saving {}", beanType.getName(), currentForm);
+					currentForm.save();
+				} else {
+					LOGGER.debug("{}: NOT saving {} (not dirty)", beanType.getName(), currentForm);
+				}
+				currentForm = null;
 			}
 		} catch (final ModelException e) {
-			LOGGER.error("Error while saving data", e);
+			LOGGER.error("{}: Error while saving data", beanType.getName(), e);
 			final Presentation presentation = context.getPresentation();
 			JOptionPane.showMessageDialog(presentation.getApplicationFrame(),
 					presentation.getMessage("SaveFailedMessage"), presentation.getMessage("SaveFailedTitle"),
 					JOptionPane.WARNING_MESSAGE);
 		} finally {
-			refreshList(selected);
+			if (refresh) {
+				LOGGER.debug("{}: Refreshing list", beanType.getName());
+				refreshList(selected);
+			} else {
+				LOGGER.debug("{}: Installing new bean form", beanType.getName());
+				installBeanForm(selected, tab);
+			}
 		}
+		LOGGER.debug("{}: -->", beanType.getName());
 	}
 
 	private void showFilter(final Point position, final Action filterAction) {
@@ -483,6 +533,10 @@ public class DataPane<T extends Bean> extends JSplitPane {
 			}
 		}
 		return result;
+	}
+
+	public void removed() {
+		context.removeApplicationContextListener(AdvancedConfigurationEntry.offlineMode, applicationContextListener);
 	}
 
 }

@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.model.ModelException;
 import net.cadrian.clef.ui.ApplicationContext;
+import net.cadrian.clef.ui.ApplicationContext.AdvancedConfigurationEntry;
+import net.cadrian.clef.ui.ApplicationContext.ApplicationContextListener;
 
 public abstract class AbstractSimpleFieldModel<T extends Bean, D, J extends JComponent> implements FieldModel<T, D, J> {
 
@@ -37,10 +39,30 @@ public abstract class AbstractSimpleFieldModel<T extends Bean, D, J extends JCom
 
 	protected static <T extends Bean, D, J extends JComponent> FieldComponent<D, J> getCachedComponent(
 			final T contextBean, final String name) throws ModelException {
-		final Map<String, FieldComponent<?, ?>> cache = CACHE.get(contextBean);
-		@SuppressWarnings("unchecked")
-		final FieldComponent<D, J> result = cache == null ? null : (FieldComponent<D, J>) cache.get(name);
-		return result;
+		synchronized (CACHE) {
+			final Map<String, FieldComponent<?, ?>> cache = CACHE.get(contextBean);
+			@SuppressWarnings("unchecked")
+			final FieldComponent<D, J> result = cache == null ? null : (FieldComponent<D, J>) cache.get(name);
+			return result;
+		}
+	}
+
+	public static void installCacheListener(final ApplicationContext context) {
+		context.addApplicationContextListener(AdvancedConfigurationEntry.offlineMode,
+				new ApplicationContextListener<Boolean>() {
+					@Override
+					public void onAdvancedConfigurationChange(final AdvancedConfigurationEntry entry,
+							final Boolean value) {
+						synchronized (CACHE) {
+							for (Map<String, FieldComponent<?, ?>> cache : CACHE.values()) {
+								for (FieldComponent<?, ?> component : cache.values()) {
+									component.removed();
+								}
+							}
+							CACHE.clear();
+						}
+					}
+				});
 	}
 
 	protected final String name;
@@ -74,12 +96,14 @@ public abstract class AbstractSimpleFieldModel<T extends Bean, D, J extends JCom
 	}
 
 	private void setCachedComponent(final T contextBean, final FieldComponent<D, J> result) {
-		Map<String, FieldComponent<?, ?>> cache = CACHE.get(contextBean);
-		if (cache == null) {
-			cache = new HashMap<>();
-			CACHE.put(contextBean, cache);
+		synchronized (CACHE) {
+			Map<String, FieldComponent<?, ?>> cache = CACHE.get(contextBean);
+			if (cache == null) {
+				cache = new HashMap<>();
+				CACHE.put(contextBean, cache);
+			}
+			cache.put(name, result);
 		}
-		cache.put(name, result);
 	}
 
 	protected abstract FieldComponent<D, J> createNewComponent(T contextBean, ApplicationContext context)
