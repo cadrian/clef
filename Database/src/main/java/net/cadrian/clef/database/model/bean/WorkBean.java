@@ -49,8 +49,20 @@ public class WorkBean extends AbstractPropertyBean implements net.cadrian.clef.m
 	}
 
 	@Override
+	public void setPricing(Pricing pricing) {
+		bean.setPricingId(((PricingBean) pricing).getId());
+		update();
+	}
+
+	@Override
 	public Author getAuthor() {
 		return db.getAuthor(bean.getAuthorId());
+	}
+
+	@Override
+	public void setAuthor(Author author) {
+		bean.setAuthorId(((AuthorBean) author).getId());
+		update();
 	}
 
 	@Override

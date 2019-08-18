@@ -21,9 +21,12 @@ import java.util.Collection;
 
 import javax.swing.JComponent;
 
+import net.cadrian.clef.model.bean.Author;
 import net.cadrian.clef.model.bean.Piece;
+import net.cadrian.clef.model.bean.Pricing;
 import net.cadrian.clef.model.bean.PropertyDescriptor.Entity;
 import net.cadrian.clef.model.bean.Work;
+import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.BeanFormModel;
 import net.cadrian.clef.ui.app.form.field.FieldComponentFactory;
 import net.cadrian.clef.ui.app.form.field.bean.BeanComponentFactory;
@@ -37,8 +40,8 @@ import net.cadrian.clef.ui.app.form.field.text.TextFieldComponentFactory;
 public class WorkFormModel extends BeanFormModel<Work> {
 
 	private static final Collection<FieldComponentFactory<Work, ?, ? extends JComponent>> COMPONENT_FACTORIES = Arrays
-			.asList(new BeanComponentFactory<>(Work.class, "Author", "Description"),
-					new BeanComponentFactory<>(Work.class, "Pricing", "Description"),
+			.asList(new BeanComponentFactory<>(Work.class, "Author", "Description", WorkFormModel::getAuthors),
+					new BeanComponentFactory<>(Work.class, "Pricing", "Description", WorkFormModel::getPricings),
 					new TextFieldComponentFactory<>(Work.class, "Name", true, "Description"),
 					new TextAreaComponentFactory<>(Work.class, "Notes", true, "Description"),
 					new PropertiesComponentFactory<>(Work.class, "Properties", Entity.work, true, "Description"),
@@ -47,6 +50,14 @@ public class WorkFormModel extends BeanFormModel<Work> {
 
 	public WorkFormModel(final Class<Work> beanType) {
 		super(COMPONENT_FACTORIES);
+	}
+
+	static Collection<? extends Author> getAuthors(final ApplicationContext context) {
+		return context.getBeans().getAuthors();
+	}
+
+	static Collection<? extends Pricing> getPricings(final ApplicationContext context) {
+		return context.getBeans().getPricings();
 	}
 
 	static Long getWorkTime(final Work work) {

@@ -16,33 +16,36 @@
  */
 package net.cadrian.clef.ui.app.form.field.bean;
 
+import javax.swing.JComponent;
 import javax.swing.JTextField;
 
 import net.cadrian.clef.model.Bean;
 import net.cadrian.clef.ui.app.form.field.FieldComponent;
 
-class BeanComponent<T extends Bean> implements FieldComponent<T, JTextField> {
+class BeanComponentText<T extends Bean> implements FieldComponent<T, JComponent> {
 
-	private final JTextField component;
+	private final JTextField componentText;
+	private T data;
 
-	BeanComponent(final boolean writable) {
-		component = new JTextField();
-		component.setEditable(writable);
+	BeanComponentText(final boolean writable) {
+		componentText = new JTextField();
+		componentText.setEditable(writable);
 	}
 
 	@Override
-	public JTextField getComponent() {
-		return component;
+	public JComponent getComponent() {
+		return componentText;
 	}
 
 	@Override
 	public T getData() {
-		return null;
+		return data;
 	}
 
 	@Override
 	public void setData(final T data) {
-		component.setText(data.toString());
+		this.data = data;
+		componentText.setText(data.toString());
 	}
 
 	@Override

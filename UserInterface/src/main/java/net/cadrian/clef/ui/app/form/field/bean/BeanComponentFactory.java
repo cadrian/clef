@@ -16,29 +16,41 @@
  */
 package net.cadrian.clef.ui.app.form.field.bean;
 
-import javax.swing.JTextField;
+import java.util.Collection;
+
+import javax.swing.JComponent;
 
 import net.cadrian.clef.model.Bean;
+import net.cadrian.clef.ui.ApplicationContext;
 import net.cadrian.clef.ui.app.form.field.AbstractSimpleFieldComponentFactory;
 import net.cadrian.clef.ui.app.form.field.FieldGetter;
 import net.cadrian.clef.ui.app.form.field.FieldModel;
 import net.cadrian.clef.ui.app.form.field.FieldSetter;
 
 public class BeanComponentFactory<T extends Bean, D extends Bean>
-		extends AbstractSimpleFieldComponentFactory<T, D, JTextField> {
+		extends AbstractSimpleFieldComponentFactory<T, D, JComponent> {
 
-	public BeanComponentFactory(final Class<T> beanType, final String fieldName) {
-		this(beanType, fieldName, null);
+	@FunctionalInterface
+	public interface ListGetter<D extends Bean> {
+		Collection<? extends D> getBeans(ApplicationContext context);
 	}
 
-	public BeanComponentFactory(final Class<T> beanType, final String fieldName, final String tab) {
-		super(beanType, fieldName, false, tab);
+	private final ListGetter<D> listGetter;
+
+	public BeanComponentFactory(final Class<T> beanType, final String fieldName, final String tab,
+			final ListGetter<D> listGetter) {
+		super(beanType, fieldName, true, tab);
+		this.listGetter = listGetter;
 	}
 
 	@Override
-	protected FieldModel<T, D, JTextField> createModel(final String fieldName, final FieldGetter<T, D> getter,
+	protected FieldModel<T, D, JComponent> createModel(final String fieldName, final FieldGetter<T, D> getter,
 			final FieldSetter<T, D> setter) {
 		return new BeanFieldModel<>(fieldName, tab, getter, setter, this);
+	}
+
+	public ListGetter<D> getListGetter() {
+		return listGetter;
 	}
 
 }

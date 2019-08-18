@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -304,7 +305,10 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		tools.addListener(new ClefToolsListenerImpl(context));
 		tools.getAction(ClefTools.Tool.Del).setEnabled(false);
 		if (showSave) {
-			tools.getAction(ClefTools.Tool.Save).setEnabled(false);
+			final Action saveAction = tools.getAction(ClefTools.Tool.Save);
+			saveAction.setEnabled(false);
+			getInputMap().put(KeyStroke.getKeyStroke("control S"), "save");
+			getActionMap().put("save", saveAction);
 		}
 		if (beanMover != null) {
 			tools.getAction(ClefTools.Tool.Move).setEnabled(false);

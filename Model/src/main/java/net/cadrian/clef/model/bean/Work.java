@@ -30,7 +30,11 @@ public interface Work extends PropertyBean {
 
 	Pricing getPricing();
 
+	void setPricing(Pricing pricing);
+
 	Author getAuthor();
+
+	void setAuthor(Author author);
 
 	String getName();
 

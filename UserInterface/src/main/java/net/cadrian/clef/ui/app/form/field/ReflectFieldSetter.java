@@ -45,9 +45,10 @@ public class ReflectFieldSetter<T extends Bean, D> implements FieldSetter<T, D> 
 			return beanType.getMethod("set" + fieldName, getter.getReturnType());
 		} catch (final NoSuchMethodException e) {
 			if (writable) {
+				LOGGER.error("Writable field {}::{} without setter", beanType.getName(), fieldName, e);
 				throw new ModelException(e);
 			}
-			LOGGER.debug("No setter, but {} is not writable anyway", fieldName);
+			LOGGER.debug("No setter, but {}::{} is not writable anyway", beanType.getName(), fieldName);
 			return null;
 		} catch (final SecurityException e) {
 			throw new ModelException(e);
