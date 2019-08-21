@@ -53,6 +53,13 @@ import net.cadrian.clef.model.bean.Work;
 
 public class ModelBeans implements Beans {
 
+	private static final class ActivityBeanComparator implements Comparator<ActivityBean> {
+		@Override
+		public int compare(final ActivityBean a1, final ActivityBean a2) {
+			return a1.getName().compareTo(a2.getName());
+		}
+	}
+
 	private final class DatabaseModelBeans implements DatabaseBeansHolder {
 		@Override
 		public DatabaseBeans<net.cadrian.clef.database.bean.Pricing> getPricings() {
@@ -421,12 +428,7 @@ public class ModelBeans implements Beans {
 			final Map<Long, net.cadrian.clef.database.bean.Activity> activities = db.getActivities().readMany(template,
 					true);
 			final List<ActivityBean> activitiesList = new ArrayList<>(db.getActivities(activities.keySet()));
-			Collections.sort(activitiesList, new Comparator<ActivityBean>() {
-				@Override
-				public int compare(final ActivityBean a1, final ActivityBean a2) {
-					return a1.getName().compareTo(a2.getName());
-				}
-			});
+			Collections.sort(activitiesList, new ActivityBeanComparator());
 			result = activitiesList;
 		} catch (final DatabaseException e) {
 			throw new ModelException(e);

@@ -22,6 +22,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -37,10 +38,13 @@ import net.cadrian.clef.ui.ApplicationContext;
 class DateComponentPicker extends JDialog {
 
 	private final class ClefToolsListenerImpl implements ClefTools.Listener {
+		private final DateComponentPicker component;
 		private final ZoneId zone;
 		private final DateTimePicker picker;
 
-		private ClefToolsListenerImpl(final ZoneId zone, final DateTimePicker picker) {
+		private ClefToolsListenerImpl(final DateComponentPicker component, final ZoneId zone,
+				final DateTimePicker picker) {
+			this.component = component;
 			this.zone = zone;
 			this.picker = picker;
 		}
@@ -50,8 +54,8 @@ class DateComponentPicker extends JDialog {
 			switch (tool) {
 			case Save:
 				final LocalDateTime ldt = picker.getDateTimeStrict();
-				date = Date.from(ldt.atZone(zone).toInstant());
-				setVisible(false);
+				component.date.set(Date.from(ldt.atZone(zone).toInstant()));
+				component.setVisible(false);
 				break;
 			default:
 			}
@@ -60,12 +64,12 @@ class DateComponentPicker extends JDialog {
 
 	private static final long serialVersionUID = 2728030026625833925L;
 
-	private Date date;
+	private final AtomicReference<Date> date = new AtomicReference<>();
 
 	DateComponentPicker(final ApplicationContext context, final Date date) {
 		super(context.getPresentation().getApplicationFrame(), context.getPresentation().getMessage("DatePickerTitle"),
 				true);
-		this.date = date;
+		this.date.set(date);
 
 		final JPanel pickerPanel = new JPanel(new BorderLayout());
 		getContentPane().add(pickerPanel);
@@ -97,7 +101,7 @@ class DateComponentPicker extends JDialog {
 		pickerPanel.add(picker, BorderLayout.CENTER);
 
 		final ClefTools tools = new ClefTools(context, ClefTools.Tool.Save);
-		tools.addListener(new ClefToolsListenerImpl(zone, picker));
+		tools.addListener(new ClefToolsListenerImpl(this, zone, picker));
 
 		pickerPanel.add(tools, BorderLayout.SOUTH);
 
@@ -106,7 +110,7 @@ class DateComponentPicker extends JDialog {
 	}
 
 	Date getDate() {
-		return date;
+		return date.get();
 	}
 
 }

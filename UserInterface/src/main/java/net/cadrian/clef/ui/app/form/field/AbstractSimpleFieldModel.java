@@ -34,6 +34,20 @@ import net.cadrian.clef.ui.ApplicationContext.ApplicationContextListener;
 
 public abstract class AbstractSimpleFieldModel<T extends Bean, D, J extends JComponent> implements FieldModel<T, D, J> {
 
+	private static final class OfflineModeApplicationContextListener implements ApplicationContextListener<Boolean> {
+		@Override
+		public void onAdvancedConfigurationChange(final AdvancedConfigurationEntry entry, final Boolean value) {
+			synchronized (CACHE) {
+				for (final Map<String, FieldComponent<?, ?>> cache : CACHE.values()) {
+					for (final FieldComponent<?, ?> component : cache.values()) {
+						component.removed();
+					}
+				}
+				CACHE.clear();
+			}
+		}
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSimpleFieldModel.class);
 
 	private static final Map<Bean, Map<String, FieldComponent<?, ?>>> CACHE = new WeakHashMap<>();
@@ -50,20 +64,7 @@ public abstract class AbstractSimpleFieldModel<T extends Bean, D, J extends JCom
 
 	public static void installCacheListener(final ApplicationContext context) {
 		context.addApplicationContextListener(AdvancedConfigurationEntry.offlineMode,
-				new ApplicationContextListener<Boolean>() {
-					@Override
-					public void onAdvancedConfigurationChange(final AdvancedConfigurationEntry entry,
-							final Boolean value) {
-						synchronized (CACHE) {
-							for (Map<String, FieldComponent<?, ?>> cache : CACHE.values()) {
-								for (FieldComponent<?, ?> component : cache.values()) {
-									component.removed();
-								}
-							}
-							CACHE.clear();
-						}
-					}
-				});
+				new OfflineModeApplicationContextListener());
 	}
 
 	protected final String name;

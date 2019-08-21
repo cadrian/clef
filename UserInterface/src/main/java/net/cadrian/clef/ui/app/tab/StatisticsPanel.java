@@ -55,6 +55,20 @@ import net.cadrian.clef.ui.tools.StatisticsComputation;
 
 public class StatisticsPanel extends JPanel {
 
+	private final class WithLostPiecesActionListener implements ActionListener {
+		private final JCheckBox withLostPieces;
+
+		private WithLostPiecesActionListener(final JCheckBox withLostPieces) {
+			this.withLostPieces = withLostPieces;
+		}
+
+		@Override
+		public void actionPerformed(final ActionEvent event) {
+			iterableProvider.setWithLostPieces(withLostPieces.isSelected());
+			computation.refresh();
+		}
+	}
+
 	private final class ActivitiesActionListener implements ActionListener {
 		private final ActivitiesComboBoxModel model;
 
@@ -222,15 +236,7 @@ public class StatisticsPanel extends JPanel {
 
 		final JCheckBox withLostPieces = new JCheckBox(
 				context.getPresentation().getMessage("Statistics.WithLostPieces"));
-		withLostPieces.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent event) {
-				iterableProvider.setWithLostPieces(withLostPieces.isSelected());
-				computation.refresh();
-			}
-
-		});
+		withLostPieces.addActionListener(new WithLostPiecesActionListener(withLostPieces));
 
 		final JLabel totalDuration = new JLabel();
 		final JLabel totalWorkTime = new JLabel();

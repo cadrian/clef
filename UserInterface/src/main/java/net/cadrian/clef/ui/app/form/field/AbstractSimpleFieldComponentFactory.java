@@ -32,6 +32,20 @@ import net.cadrian.clef.ui.app.tab.DataPane;
 public abstract class AbstractSimpleFieldComponentFactory<T extends Bean, D, J extends JComponent>
 		implements FieldComponentFactory<T, D, J> {
 
+	private static final class OfflineModeApplicationContextListener implements ApplicationContextListener<Boolean> {
+		@Override
+		public void onAdvancedConfigurationChange(final AdvancedConfigurationEntry entry, final Boolean value) {
+			synchronized (CACHE) {
+				for (final Map<String, FieldModel<?, ?, ?>> cache : CACHE.values()) {
+					for (final FieldModel<?, ?, ?> model : cache.values()) {
+						model.removed();
+					}
+				}
+				CACHE.clear();
+			}
+		}
+	}
+
 	private static final Map<Class<?>, Map<String, FieldModel<?, ?, ?>>> CACHE = new HashMap<>();
 
 	protected static <T extends Bean, D, J extends JComponent> FieldModel<T, D, J> getCachedModel(
@@ -46,20 +60,7 @@ public abstract class AbstractSimpleFieldComponentFactory<T extends Bean, D, J e
 
 	public static void installCacheListener(final ApplicationContext context) {
 		context.addApplicationContextListener(AdvancedConfigurationEntry.offlineMode,
-				new ApplicationContextListener<Boolean>() {
-					@Override
-					public void onAdvancedConfigurationChange(final AdvancedConfigurationEntry entry,
-							final Boolean value) {
-						synchronized (CACHE) {
-							for (Map<String, FieldModel<?, ?, ?>> cache : CACHE.values()) {
-								for (FieldModel<?, ?, ?> model : cache.values()) {
-									model.removed();
-								}
-							}
-							CACHE.clear();
-						}
-					}
-				});
+				new OfflineModeApplicationContextListener());
 	}
 
 	protected final Class<T> beanType;
