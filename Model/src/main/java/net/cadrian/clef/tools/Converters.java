@@ -73,11 +73,11 @@ public class Converters {
 		final long result;
 		final String[] split = time.split(":");
 		switch (split.length) {
-		case 0: { // seconds
+		case 1: { // seconds
 			result = Long.parseLong(split[0]);
 			break;
 		}
-		case 1: { // minutes and seconds
+		case 2: { // minutes and seconds
 			final long s = Long.parseLong(split[1]);
 			final long m = Long.parseLong(split[0]);
 			result = m * 60L + s;
