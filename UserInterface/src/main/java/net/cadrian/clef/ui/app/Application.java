@@ -52,6 +52,7 @@ import net.cadrian.clef.ui.app.form.model.SessionFormModel;
 import net.cadrian.clef.ui.app.form.model.WorkFormModel;
 import net.cadrian.clef.ui.app.tab.ConfigurationPanel;
 import net.cadrian.clef.ui.app.tab.DataPane;
+import net.cadrian.clef.ui.app.tab.HelpPanel;
 import net.cadrian.clef.ui.app.tab.StatisticsPanel;
 import net.cadrian.clef.ui.app.tab.filter.SessionFilter;
 
@@ -132,6 +133,7 @@ public class Application extends JFrame {
 	private final DataPane<Activity> activitiesPanel;
 	private final StatisticsPanel statisticsPanel;
 	private final ConfigurationPanel configurationPanel;
+	private final HelpPanel helpPanel;
 
 	public Application(final Beans beans) {
 		final PresentationImpl presentation = new PresentationImpl(this);
@@ -158,6 +160,7 @@ public class Application extends JFrame {
 				null, null, BeanComparators::compareActivities, new ActivityFormModel(Activity.class));
 		statisticsPanel = new StatisticsPanel(context);
 		configurationPanel = new ConfigurationPanel(context);
+		helpPanel = new HelpPanel(context);
 
 		initComponents();
 		pack();
@@ -204,6 +207,7 @@ public class Application extends JFrame {
 		mainPane.addTab(context.getPresentation().getMessage("Management"), mgtPane);
 		mainPane.addTab(context.getPresentation().getMessage("Statistics"), statisticsPanel);
 		mainPane.addTab(context.getPresentation().getMessage("Configuration"), configurationPanel);
+		mainPane.addTab(context.getPresentation().getMessage("Help"), helpPanel);
 
 		mainPane.addChangeListener(new MainPaneRefresher(mgtPane, mainPane));
 
