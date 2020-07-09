@@ -151,6 +151,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		protected void done() {
 			LOGGER.debug("Selecting last element");
 			list.setSelectedIndex(index);
+			list.ensureIndexIsVisible(index);
 		}
 	}
 
@@ -265,6 +266,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		protected void done() {
 			LOGGER.debug("Selecting element #{}", selectedIndex);
 			list.setSelectedIndex(selectedIndex);
+			list.ensureIndexIsVisible(selectedIndex);
 		}
 	}
 
