@@ -111,9 +111,11 @@ public class DataPane<T extends Bean> extends JSplitPane {
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
+			final T selected = list.getSelectedValue();
+			final int selectedIndex = list.getSelectedIndex();
 			layeredPane.remove(beanFilterComponent);
 			SwingUtilities.invokeLater(new PaneRefresher());
-			refreshList(list.getSelectedValue());
+			refreshList(selected, selectedIndex);
 		}
 	}
 
@@ -217,14 +219,15 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		private int selectedIndex = -1;
 
 		private RefreshListWorker(final ApplicationContext context, final BeanGetter<T> beanGetter,
-				final BeanFilter<T> beanFilter, final SortableListModel<T> model, final JList<T> list,
-				final T selected) {
+				final BeanFilter<T> beanFilter, final SortableListModel<T> model, final JList<T> list, final T selected,
+				final int selectedIndex) {
 			this.context = context;
 			this.beanGetter = beanGetter;
 			this.beanFilter = beanFilter;
 			this.model = model;
 			this.list = list;
 			this.selected = selected;
+			this.selectedIndex = selectedIndex;
 		}
 
 		@Override
@@ -255,18 +258,25 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		protected void process(final java.util.List<T> chunks) {
 			for (final T bean : chunks) {
 				LOGGER.debug("Adding element: {} (selected is {})", bean, selected);
-				final int index = model.add(bean);
-				if (bean.isVersionOf(selected)) {
-					selectedIndex = index;
-				}
+				model.add(bean);
 			}
 		}
 
 		@Override
 		protected void done() {
-			LOGGER.debug("Selecting element #{}", selectedIndex);
-			list.setSelectedIndex(selectedIndex);
-			list.ensureIndexIsVisible(selectedIndex);
+			final int size = model.getSize();
+			for (int index = 0; selectedIndex == -1 && index < size; index++) {
+				final T bean = model.getElementAt(index);
+				if (bean.isVersionOf(selected)) {
+					selectedIndex = index;
+				}
+			}
+
+			if (selectedIndex != -1) {
+				LOGGER.debug("Selecting element #{}", selectedIndex);
+				list.setSelectedIndex(selectedIndex);
+				list.ensureIndexIsVisible(selectedIndex);
+			}
 		}
 	}
 
@@ -353,7 +363,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		applicationContextListener = new ApplicationContextListenerImpl();
 		context.addApplicationContextListener(AdvancedConfigurationEntry.offlineMode, applicationContextListener);
 
-		refreshList(null);
+		refreshListNoSelection();
 	}
 
 	public Collection<T> getList() {
@@ -370,13 +380,13 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	}
 
 	public void refresh() {
-		refreshList(getSelection());
+		refreshList(getSelection(), list.getSelectedIndex());
 	}
 
 	public void select(final T pieceVersion, final boolean refresh) {
 		LOGGER.debug("Select piece version: {}", pieceVersion);
 		if (refresh) {
-			refreshList(pieceVersion);
+			refreshList(pieceVersion, -1);
 		} else {
 			installBeanForm(pieceVersion, getTab());
 		}
@@ -442,7 +452,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 						presentation.getMessage("DeleteFailedMessage"), presentation.getMessage("DeleteFailedTitle"),
 						JOptionPane.WARNING_MESSAGE);
 			} finally {
-				refreshList(null);
+				refreshListNoSelection();
 			}
 		}
 	}
@@ -454,7 +464,8 @@ public class DataPane<T extends Bean> extends JSplitPane {
 	private void saveData(final boolean refresh) {
 		LOGGER.debug("{}: <-- {}", beanType.getName(), refresh);
 		final T selected = list.getSelectedValue();
-		LOGGER.debug("selected={}", selected);
+		final int selectedIndex = list.getSelectedIndex();
+		LOGGER.debug("selected={} ({})", selected, selectedIndex);
 		final String tab = getTab();
 		try {
 			formCache.remove(selected);
@@ -476,7 +487,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		} finally {
 			if (refresh) {
 				LOGGER.debug("{}: Refreshing list", beanType.getName());
-				refreshList(selected);
+				refreshList(selected, selectedIndex);
 			} else {
 				LOGGER.debug("{}: Installing new bean form", beanType.getName());
 				installBeanForm(selected, tab);
@@ -498,7 +509,7 @@ public class DataPane<T extends Bean> extends JSplitPane {
 
 	private void move() {
 		beanMover.move(getSelection());
-		refreshList(null);
+		refreshListNoSelection();
 	}
 
 	String getTab() {
@@ -513,12 +524,16 @@ public class DataPane<T extends Bean> extends JSplitPane {
 		return result;
 	}
 
-	void refreshList(final T selected) {
+	void refreshListNoSelection() {
+		refreshList(null, -1);
+	}
+
+	void refreshList(final T selected, final int selectedIndex) {
 		if (context.applicationIsClosing()) {
 			return;
 		}
 		final SwingWorker<Void, T> worker = new RefreshListWorker<>(context, beanGetter, beanFilter, model, list,
-				selected);
+				selected, selectedIndex);
 		LOGGER.debug("Removing all elements");
 		model.removeAll();
 		LOGGER.debug("Adding elements using getter: {} and filter: {}", beanGetter, beanFilter);
